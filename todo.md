@@ -79,3 +79,7 @@
 - [x] GitHub Actions CI/CD pipeline (lint, test, build, docker)
 - [x] Dockerfile for the API (multi-stage build)
 - [x] .dockerignore file
+
+## Deployment
+- [ ] Push project to GitHub repository
+- [ ] Connect repository to Vercel
