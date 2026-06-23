@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 const navLinks = [
   { label: "Features", href: "/features" },
   { label: "Pricing", href: "/pricing" },
+  { label: "Docs", href: "/docs" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
@@ -38,9 +39,9 @@ const footerColumns: {
   {
     title: "Resources",
     links: [
-      { label: "Documentation", href: "/features" },
-      { label: "API reference", href: "/features" },
-      { label: "Guides", href: "/features" },
+      { label: "Documentation", href: "/docs" },
+      { label: "API reference", href: "/docs#api" },
+      { label: "Guides", href: "/docs#quickstart" },
       { label: "Status", href: "/" },
     ],
   },
