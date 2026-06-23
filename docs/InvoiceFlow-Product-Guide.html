@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>InvoiceFlow — Product & Launch Guide</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 10.5pt; line-height: 1.5; color: #1c1d22; margin: 0;
+  }
+  h1 { font-size: 26pt; color: #11121a; margin: 0 0 6pt; letter-spacing: -0.5pt; }
+  h2 {
+    font-size: 16pt; color: #11121a; margin: 22pt 0 8pt;
+    padding-bottom: 4pt; border-bottom: 2px solid #5e6ad2; letter-spacing: -0.3pt;
+  }
+  h3 { font-size: 12pt; color: #2a2b35; margin: 14pt 0 4pt; }
+  p { margin: 0 0 8pt; }
+  ul, ol { margin: 0 0 8pt; padding-left: 18pt; }
+  li { margin: 0 0 3pt; }
+  a { color: #4954c4; text-decoration: none; }
+  code {
+    font-family: "Courier New", monospace; font-size: 9.5pt;
+    background: #f1f2f6; padding: 1px 4px; border-radius: 3px; color: #3a3b48;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 6pt 0 12pt; font-size: 9.5pt; }
+  th, td { border: 1px solid #d8dae2; padding: 5pt 7pt; text-align: left; vertical-align: top; }
+  th { background: #f4f5fa; color: #2a2b35; font-weight: 600; }
+  .muted { color: #6a6d78; }
+  .accent { color: #5e6ad2; font-weight: 600; }
+  .pill {
+    display: inline-block; background: #eceef9; color: #4954c4;
+    padding: 1px 8px; border-radius: 10px; font-size: 8.5pt; font-weight: 600;
+  }
+  .page-break { page-break-before: always; }
+  .cover { padding-top: 60pt; }
+  .cover .logo {
+    display: inline-block; background: #5e6ad2; color: #fff; font-weight: 700;
+    width: 34pt; height: 34pt; text-align: center; line-height: 34pt;
+    border-radius: 8px; font-size: 18pt;
+  }
+  .cover h1 { font-size: 34pt; margin-top: 16pt; }
+  .lead { font-size: 13pt; color: #4a4d59; max-width: 460pt; }
+  .meta-box {
+    border: 1px solid #d8dae2; border-radius: 8px; padding: 12pt 16pt;
+    margin-top: 26pt; background: #fafbfd;
+  }
+  .callout {
+    border-left: 3px solid #5e6ad2; background: #f6f7fc;
+    padding: 8pt 12pt; margin: 10pt 0; border-radius: 0 6px 6px 0;
+  }
+  .footer-note { color: #8a8d98; font-size: 8.5pt; margin-top: 30pt; }
+</style>
+</head>
+<body>
+
+<!-- ───────────────────────── COVER ───────────────────────── -->
+<div class="cover">
+  <span class="logo">I</span>
+  <h1>InvoiceFlow</h1>
+  <p class="lead">Product &amp; Launch Guide — everything you and your clients need to
+  know about what we're building, how it works, and what's required to ship it.</p>
+
+  <div class="meta-box">
+    <table style="border:none; margin:0;">
+      <tr><td style="border:none; width:130pt;"><strong>Prepared for</strong></td><td style="border:none;">InvoiceFlow stakeholders &amp; clients</td></tr>
+      <tr><td style="border:none;"><strong>Product</strong></td><td style="border:none;">InvoiceFlow — online invoicing SaaS</td></tr>
+      <tr><td style="border:none;"><strong>Stage</strong></td><td style="border:none;">Marketing site live; building the multi-tenant product</td></tr>
+      <tr><td style="border:none;"><strong>Stack</strong></td><td style="border:none;">TypeScript · React · Supabase · Polar.sh · Stripe · Resend · Vercel</td></tr>
+      <tr><td style="border:none;"><strong>Date</strong></td><td style="border:none;">June 2026</td></tr>
+    </table>
+  </div>
+  <p class="footer-note">Confidential — for internal and client use. Companion technical
+  docs: PRODUCT_PLAN.md, SETUP_GUIDE.md, API.md in the repository.</p>
+</div>
+
+<!-- ───────────────────────── EXEC SUMMARY ───────────────────────── -->
+<div class="page-break"></div>
+<h2>1. Executive summary</h2>
+<p>InvoiceFlow is a fast, focused <strong>online invoicing platform</strong> for
+freelancers, agencies, and small finance teams. Users create polished, branded invoices,
+send them by email with a built-in payment link, and get paid faster through automated
+reminders — all from a clean, Linear-grade dashboard.</p>
+<p>The public marketing website is <span class="accent">already built and deployable</span>.
+This guide covers building the <strong>actual product</strong>: a secure, multi-tenant
+SaaS with accounts, subscription billing, online payments, automation, and a public API —
+engineered with modern, scalable best practices in TypeScript.</p>
+
+<div class="callout">
+<strong>What "done" looks like (v1):</strong> a customer signs up, creates their
+organization, adds clients, issues invoices, gets paid online, and is billed monthly for
+their plan — with email automation and a documented API, running on infrastructure that
+scales automatically.
+</div>
+
+<h3>Who this is for</h3>
+<ul>
+  <li><strong>You (owner):</strong> understand scope, timeline, costs, and exactly what to set up.</li>
+  <li><strong>Your clients / customers:</strong> understand what the product does, how their
+  data is protected, and how billing &amp; payments work.</li>
+</ul>
+
+<!-- ───────────────────────── PRODUCT ───────────────────────── -->
+<h2>2. What the product does</h2>
+<table>
+  <tr><th style="width:150pt;">Capability</th><th>Description</th></tr>
+  <tr><td>Accounts &amp; teams</td><td>Sign up, create an organization, invite teammates with roles (owner, admin, member, viewer).</td></tr>
+  <tr><td>Clients</td><td>Manage customers, contacts, addresses, and payment terms with full invoice history.</td></tr>
+  <tr><td>Invoices</td><td>Create branded invoices with line items, automatic VAT/tax, multi-currency totals, and PDF export.</td></tr>
+  <tr><td>Send &amp; get paid</td><td>Email invoices with a secure online payment link; clients pay by card/bank; status flips to paid automatically.</td></tr>
+  <tr><td>Automation</td><td>Scheduled reminders before/after due dates; automatic overdue flagging.</td></tr>
+  <tr><td>Dashboard</td><td>Live revenue, outstanding balances, and overdue counts at a glance.</td></tr>
+  <tr><td>Subscriptions</td><td>Self-serve plans (Starter free, Pro, Business) with upgrade/downgrade and tax handled for you.</td></tr>
+  <tr><td>Public API</td><td>Programmatic access to clients, invoices, and payments for integrations.</td></tr>
+</table>
+
+<!-- ───────────────────────── HOW IT WORKS ───────────────────────── -->
+<h2>3. How it works (architecture)</h2>
+<p>The product is built as a <strong>single, typed system</strong> with one shared
+business-logic core serving three entry points: the app UI, a public API, and payment
+webhooks. It runs on serverless infrastructure that scales automatically with demand.</p>
+<table>
+  <tr><th style="width:150pt;">Layer</th><th>Technology</th><th>Role</th></tr>
+  <tr><td>Web app</td><td>React + Vite + Tailwind</td><td>The dashboard &amp; marketing site (already built).</td></tr>
+  <tr><td>API</td><td>tRPC + REST (TypeScript)</td><td>Typed first-party API for the app + a public REST API for integrations.</td></tr>
+  <tr><td>Database</td><td>Supabase Postgres</td><td>All data, isolated per organization with row-level security.</td></tr>
+  <tr><td>Authentication</td><td>Supabase Auth</td><td>Email, magic link, and Google sign-in with secure tokens.</td></tr>
+  <tr><td>Subscriptions</td><td>Polar.sh</td><td>Bills your customers for their plan; handles sales tax/VAT as merchant of record.</td></tr>
+  <tr><td>Invoice payments</td><td>Stripe</td><td>Lets your customers' clients pay invoices online by card/bank.</td></tr>
+  <tr><td>Email</td><td>Resend</td><td>Invoices, receipts, reminders, and team invites.</td></tr>
+  <tr><td>Files</td><td>Supabase Storage</td><td>Stores generated invoice PDFs securely.</td></tr>
+  <tr><td>Hosting &amp; jobs</td><td>Vercel + Vercel Cron</td><td>Global serverless hosting and scheduled automation.</td></tr>
+</table>
+
+<h3>Engineering principles</h3>
+<ul>
+  <li><strong>One service layer, three doors.</strong> App, API, and webhooks share the same
+  validated business logic — no duplication, no drift.</li>
+  <li><strong>Multi-tenant &amp; isolated.</strong> Every record belongs to an organization;
+  database-level security guarantees one customer can never see another's data.</li>
+  <li><strong>Stateless &amp; serverless.</strong> Scales horizontally and automatically; no
+  servers to babysit.</li>
+  <li><strong>Typed end to end.</strong> TypeScript + schema validation catch errors before
+  they reach production.</li>
+</ul>
+
+<!-- ───────────────────────── SECURITY ───────────────────────── -->
+<h2>4. Security &amp; data protection</h2>
+<ul>
+  <li><strong>Per-tenant isolation</strong> enforced at the database level (row-level security).</li>
+  <li><strong>Secure auth</strong> via Supabase (industry-standard JWTs); secrets never in the browser.</li>
+  <li><strong>API keys</strong> stored hashed, shown once, scoped, and revocable.</li>
+  <li><strong>Verified, idempotent webhooks</strong> for all payment events.</li>
+  <li><strong>Input validation</strong> on every request; <strong>rate limiting</strong> on sensitive routes.</li>
+  <li><strong>Encrypted in transit and at rest;</strong> secrets managed in Vercel/Supabase, not in code.</li>
+  <li>A <strong>security review</strong> is run before every release.</li>
+</ul>
+
+<!-- ───────────────────────── SETUP ───────────────────────── -->
+<div class="page-break"></div>
+<h2>5. What you need to set up &amp; connect</h2>
+<p>To go live, a few third-party accounts must be created and connected. Full click-by-click
+steps are in <code>docs/SETUP_GUIDE.md</code>; this is the summary and the order to do them in.</p>
+<table>
+  <tr><th style="width:90pt;">Service</th><th>Purpose</th><th>What you provide</th><th>Order</th></tr>
+  <tr><td>Supabase</td><td>Database, auth, file storage</td><td>Project URL + keys + DB connection</td><td><span class="pill">1st</span></td></tr>
+  <tr><td>Resend</td><td>Sending email</td><td>API key + verified sending domain (DNS)</td><td>2nd</td></tr>
+  <tr><td>Polar.sh</td><td>Subscription billing</td><td>3 products (Starter/Pro/Business) + access token</td><td>3rd</td></tr>
+  <tr><td>Stripe</td><td>Invoice payments</td><td>API keys + webhook secret</td><td>4th</td></tr>
+  <tr><td>Vercel</td><td>Hosting + automation</td><td>Import repo + paste env vars + add domain</td><td>5th</td></tr>
+  <tr><td>Domain</td><td>Your web + email address</td><td>A domain + DNS pointed at Vercel/Resend</td><td>6th</td></tr>
+  <tr><td>Sentry <span class="muted">(optional)</span></td><td>Error monitoring</td><td>Project DSN</td><td>7th</td></tr>
+</table>
+<div class="callout">
+<strong>Do Supabase first.</strong> As soon as the Supabase project exists and its keys are
+shared, engineering begins Phase 1. The remaining accounts can be set up in parallel.
+</div>
+
+<!-- ───────────────────────── ROADMAP ───────────────────────── -->
+<h2>6. Build roadmap &amp; timeline</h2>
+<p>We execute <strong>linearly and ship as we go</strong> — each phase is independently
+deployable, so progress is visible continuously rather than in one big-bang release.</p>
+<table>
+  <tr><th style="width:50pt;">Phase</th><th>Outcome</th><th>Needs from you</th></tr>
+  <tr><td><strong>0 — Done</strong></td><td>Marketing website + deployment config</td><td>—</td></tr>
+  <tr><td><strong>1</strong></td><td>Database + accounts + organizations (multi-tenant foundation)</td><td>Supabase keys</td></tr>
+  <tr><td><strong>2</strong></td><td>Core invoicing &amp; clients live in the multi-tenant app</td><td>—</td></tr>
+  <tr><td><strong>3</strong></td><td>Subscription billing (Polar) + online invoice payments (Stripe)</td><td>Polar + Stripe keys</td></tr>
+  <tr><td><strong>4</strong></td><td>Public REST API + API keys + interactive docs</td><td>—</td></tr>
+  <tr><td><strong>5</strong></td><td>Email automation, reminders, PDF storage</td><td>Resend + domain</td></tr>
+  <tr><td><strong>6 — Launch</strong></td><td>Security review, testing, monitoring → go live</td><td>Sentry (optional)</td></tr>
+  <tr><td><strong>7</strong></td><td>Recurring invoices, multi-currency, audit log, analytics</td><td>—</td></tr>
+</table>
+
+<!-- ───────────────────────── COSTS ───────────────────────── -->
+<h2>7. Running costs (estimate)</h2>
+<p>The stack is chosen to start near-free and scale with revenue. Typical early-stage monthly cost:</p>
+<table>
+  <tr><th style="width:120pt;">Service</th><th>Free tier</th><th>Paid (when you grow)</th></tr>
+  <tr><td>Supabase</td><td>Yes (hobby)</td><td>~$25/mo Pro</td></tr>
+  <tr><td>Vercel</td><td>Yes (hobby)</td><td>~$20/mo Pro</td></tr>
+  <tr><td>Resend</td><td>3,000 emails/mo</td><td>from ~$20/mo</td></tr>
+  <tr><td>Polar.sh</td><td>No monthly fee</td><td>% of subscription revenue (merchant of record)</td></tr>
+  <tr><td>Stripe</td><td>No monthly fee</td><td>~2.9% + 30¢ per payment</td></tr>
+  <tr><td>Domain</td><td>—</td><td>~$12/year</td></tr>
+  <tr><td>Sentry</td><td>Yes</td><td>from ~$26/mo</td></tr>
+</table>
+<p class="muted">Payment processors only charge when you make money. You can launch on free
+tiers and upgrade as usage grows.</p>
+
+<!-- ───────────────────────── NEXT STEPS ───────────────────────── -->
+<h2>8. Immediate next steps</h2>
+<ol>
+  <li><strong>You:</strong> create the Supabase project (Setup Guide §1) and share the keys.</li>
+  <li><strong>You (parallel):</strong> start Resend, Polar, and Stripe accounts.</li>
+  <li><strong>Engineering:</strong> begin Phase 1 (database, auth, organizations) the moment Supabase is ready.</li>
+  <li><strong>Together:</strong> review each phase as it ships; adjust scope toward launch.</li>
+</ol>
+
+<p class="footer-note">InvoiceFlow — Product &amp; Launch Guide · Generated from the project
+repository. For the full technical detail see PRODUCT_PLAN.md, SETUP_GUIDE.md, and API.md.</p>
+
+</body>
+</html>
