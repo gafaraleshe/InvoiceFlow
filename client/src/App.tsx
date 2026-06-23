@@ -21,6 +21,7 @@ import Pricing from "./pages/marketing/Pricing";
 import Features from "./pages/marketing/Features";
 import About from "./pages/marketing/About";
 import Contact from "./pages/marketing/Contact";
+import Docs from "./pages/marketing/Docs";
 import NotFoundMarketing from "./pages/marketing/NotFoundMarketing";
 
 // Path prefixes that belong to the authenticated dashboard app. Everything
@@ -51,6 +52,7 @@ function MarketingArea() {
         <Route path="/pricing" component={Pricing} />
         <Route path="/about" component={About} />
         <Route path="/contact" component={Contact} />
+        <Route path="/docs" component={Docs} />
         <Route component={NotFoundMarketing} />
       </Switch>
     </MarketingLayout>
