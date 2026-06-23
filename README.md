@@ -14,6 +14,24 @@
 
 ---
 
+## 📐 Building the product (roadmap & docs)
+
+We're evolving InvoiceFlow from an app into a **shippable, multi-tenant invoicing SaaS**
+(Supabase Auth + Postgres, Polar.sh subscriptions, Stripe invoice payments, Resend email,
+a public REST API, all on Vercel). Start here:
+
+| Document | What it covers |
+|---|---|
+| [`docs/PRODUCT_PLAN.md`](docs/PRODUCT_PLAN.md) | Architecture, multi-tenant data model, security, scalability, and the phased roadmap |
+| [`docs/SETUP_GUIDE.md`](docs/SETUP_GUIDE.md) | Click-by-click setup for Supabase, Resend, Polar.sh, Stripe, and Vercel (+ env vars) |
+| [`docs/API.md`](docs/API.md) | Public REST API (`/api/v1`) design — auth, resources, pagination, OpenAPI |
+| [`.env.example`](.env.example) | Every environment variable the product needs |
+| [`docs/InvoiceFlow-Product-Guide.pdf`](docs/InvoiceFlow-Product-Guide.pdf) | One-page-per-topic PDF for you **and your clients** — summary, setup, costs, timeline |
+
+> Regenerate the PDF after editing the guide: `node scripts/generate-guide-pdf.mjs`.
+
+---
+
 ## Overview
 
 **InvoiceFlow** is a full-stack invoice management application designed for freelancers and small businesses operating in the UK. It handles the complete invoicing lifecycle — from creating clients and drafting invoices with itemised line items, through automatic UK VAT (20%) calculation, to generating professional invoice documents and emailing them directly to clients via the Resend API.
