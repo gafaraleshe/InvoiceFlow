@@ -53,43 +53,15 @@ export default function DashboardLayout({
     const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY);
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
-  const { loading, user } = useAuth();
+  // Redirects to /login (Supabase) when there's no session.
+  const { loading, user } = useAuth({ redirectOnUnauthenticated: true });
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
   }, [sidebarWidth]);
 
-  if (loading) {
+  if (loading || !user) {
     return <DashboardLayoutSkeleton />;
-  }
-
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-        <div className="flex flex-col items-center gap-8 p-10 max-w-md w-full bg-white rounded-2xl shadow-lg border border-border/50">
-          <div className="flex flex-col items-center gap-4">
-            <div className="text-2xl font-bold tracking-tight text-primary">
-              InvoiceFlow
-            </div>
-            <h1 className="text-xl font-semibold tracking-tight text-center">
-              Sign in to continue
-            </h1>
-            <p className="text-sm text-muted-foreground text-center max-w-sm">
-              Manage your invoices, clients, and payments in one place.
-            </p>
-          </div>
-          <Button
-            onClick={() => {
-              window.location.href = getLoginUrl();
-            }}
-            size="lg"
-            className="w-full shadow-lg hover:shadow-xl transition-all"
-          >
-            Sign in
-          </Button>
-        </div>
-      </div>
-    );
   }
 
   return (

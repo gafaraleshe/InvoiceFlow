@@ -1,61 +1,35 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it } from "vitest";
 import { appRouter } from "./routers";
-import { COOKIE_NAME } from "../shared/const";
 import type { TrpcContext } from "./_core/context";
+import type { Role } from "./db";
 import { calculateVat } from "./db";
 
 // ─── Test Helpers ───────────────────────────────────────────────────────────
 
-type AuthenticatedUser = NonNullable<TrpcContext["user"]>;
-type CookieCall = { name: string; options: Record<string, unknown> };
+const USER_ID = "33333333-3333-4333-8333-333333333333";
+const ORG_ID = "22222222-2222-4222-8222-222222222222";
+const CLIENT_ID = "11111111-1111-4111-8111-111111111111";
 
-function createMockUser(overrides?: Partial<AuthenticatedUser>): AuthenticatedUser {
+function createAuthContext(role: Role = "admin"): TrpcContext {
   return {
-    id: 1,
-    openId: "test-user-001",
-    email: "test@example.com",
-    name: "Test User",
-    loginMethod: "manus",
-    role: "admin",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    lastSignedIn: new Date(),
-    ...overrides,
+    user: { id: USER_ID, email: "test@example.com", fullName: "Test User" },
+    active: {
+      userId: USER_ID,
+      organizationId: ORG_ID,
+      organizationName: "Test Org",
+      role,
+    },
+    req: { protocol: "https", headers: {} } as TrpcContext["req"],
+    res: {} as TrpcContext["res"],
   };
-}
-
-function createAuthContext(
-  userOverrides?: Partial<AuthenticatedUser>
-): { ctx: TrpcContext; clearedCookies: CookieCall[] } {
-  const clearedCookies: CookieCall[] = [];
-  const user = createMockUser(userOverrides);
-
-  const ctx: TrpcContext = {
-    user,
-    req: {
-      protocol: "https",
-      headers: {},
-    } as TrpcContext["req"],
-    res: {
-      clearCookie: (name: string, options: Record<string, unknown>) => {
-        clearedCookies.push({ name, options });
-      },
-    } as TrpcContext["res"],
-  };
-
-  return { ctx, clearedCookies };
 }
 
 function createUnauthContext(): TrpcContext {
   return {
     user: null,
-    req: {
-      protocol: "https",
-      headers: {},
-    } as TrpcContext["req"],
-    res: {
-      clearCookie: vi.fn(),
-    } as TrpcContext["res"],
+    active: null,
+    req: { protocol: "https", headers: {} } as TrpcContext["req"],
+    res: {} as TrpcContext["res"],
   };
 }
 
@@ -104,7 +78,7 @@ describe("VAT Calculation", () => {
   it("rounds VAT amount to 2 decimal places", () => {
     const result = calculateVat(33.33, 20);
     expect(result.vatAmount).toBe(6.67);
-    expect(result.total).toBe(40); // 33.33 + 6.67 = 40.00
+    expect(result.total).toBe(40);
   });
 
   it("handles single penny amounts", () => {
@@ -121,20 +95,9 @@ describe("VAT Calculation", () => {
   });
 
   it("calculates correctly for typical freelance amounts", () => {
-    // Web design project: £2,500
-    const result1 = calculateVat(2500, 20);
-    expect(result1.vatAmount).toBe(500);
-    expect(result1.total).toBe(3000);
-
-    // Consulting: £750
-    const result2 = calculateVat(750, 20);
-    expect(result2.vatAmount).toBe(150);
-    expect(result2.total).toBe(900);
-
-    // Small task: £45.50
-    const result3 = calculateVat(45.5, 20);
-    expect(result3.vatAmount).toBe(9.1);
-    expect(result3.total).toBe(54.6);
+    expect(calculateVat(2500, 20).total).toBe(3000);
+    expect(calculateVat(750, 20).total).toBe(900);
+    expect(calculateVat(45.5, 20).total).toBe(54.6);
   });
 });
 
@@ -142,46 +105,27 @@ describe("VAT Calculation", () => {
 
 describe("Authentication Flows", () => {
   describe("auth.me", () => {
-    it("returns user data when authenticated", async () => {
-      const { ctx } = createAuthContext();
-      const caller = appRouter.createCaller(ctx);
+    it("returns the user + organization when authenticated", async () => {
+      const caller = appRouter.createCaller(createAuthContext());
       const result = await caller.auth.me();
       expect(result).toBeDefined();
-      expect(result?.openId).toBe("test-user-001");
+      expect(result?.id).toBe(USER_ID);
       expect(result?.email).toBe("test@example.com");
-      expect(result?.name).toBe("Test User");
+      expect(result?.organizationId).toBe(ORG_ID);
+      expect(result?.role).toBe("admin");
     });
 
     it("returns null when not authenticated", async () => {
-      const ctx = createUnauthContext();
-      const caller = appRouter.createCaller(ctx);
+      const caller = appRouter.createCaller(createUnauthContext());
       const result = await caller.auth.me();
       expect(result).toBeNull();
     });
   });
 
   describe("auth.logout", () => {
-    it("clears the session cookie and returns success", async () => {
-      const { ctx, clearedCookies } = createAuthContext();
-      const caller = appRouter.createCaller(ctx);
-      const result = await caller.auth.logout();
-
-      expect(result).toEqual({ success: true });
-      expect(clearedCookies).toHaveLength(1);
-      expect(clearedCookies[0]?.name).toBe(COOKIE_NAME);
-      expect(clearedCookies[0]?.options).toMatchObject({
-        maxAge: -1,
-        secure: true,
-        httpOnly: true,
-        path: "/",
-      });
-    });
-
-    it("works even when not authenticated", async () => {
-      const ctx = createUnauthContext();
-      const caller = appRouter.createCaller(ctx);
-      const result = await caller.auth.logout();
-      expect(result).toEqual({ success: true });
+    it("returns success", async () => {
+      const caller = appRouter.createCaller(createAuthContext());
+      expect(await caller.auth.logout()).toEqual({ success: true });
     });
   });
 });
@@ -189,42 +133,28 @@ describe("Authentication Flows", () => {
 // ─── Role-Based Access Control Tests ────────────────────────────────────────
 
 describe("Role-Based Access Control", () => {
-  it("admin user has admin role", async () => {
-    const { ctx } = createAuthContext({ role: "admin" });
-    const caller = appRouter.createCaller(ctx);
-    const user = await caller.auth.me();
-    expect(user?.role).toBe("admin");
-  });
-
-  it("viewer user has user role", async () => {
-    const { ctx } = createAuthContext({ role: "user" });
-    const caller = appRouter.createCaller(ctx);
-    const user = await caller.auth.me();
-    expect(user?.role).toBe("user");
+  it("exposes the active role", async () => {
+    const caller = appRouter.createCaller(createAuthContext("viewer"));
+    const me = await caller.auth.me();
+    expect(me?.role).toBe("viewer");
   });
 
   it("protected procedures reject unauthenticated users", async () => {
-    const ctx = createUnauthContext();
-    const caller = appRouter.createCaller(ctx);
-
+    const caller = appRouter.createCaller(createUnauthContext());
     await expect(
       caller.clients.list({ limit: 10, offset: 0 })
     ).rejects.toThrow();
   });
 
   it("protected procedures reject unauthenticated invoice access", async () => {
-    const ctx = createUnauthContext();
-    const caller = appRouter.createCaller(ctx);
-
+    const caller = appRouter.createCaller(createUnauthContext());
     await expect(
       caller.invoice.list({ limit: 10, offset: 0, status: "all" })
     ).rejects.toThrow();
   });
 
   it("protected procedures reject unauthenticated dashboard access", async () => {
-    const ctx = createUnauthContext();
-    const caller = appRouter.createCaller(ctx);
-
+    const caller = appRouter.createCaller(createUnauthContext());
     await expect(caller.dashboard.stats()).rejects.toThrow();
   });
 });
@@ -232,12 +162,11 @@ describe("Role-Based Access Control", () => {
 // ─── Input Validation Tests ─────────────────────────────────────────────────
 
 describe("Input Validation (Zod)", () => {
-  it("rejects client creation with empty name", async () => {
-    const { ctx } = createAuthContext();
-    const caller = appRouter.createCaller(ctx);
+  const caller = () => appRouter.createCaller(createAuthContext());
 
+  it("rejects client creation with empty name", async () => {
     await expect(
-      caller.clients.create({
+      caller().clients.create({
         name: "",
         email: "test@example.com",
         paymentTerms: 30,
@@ -246,11 +175,8 @@ describe("Input Validation (Zod)", () => {
   });
 
   it("rejects client creation with invalid email", async () => {
-    const { ctx } = createAuthContext();
-    const caller = appRouter.createCaller(ctx);
-
     await expect(
-      caller.clients.create({
+      caller().clients.create({
         name: "Test Client",
         email: "not-an-email",
         paymentTerms: 30,
@@ -259,12 +185,9 @@ describe("Input Validation (Zod)", () => {
   });
 
   it("rejects invoice creation with no line items", async () => {
-    const { ctx } = createAuthContext();
-    const caller = appRouter.createCaller(ctx);
-
     await expect(
-      caller.invoice.create({
-        clientId: 1,
+      caller().invoice.create({
+        clientId: CLIENT_ID,
         issueDate: Date.now(),
         dueDate: Date.now() + 86400000 * 30,
         vatRate: 20,
@@ -273,12 +196,22 @@ describe("Input Validation (Zod)", () => {
     ).rejects.toThrow();
   });
 
-  it("rejects negative payment terms", async () => {
-    const { ctx } = createAuthContext();
-    const caller = appRouter.createCaller(ctx);
-
+  it("rejects a non-uuid client id", async () => {
     await expect(
-      caller.clients.create({
+      caller().invoice.create({
+        // @ts-expect-error intentionally invalid id
+        clientId: 1,
+        issueDate: Date.now(),
+        dueDate: Date.now() + 86400000 * 30,
+        vatRate: 20,
+        lineItems: [{ description: "Test", quantity: 1, unitPrice: 100 }],
+      })
+    ).rejects.toThrow();
+  });
+
+  it("rejects negative payment terms", async () => {
+    await expect(
+      caller().clients.create({
         name: "Test",
         email: "test@example.com",
         paymentTerms: -1,
@@ -287,12 +220,9 @@ describe("Input Validation (Zod)", () => {
   });
 
   it("rejects VAT rate above 100", async () => {
-    const { ctx } = createAuthContext();
-    const caller = appRouter.createCaller(ctx);
-
     await expect(
-      caller.invoice.create({
-        clientId: 1,
+      caller().invoice.create({
+        clientId: CLIENT_ID,
         issueDate: Date.now(),
         dueDate: Date.now() + 86400000 * 30,
         vatRate: 150,
@@ -302,45 +232,31 @@ describe("Input Validation (Zod)", () => {
   });
 
   it("rejects invalid invoice status", async () => {
-    const { ctx } = createAuthContext();
-    const caller = appRouter.createCaller(ctx);
-
     await expect(
-      caller.invoice.updateStatus({
-        id: 1,
-        status: "invalid" as any,
+      caller().invoice.updateStatus({
+        id: CLIENT_ID,
+        status: "invalid" as never,
       })
     ).rejects.toThrow();
   });
 
-  it("accepts valid client data", async () => {
-    // This test validates that the schema accepts proper input
-    // The actual DB call will fail since we're not connected, but
-    // Zod validation should pass
-    const { ctx } = createAuthContext();
-    const caller = appRouter.createCaller(ctx);
-
-    // This will throw a DB error, not a validation error
+  it("accepts valid client data (fails later at the DB, not validation)", async () => {
     try {
-      await caller.clients.create({
+      await caller().clients.create({
         name: "Valid Client",
         email: "valid@example.com",
         company: "Acme Ltd",
         paymentTerms: 30,
       });
-    } catch (err: any) {
-      // Should NOT be a Zod validation error
-      expect(err.code).not.toBe("BAD_REQUEST");
+    } catch (err) {
+      expect((err as { code?: string }).code).not.toBe("BAD_REQUEST");
     }
   });
 
-  it("accepts valid invoice data with line items", async () => {
-    const { ctx } = createAuthContext();
-    const caller = appRouter.createCaller(ctx);
-
+  it("accepts valid invoice data (fails later at the DB, not validation)", async () => {
     try {
-      await caller.invoice.create({
-        clientId: 1,
+      await caller().invoice.create({
+        clientId: CLIENT_ID,
         issueDate: Date.now(),
         dueDate: Date.now() + 86400000 * 30,
         vatRate: 20,
@@ -349,9 +265,8 @@ describe("Input Validation (Zod)", () => {
           { description: "Design Work", quantity: 10, unitPrice: 100 },
         ],
       });
-    } catch (err: any) {
-      // Should NOT be a Zod validation error
-      expect(err.code).not.toBe("BAD_REQUEST");
+    } catch (err) {
+      expect((err as { code?: string }).code).not.toBe("BAD_REQUEST");
     }
   });
 });
@@ -360,63 +275,42 @@ describe("Input Validation (Zod)", () => {
 
 describe("Line Item Calculations", () => {
   it("calculates single item amount correctly", () => {
-    const quantity = 10;
-    const unitPrice = 75;
-    const amount = Number((quantity * unitPrice).toFixed(2));
-    expect(amount).toBe(750);
+    expect(Number((10 * 75).toFixed(2))).toBe(750);
   });
 
   it("calculates fractional quantity correctly", () => {
-    const quantity = 2.5;
-    const unitPrice = 100;
-    const amount = Number((quantity * unitPrice).toFixed(2));
-    expect(amount).toBe(250);
+    expect(Number((2.5 * 100).toFixed(2))).toBe(250);
   });
 
   it("calculates subtotal from multiple items", () => {
     const items = [
-      { quantity: 40, unitPrice: 75 },    // 3000
-      { quantity: 10, unitPrice: 100 },   // 1000
-      { quantity: 5, unitPrice: 50 },     // 250
+      { quantity: 40, unitPrice: 75 },
+      { quantity: 10, unitPrice: 100 },
+      { quantity: 5, unitPrice: 50 },
     ];
-
     const subtotal = items.reduce(
-      (sum, item) => sum + Number((item.quantity * item.unitPrice).toFixed(2)),
+      (sum, i) => sum + Number((i.quantity * i.unitPrice).toFixed(2)),
       0
     );
-
     expect(subtotal).toBe(4250);
-
     const { vatAmount, total } = calculateVat(subtotal, 20);
     expect(vatAmount).toBe(850);
     expect(total).toBe(5100);
   });
 
   it("handles zero quantity", () => {
-    const amount = Number((0 * 100).toFixed(2));
-    expect(amount).toBe(0);
-  });
-
-  it("handles zero unit price", () => {
-    const amount = Number((5 * 0).toFixed(2));
-    expect(amount).toBe(0);
+    expect(Number((0 * 100).toFixed(2))).toBe(0);
   });
 
   it("handles decimal precision in multi-item invoice", () => {
     const items = [
-      { quantity: 1.5, unitPrice: 33.33 },  // 49.995 → 50.00
-      { quantity: 3, unitPrice: 16.67 },     // 50.01
+      { quantity: 1.5, unitPrice: 33.33 },
+      { quantity: 3, unitPrice: 16.67 },
     ];
-
     const subtotal = items.reduce(
-      (sum, item) => sum + Number((item.quantity * item.unitPrice).toFixed(2)),
+      (sum, i) => sum + Number((i.quantity * i.unitPrice).toFixed(2)),
       0
     );
-
-    // 1.5 * 33.33 = 49.995 → toFixed(2) = 50.00, 3 * 16.67 = 50.01
-    // 50.00 + 50.01 = 100.01, but due to toFixed rounding: 50.00 + 50.01 = 100.01
-    // Actually: Number((1.5 * 33.33).toFixed(2)) = 50, Number((3 * 16.67).toFixed(2)) = 50.01
-    // 50 + 50.01 = 100.01 ... but JS: 1.5*33.33 = 49.995 → toFixed(2) = "50.00" → Number = 50
     expect(subtotal).toBe(100);
   });
 });

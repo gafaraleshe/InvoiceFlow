@@ -5,7 +5,7 @@ interface SendInvoiceEmailParams {
   invoiceNumber: string;
   clientName: string;
   total: string;
-  dueDate: Date;
+  dueDate: string | Date;
   pdfUrl: string;
   message?: string;
 }
@@ -18,7 +18,7 @@ function formatCurrency(value: string | number): string {
   }).format(num);
 }
 
-function formatDate(date: Date): string {
+function formatDate(date: string | Date): string {
   return new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
     month: "long",
@@ -113,7 +113,8 @@ export async function sendInvoiceEmail(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: process.env.RESEND_FROM_EMAIL || "InvoiceFlow <invoices@resend.dev>",
+      from:
+        process.env.RESEND_FROM_EMAIL || "InvoiceFlow <invoices@resend.dev>",
       to: [params.to],
       subject: `Invoice ${params.invoiceNumber} — ${formatCurrency(params.total)} due ${formatDate(params.dueDate)}`,
       html,

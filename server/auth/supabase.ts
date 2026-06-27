@@ -2,52 +2,84 @@
  * Supabase Auth verification (Phase 1).
  *
  * The browser authenticates with Supabase and sends the resulting access token
- * to our API as a Bearer token. Here we verify that JWT with the project's
- * `SUPABASE_JWT_SECRET` (HS256) and extract the user identity. This is the
+ * to our API as a Bearer token. We verify that JWT here — this is the
  * server-side trust boundary that replaces the previous Manus OAuth.
  *
- * No network call is needed — verification is local using the shared secret.
+ * Supports both signing schemes:
+ *  - Asymmetric (ES256/RS256) — the modern Supabase default. Verified against
+ *    the project's public JWKS endpoint (no secret needed).
+ *  - HS256 — legacy shared secret via SUPABASE_JWT_SECRET.
  */
-import { jwtVerify } from "jose";
+import { createRemoteJWKSet, jwtVerify } from "jose";
 
 const encoder = new TextEncoder();
 
-function getJwtSecret(): Uint8Array | null {
-  const secret = process.env.SUPABASE_JWT_SECRET;
-  return secret ? encoder.encode(secret) : null;
+const supabaseUrl = (
+  process.env.SUPABASE_URL ??
+  process.env.VITE_SUPABASE_URL ??
+  ""
+).replace(/\/$/, "");
+
+// Lazily-created, cached remote key set for asymmetric verification.
+let jwks: ReturnType<typeof createRemoteJWKSet> | null = null;
+function getJwks() {
+  if (!supabaseUrl) return null;
+  if (!jwks) {
+    jwks = createRemoteJWKSet(
+      new URL(`${supabaseUrl}/auth/v1/.well-known/jwks.json`)
+    );
+  }
+  return jwks;
 }
 
 export interface SupabaseUser {
   id: string; // auth.users.id (uuid)
   email: string | null;
-  role: string | null; // Supabase auth role (e.g. "authenticated")
+  fullName: string | null;
+}
+
+function extractUser(payload: Record<string, unknown>): SupabaseUser | null {
+  if (!payload.sub || typeof payload.sub !== "string") return null;
+  const meta = (payload.user_metadata as Record<string, unknown>) ?? {};
+  return {
+    id: payload.sub,
+    email: (payload.email as string | undefined) ?? null,
+    fullName:
+      (meta.full_name as string | undefined) ??
+      (meta.name as string | undefined) ??
+      null,
+  };
 }
 
 /**
  * Verify a Supabase access token. Returns the user, or null if the token is
- * missing/invalid/expired or the secret isn't configured.
+ * missing/invalid/expired or no verification material is configured.
  */
 export async function verifySupabaseToken(
   token: string | undefined | null
 ): Promise<SupabaseUser | null> {
   if (!token) return null;
-  const secret = getJwtSecret();
-  if (!secret) {
-    console.warn("[auth] SUPABASE_JWT_SECRET not set — cannot verify tokens.");
-    return null;
-  }
 
+  // Legacy HS256 shared secret takes precedence if explicitly configured.
+  const secret = process.env.SUPABASE_JWT_SECRET;
   try {
-    const { payload } = await jwtVerify(token, secret, {
-      // Supabase signs access tokens for the "authenticated" audience.
+    if (secret) {
+      const { payload } = await jwtVerify(token, encoder.encode(secret), {
+        audience: "authenticated",
+      });
+      return extractUser(payload);
+    }
+    const keys = getJwks();
+    if (!keys) {
+      console.warn(
+        "[auth] No SUPABASE_URL or SUPABASE_JWT_SECRET set — cannot verify tokens."
+      );
+      return null;
+    }
+    const { payload } = await jwtVerify(token, keys, {
       audience: "authenticated",
     });
-    if (!payload.sub) return null;
-    return {
-      id: payload.sub,
-      email: (payload.email as string | undefined) ?? null,
-      role: (payload.role as string | undefined) ?? null,
-    };
+    return extractUser(payload);
   } catch {
     return null;
   }
