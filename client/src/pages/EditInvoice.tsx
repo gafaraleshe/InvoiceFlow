@@ -18,17 +18,20 @@ interface LineItemForm {
 }
 
 function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(value);
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+  }).format(value);
 }
 
 export default function EditInvoicePage() {
   const params = useParams<{ id: string }>();
   const [, setLocation] = useLocation();
-  const invoiceId = parseInt(params.id || "0", 10);
+  const invoiceId = params.id ?? "";
 
   const { data: invoice, isLoading } = trpc.invoice.getById.useQuery(
     { id: invoiceId },
-    { enabled: invoiceId > 0 }
+    { enabled: !!invoiceId }
   );
 
   const [issueDate, setIssueDate] = useState("");
@@ -42,7 +45,7 @@ export default function EditInvoicePage() {
     if (invoice && !initialized) {
       setIssueDate(new Date(invoice.issueDate).toISOString().split("T")[0]);
       setDueDate(new Date(invoice.dueDate).toISOString().split("T")[0]);
-      setVatRate(Number(invoice.vatRate));
+      setVatRate(Number(invoice.taxRate));
       setNotes(invoice.notes || "");
       setLineItems(
         invoice.lineItems.map((item: any) => ({
@@ -56,22 +59,32 @@ export default function EditInvoicePage() {
   }, [invoice, initialized]);
 
   const subtotal = useMemo(
-    () => lineItems.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0),
+    () =>
+      lineItems.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0),
     [lineItems]
   );
-  const vatAmount = useMemo(() => Number(((subtotal * vatRate) / 100).toFixed(2)), [subtotal, vatRate]);
-  const total = useMemo(() => Number((subtotal + vatAmount).toFixed(2)), [subtotal, vatAmount]);
+  const vatAmount = useMemo(
+    () => Number(((subtotal * vatRate) / 100).toFixed(2)),
+    [subtotal, vatRate]
+  );
+  const total = useMemo(
+    () => Number((subtotal + vatAmount).toFixed(2)),
+    [subtotal, vatAmount]
+  );
 
   const updateInvoice = trpc.invoice.update.useMutation({
     onSuccess: () => {
       toast.success("Invoice updated");
       setLocation(`/invoices/${invoiceId}`);
     },
-    onError: (err) => toast.error(err.message),
+    onError: err => toast.error(err.message),
   });
 
   const addLineItem = () => {
-    setLineItems([...lineItems, { description: "", quantity: 1, unitPrice: 0 }]);
+    setLineItems([
+      ...lineItems,
+      { description: "", quantity: 1, unitPrice: 0 },
+    ]);
   };
 
   const removeLineItem = (index: number) => {
@@ -79,7 +92,11 @@ export default function EditInvoicePage() {
     setLineItems(lineItems.filter((_, i) => i !== index));
   };
 
-  const updateLineItem = (index: number, field: keyof LineItemForm, value: string | number) => {
+  const updateLineItem = (
+    index: number,
+    field: keyof LineItemForm,
+    value: string | number
+  ) => {
     const updated = [...lineItems];
     updated[index] = { ...updated[index], [field]: value };
     setLineItems(updated);
@@ -88,7 +105,7 @@ export default function EditInvoicePage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const validItems = lineItems.filter((item) => item.description.trim());
+    const validItems = lineItems.filter(item => item.description.trim());
     if (validItems.length === 0) {
       toast.error("Add at least one line item");
       return;
@@ -129,12 +146,16 @@ export default function EditInvoicePage() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setLocation(`/invoices/${invoiceId}`)}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setLocation(`/invoices/${invoiceId}`)}
+        >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
-            Edit {invoice.invoiceNumber}
+            Edit {invoice.number}
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
             Update invoice details and line items
@@ -152,20 +173,39 @@ export default function EditInvoicePage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Issue Date</Label>
-                  <Input type="date" value={issueDate} onChange={(e) => setIssueDate(e.target.value)} />
+                  <Input
+                    type="date"
+                    value={issueDate}
+                    onChange={e => setIssueDate(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Due Date</Label>
-                  <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+                  <Input
+                    type="date"
+                    value={dueDate}
+                    onChange={e => setDueDate(e.target.value)}
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label>VAT Rate (%)</Label>
-                <Input type="number" value={vatRate} onChange={(e) => setVatRate(Number(e.target.value))} min={0} max={100} />
+                <Input
+                  type="number"
+                  value={vatRate}
+                  onChange={e => setVatRate(Number(e.target.value))}
+                  min={0}
+                  max={100}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Notes</Label>
-                <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Additional notes..." rows={3} />
+                <Textarea
+                  value={notes}
+                  onChange={e => setNotes(e.target.value)}
+                  placeholder="Additional notes..."
+                  rows={3}
+                />
               </div>
             </CardContent>
           </Card>
@@ -195,7 +235,12 @@ export default function EditInvoicePage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Line Items</CardTitle>
-            <Button type="button" variant="outline" size="sm" onClick={addLineItem}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addLineItem}
+            >
               <Plus className="h-4 w-4 mr-1.5" />
               Add Item
             </Button>
@@ -212,19 +257,48 @@ export default function EditInvoicePage() {
               {lineItems.map((item, idx) => (
                 <div key={idx} className="grid grid-cols-12 gap-3 items-center">
                   <div className="col-span-5">
-                    <Input placeholder="Description" value={item.description} onChange={(e) => updateLineItem(idx, "description", e.target.value)} />
+                    <Input
+                      placeholder="Description"
+                      value={item.description}
+                      onChange={e =>
+                        updateLineItem(idx, "description", e.target.value)
+                      }
+                    />
                   </div>
                   <div className="col-span-2">
-                    <Input type="number" value={item.quantity} onChange={(e) => updateLineItem(idx, "quantity", Number(e.target.value))} min={0} step="0.01" />
+                    <Input
+                      type="number"
+                      value={item.quantity}
+                      onChange={e =>
+                        updateLineItem(idx, "quantity", Number(e.target.value))
+                      }
+                      min={0}
+                      step="0.01"
+                    />
                   </div>
                   <div className="col-span-2">
-                    <Input type="number" value={item.unitPrice} onChange={(e) => updateLineItem(idx, "unitPrice", Number(e.target.value))} min={0} step="0.01" />
+                    <Input
+                      type="number"
+                      value={item.unitPrice}
+                      onChange={e =>
+                        updateLineItem(idx, "unitPrice", Number(e.target.value))
+                      }
+                      min={0}
+                      step="0.01"
+                    />
                   </div>
                   <div className="col-span-2 text-right font-mono text-sm font-medium">
                     {formatCurrency(item.quantity * item.unitPrice)}
                   </div>
                   <div className="col-span-1 flex justify-end">
-                    <Button type="button" variant="ghost" size="icon" onClick={() => removeLineItem(idx)} disabled={lineItems.length <= 1} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeLineItem(idx)}
+                      disabled={lineItems.length <= 1}
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -235,7 +309,11 @@ export default function EditInvoicePage() {
         </Card>
 
         <div className="flex justify-end gap-3">
-          <Button type="button" variant="outline" onClick={() => setLocation(`/invoices/${invoiceId}`)}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setLocation(`/invoices/${invoiceId}`)}
+          >
             Cancel
           </Button>
           <Button type="submit" disabled={updateInvoice.isPending}>

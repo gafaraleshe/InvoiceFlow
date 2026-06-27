@@ -23,6 +23,7 @@ import About from "./pages/marketing/About";
 import Contact from "./pages/marketing/Contact";
 import Docs from "./pages/marketing/Docs";
 import NotFoundMarketing from "./pages/marketing/NotFoundMarketing";
+import Login from "./pages/Login";
 
 // Path prefixes that belong to the authenticated dashboard app. Everything
 // else is served by the public marketing site.
@@ -80,6 +81,7 @@ function AppArea() {
 
 function Router() {
   const [location] = useLocation();
+  if (location === "/login") return <Login />;
   return isAppPath(location) ? <AppArea /> : <MarketingArea />;
 }
 

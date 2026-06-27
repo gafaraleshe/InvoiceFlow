@@ -25,11 +25,11 @@ export default function CreateClientPage() {
   const [notes, setNotes] = useState("");
 
   const createClient = trpc.clients.create.useMutation({
-    onSuccess: (data) => {
+    onSuccess: data => {
       toast.success("Client created successfully");
       setLocation(`/clients/${data?.id}`);
     },
-    onError: (err) => toast.error(err.message),
+    onError: err => toast.error(err.message),
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -56,7 +56,11 @@ export default function CreateClientPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setLocation("/clients")}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setLocation("/clients")}
+        >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
@@ -76,21 +80,38 @@ export default function CreateClientPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Name *</Label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="John Doe" />
+                <Input
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="John Doe"
+                />
               </div>
               <div className="space-y-2">
                 <Label>Email *</Label>
-                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="john@example.com" />
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="john@example.com"
+                />
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Company</Label>
-                <Input value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Acme Ltd" />
+                <Input
+                  value={company}
+                  onChange={e => setCompany(e.target.value)}
+                  placeholder="Acme Ltd"
+                />
               </div>
               <div className="space-y-2">
                 <Label>Phone</Label>
-                <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+44 20 1234 5678" />
+                <Input
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  placeholder="+44 20 1234 5678"
+                />
               </div>
             </div>
           </CardContent>
@@ -103,24 +124,43 @@ export default function CreateClientPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Address Line 1</Label>
-              <Input value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} placeholder="123 High Street" />
+              <Input
+                value={addressLine1}
+                onChange={e => setAddressLine1(e.target.value)}
+                placeholder="123 High Street"
+              />
             </div>
             <div className="space-y-2">
               <Label>Address Line 2</Label>
-              <Input value={addressLine2} onChange={(e) => setAddressLine2(e.target.value)} placeholder="Suite 4" />
+              <Input
+                value={addressLine2}
+                onChange={e => setAddressLine2(e.target.value)}
+                placeholder="Suite 4"
+              />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>City</Label>
-                <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="London" />
+                <Input
+                  value={city}
+                  onChange={e => setCity(e.target.value)}
+                  placeholder="London"
+                />
               </div>
               <div className="space-y-2">
                 <Label>Postcode</Label>
-                <Input value={postcode} onChange={(e) => setPostcode(e.target.value)} placeholder="SW1A 1AA" />
+                <Input
+                  value={postcode}
+                  onChange={e => setPostcode(e.target.value)}
+                  placeholder="SW1A 1AA"
+                />
               </div>
               <div className="space-y-2">
                 <Label>Country</Label>
-                <Input value={country} onChange={(e) => setCountry(e.target.value)} />
+                <Input
+                  value={country}
+                  onChange={e => setCountry(e.target.value)}
+                />
               </div>
             </div>
           </CardContent>
@@ -133,17 +173,32 @@ export default function CreateClientPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Payment Terms (days)</Label>
-              <Input type="number" value={paymentTerms} onChange={(e) => setPaymentTerms(Number(e.target.value))} min={1} max={365} />
+              <Input
+                type="number"
+                value={paymentTerms}
+                onChange={e => setPaymentTerms(Number(e.target.value))}
+                min={1}
+                max={365}
+              />
             </div>
             <div className="space-y-2">
               <Label>Notes</Label>
-              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Additional notes about this client..." rows={3} />
+              <Textarea
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
+                placeholder="Additional notes about this client..."
+                rows={3}
+              />
             </div>
           </CardContent>
         </Card>
 
         <div className="flex justify-end gap-3">
-          <Button type="button" variant="outline" onClick={() => setLocation("/clients")}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setLocation("/clients")}
+          >
             Cancel
           </Button>
           <Button type="submit" disabled={createClient.isPending}>

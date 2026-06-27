@@ -2,14 +2,14 @@ import { storagePut } from "./storage";
 import { nanoid } from "nanoid";
 
 interface InvoiceForPdf {
-  id: number;
-  invoiceNumber: string;
+  id: string;
+  number: string;
   status: string;
-  issueDate: Date;
-  dueDate: Date;
+  issueDate: string;
+  dueDate: string;
   subtotal: string;
-  vatRate: string;
-  vatAmount: string;
+  taxRate: string;
+  taxAmount: string;
   total: string;
   notes?: string | null;
   clientName?: string | null;
@@ -36,7 +36,7 @@ function formatCurrency(value: string | number): string {
   }).format(num);
 }
 
-function formatDate(date: Date): string {
+function formatDate(date: string | Date): string {
   return new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
     month: "long",
@@ -47,7 +47,7 @@ function formatDate(date: Date): string {
 function generateInvoiceHtml(invoice: InvoiceForPdf): string {
   const lineItemsHtml = invoice.lineItems
     .map(
-      (item) => `
+      item => `
     <tr>
       <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; font-size: 14px; color: #374151;">${item.description}</td>
       <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; font-size: 14px; color: #374151; text-align: center;">${Number(item.quantity).toFixed(2)}</td>
@@ -111,7 +111,7 @@ function generateInvoiceHtml(invoice: InvoiceForPdf): string {
     <div class="header">
       <div class="brand">InvoiceFlow</div>
       <div class="invoice-meta">
-        <div class="invoice-number">${invoice.invoiceNumber}</div>
+        <div class="invoice-number">${invoice.number}</div>
         <span class="status-badge" style="background: ${statusColor}15; color: ${statusColor};">${invoice.status.toUpperCase()}</span>
       </div>
     </div>
@@ -139,7 +139,7 @@ function generateInvoiceHtml(invoice: InvoiceForPdf): string {
       </div>
       <div class="date-item">
         <label>VAT Rate</label>
-        <span>${Number(invoice.vatRate).toFixed(0)}%</span>
+        <span>${Number(invoice.taxRate).toFixed(0)}%</span>
       </div>
     </div>
 
@@ -164,8 +164,8 @@ function generateInvoiceHtml(invoice: InvoiceForPdf): string {
           <span>${formatCurrency(invoice.subtotal)}</span>
         </div>
         <div class="totals-row">
-          <span>VAT (${Number(invoice.vatRate).toFixed(0)}%)</span>
-          <span>${formatCurrency(invoice.vatAmount)}</span>
+          <span>VAT (${Number(invoice.taxRate).toFixed(0)}%)</span>
+          <span>${formatCurrency(invoice.taxAmount)}</span>
         </div>
         <div class="totals-row total">
           <span>Total</span>
@@ -193,7 +193,7 @@ function generateInvoiceHtml(invoice: InvoiceForPdf): string {
 
 export async function generateInvoicePdf(
   invoice: InvoiceForPdf
-): Promise<{ pdfUrl: string; pdfKey: string }> {
+): Promise<{ pdfPath: string }> {
   const html = generateInvoiceHtml(invoice);
 
   // Use the built-in Forge API to convert HTML to PDF
@@ -201,13 +201,9 @@ export async function generateInvoicePdf(
 
   // Try using a simple HTML-to-PDF approach via the server
   // We'll store the HTML as a styled document and use it as the PDF representation
-  const pdfKey = `invoices/${invoice.invoiceNumber}-${nanoid(8)}.html`;
+  const pdfKey = `invoices/${invoice.number}-${nanoid(8)}.html`;
 
-  const { url } = await storagePut(
-    pdfKey,
-    html,
-    "text/html"
-  );
+  const { url } = await storagePut(pdfKey, html, "text/html");
 
-  return { pdfUrl: url, pdfKey };
+  return { pdfPath: url };
 }

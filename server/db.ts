@@ -1,247 +1,286 @@
-import { eq, and, desc, asc, sql, like, inArray } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/mysql2";
+/**
+ * InvoiceFlow data + service layer (Supabase Postgres, multi-tenant).
+ *
+ * Every function is scoped to an `organizationId`. The tRPC layer resolves the
+ * caller's active org from their Supabase identity (see _core/context.ts) and
+ * passes it here — business logic never trusts a client-supplied org.
+ *
+ * Money is stored as Postgres numeric (strings); we convert to Number only for
+ * arithmetic to avoid float drift.
+ */
+import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { db } from "./db/client";
 import {
-  InsertUser,
-  users,
   clients,
   invoices,
   lineItems,
+  memberships,
+  organizations,
+  users,
   type InsertClient,
   type InsertInvoice,
-  type InsertLineItem,
-  type Client,
-  type Invoice,
-  type LineItem,
-} from "../drizzle/schema";
-import { ENV } from "./_core/env";
+} from "./db/schema";
 
-let _db: ReturnType<typeof drizzle> | null = null;
+/* ── pure helpers (unit-tested) ─────────────────────────────────────────── */
 
-export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
-    try {
-      _db = drizzle(process.env.DATABASE_URL);
-    } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
-      _db = null;
-    }
-  }
-  return _db;
+export function calculateVat(subtotal: number, vatRate: number = 20) {
+  const vatAmount = Number(((subtotal * vatRate) / 100).toFixed(2));
+  const total = Number((subtotal + vatAmount).toFixed(2));
+  return { subtotal, vatRate, vatAmount, total };
 }
 
-// ─── Users ──────────────────────────────────────────────────────────────────
-
-export async function upsertUser(user: InsertUser): Promise<void> {
-  if (!user.openId) {
-    throw new Error("User openId is required for upsert");
-  }
-
-  const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot upsert user: database not available");
-    return;
-  }
-
-  try {
-    const values: InsertUser = {
-      openId: user.openId,
-    };
-    const updateSet: Record<string, unknown> = {};
-
-    const textFields = ["name", "email", "loginMethod"] as const;
-    type TextField = (typeof textFields)[number];
-
-    const assignNullable = (field: TextField) => {
-      const value = user[field];
-      if (value === undefined) return;
-      const normalized = value ?? null;
-      values[field] = normalized;
-      updateSet[field] = normalized;
-    };
-
-    textFields.forEach(assignNullable);
-
-    if (user.lastSignedIn !== undefined) {
-      values.lastSignedIn = user.lastSignedIn;
-      updateSet.lastSignedIn = user.lastSignedIn;
-    }
-    if (user.role !== undefined) {
-      values.role = user.role;
-      updateSet.role = user.role;
-    } else if (user.openId === ENV.ownerOpenId) {
-      values.role = "admin";
-      updateSet.role = "admin";
-    }
-
-    if (!values.lastSignedIn) {
-      values.lastSignedIn = new Date();
-    }
-
-    if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date();
-    }
-
-    await db
-      .insert(users)
-      .values(values)
-      .onDuplicateKeyUpdate({
-        set: updateSet,
-      });
-  } catch (error) {
-    console.error("[Database] Failed to upsert user:", error);
-    throw error;
-  }
+function slugify(name: string): string {
+  return (
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60) || "team"
+  );
 }
 
-export async function getUserByOpenId(openId: string) {
-  const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot get user: database not available");
-    return undefined;
-  }
+/* ── identity & organizations ───────────────────────────────────────────── */
 
-  const result = await db
-    .select()
-    .from(users)
-    .where(eq(users.openId, openId))
-    .limit(1);
+export type Role = "owner" | "admin" | "member" | "viewer";
 
-  return result.length > 0 ? result[0] : undefined;
+export interface ActiveContext {
+  userId: string;
+  organizationId: string;
+  organizationName: string;
+  role: Role;
 }
 
-// ─── Clients ────────────────────────────────────────────────────────────────
+/** Mirror a Supabase auth user into our `users` table (idempotent). */
+export async function syncUser(u: {
+  id: string;
+  email: string;
+  fullName?: string | null;
+  avatarUrl?: string | null;
+}) {
+  await db
+    .insert(users)
+    .values({
+      id: u.id,
+      email: u.email,
+      fullName: u.fullName ?? null,
+      avatarUrl: u.avatarUrl ?? null,
+    })
+    .onConflictDoUpdate({
+      target: users.id,
+      set: { email: u.email, updatedAt: new Date() },
+    });
+}
+
+export async function getMemberships(userId: string) {
+  return db
+    .select({
+      organizationId: memberships.organizationId,
+      role: memberships.role,
+      name: organizations.name,
+      slug: organizations.slug,
+      plan: organizations.plan,
+    })
+    .from(memberships)
+    .innerJoin(organizations, eq(memberships.organizationId, organizations.id))
+    .where(eq(memberships.userId, userId))
+    .orderBy(asc(organizations.createdAt));
+}
+
+/** Create an organization and make `ownerUserId` its owner. */
+export async function createOrganization(name: string, ownerUserId: string) {
+  return db.transaction(async tx => {
+    let slug = slugify(name);
+    const exists = await tx
+      .select({ id: organizations.id })
+      .from(organizations)
+      .where(eq(organizations.slug, slug))
+      .limit(1);
+    if (exists.length)
+      slug = `${slug}-${Math.random().toString(36).slice(2, 6)}`;
+
+    const [org] = await tx
+      .insert(organizations)
+      .values({ name, slug })
+      .returning();
+    await tx
+      .insert(memberships)
+      .values({ organizationId: org.id, userId: ownerUserId, role: "owner" });
+    return org;
+  });
+}
+
+/**
+ * Resolve the caller's active organization, bootstrapping a personal workspace
+ * on first login. Returns the context used to scope every query.
+ */
+export async function resolveActiveContext(
+  user: { id: string; email: string; fullName?: string | null },
+  requestedOrgId?: string | null
+): Promise<ActiveContext> {
+  await syncUser(user);
+  let mine = await getMemberships(user.id);
+
+  if (mine.length === 0) {
+    const defaultName = user.fullName?.trim()
+      ? `${user.fullName.split(" ")[0]}'s workspace`
+      : "My workspace";
+    await createOrganization(defaultName, user.id);
+    mine = await getMemberships(user.id);
+  }
+
+  const chosen =
+    (requestedOrgId && mine.find(m => m.organizationId === requestedOrgId)) ||
+    mine[0];
+
+  return {
+    userId: user.id,
+    organizationId: chosen.organizationId,
+    organizationName: chosen.name,
+    role: chosen.role,
+  };
+}
+
+/* ── clients ────────────────────────────────────────────────────────────── */
 
 export async function getClients(
-  userId: number,
+  orgId: string,
   opts?: { search?: string; limit?: number; offset?: number }
 ) {
-  const db = await getDb();
-  if (!db) return [];
-
-  const conditions = [eq(clients.userId, userId)];
+  const conditions = [eq(clients.organizationId, orgId)];
   if (opts?.search) {
+    const q = `%${opts.search}%`;
     conditions.push(
-      sql`(${clients.name} LIKE ${`%${opts.search}%`} OR ${clients.email} LIKE ${`%${opts.search}%`} OR ${clients.company} LIKE ${`%${opts.search}%`})`
+      or(
+        ilike(clients.name, q),
+        ilike(clients.email, q),
+        ilike(clients.company, q)
+      )!
     );
   }
-
-  const query = db
+  return db
     .select()
     .from(clients)
     .where(and(...conditions))
-    .orderBy(desc(clients.updatedAt));
-
-  if (opts?.limit) query.limit(opts.limit);
-  if (opts?.offset) query.offset(opts.offset);
-
-  return query;
+    .orderBy(desc(clients.updatedAt))
+    .limit(opts?.limit ?? 50)
+    .offset(opts?.offset ?? 0);
 }
 
-export async function getClientCount(userId: number, search?: string) {
-  const db = await getDb();
-  if (!db) return 0;
-
-  const conditions = [eq(clients.userId, userId)];
+export async function getClientCount(orgId: string, search?: string) {
+  const conditions = [eq(clients.organizationId, orgId)];
   if (search) {
+    const q = `%${search}%`;
     conditions.push(
-      sql`(${clients.name} LIKE ${`%${search}%`} OR ${clients.email} LIKE ${`%${search}%`} OR ${clients.company} LIKE ${`%${search}%`})`
+      or(
+        ilike(clients.name, q),
+        ilike(clients.email, q),
+        ilike(clients.company, q)
+      )!
     );
   }
-
-  const result = await db
-    .select({ count: sql<number>`count(*)` })
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
     .from(clients)
     .where(and(...conditions));
-
-  return result[0]?.count ?? 0;
+  return row?.count ?? 0;
 }
 
-export async function getClientById(id: number, userId: number) {
-  const db = await getDb();
-  if (!db) return undefined;
-
-  const result = await db
+export async function getClientById(id: string, orgId: string) {
+  const [row] = await db
     .select()
     .from(clients)
-    .where(and(eq(clients.id, id), eq(clients.userId, userId)))
+    .where(and(eq(clients.id, id), eq(clients.organizationId, orgId)))
     .limit(1);
-
-  return result[0];
+  return row;
 }
 
-export async function createClient(data: InsertClient) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  const result = await db.insert(clients).values(data);
-  const insertId = result[0].insertId;
-  return getClientById(insertId, data.userId);
+export async function createClient(
+  orgId: string,
+  data: Omit<InsertClient, "id" | "organizationId" | "createdAt" | "updatedAt">
+) {
+  const [row] = await db
+    .insert(clients)
+    .values({ ...data, organizationId: orgId })
+    .returning();
+  return row;
 }
 
 export async function updateClient(
-  id: number,
-  userId: number,
-  data: Partial<Omit<InsertClient, "id" | "userId" | "createdAt">>
+  id: string,
+  orgId: string,
+  data: Partial<Omit<InsertClient, "id" | "organizationId" | "createdAt">>
 ) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  await db
+  const [row] = await db
     .update(clients)
-    .set(data)
-    .where(and(eq(clients.id, id), eq(clients.userId, userId)));
-
-  return getClientById(id, userId);
+    .set({ ...data, updatedAt: new Date() })
+    .where(and(eq(clients.id, id), eq(clients.organizationId, orgId)))
+    .returning();
+  return row;
 }
 
-export async function deleteClient(id: number, userId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  // Check if client has invoices
-  const invoiceCount = await db
-    .select({ count: sql<number>`count(*)` })
+export async function deleteClient(id: string, orgId: string) {
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
     .from(invoices)
-    .where(and(eq(invoices.clientId, id), eq(invoices.userId, userId)));
-
-  if ((invoiceCount[0]?.count ?? 0) > 0) {
+    .where(and(eq(invoices.clientId, id), eq(invoices.organizationId, orgId)));
+  if ((row?.count ?? 0) > 0) {
     throw new Error("Cannot delete client with existing invoices");
   }
-
   await db
     .delete(clients)
-    .where(and(eq(clients.id, id), eq(clients.userId, userId)));
-
+    .where(and(eq(clients.id, id), eq(clients.organizationId, orgId)));
   return { success: true };
 }
 
-// ─── Invoices ───────────────────────────────────────────────────────────────
+/* ── invoices ───────────────────────────────────────────────────────────── */
+
+type InvoiceInput = {
+  clientId: string;
+  issueDate: string; // YYYY-MM-DD
+  dueDate: string; // YYYY-MM-DD
+  vatRate: number;
+  currency?: string;
+  notes?: string | null;
+};
+type LineItemInput = {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  sortOrder?: number;
+};
+
+function priceLineItems(items: LineItemInput[]) {
+  let subtotal = 0;
+  const processed = items.map((item, idx) => {
+    const amount = Number((item.quantity * item.unitPrice).toFixed(2));
+    subtotal += amount;
+    return {
+      description: item.description,
+      quantity: String(item.quantity),
+      unitPrice: String(item.unitPrice),
+      amount: String(amount),
+      sortOrder: item.sortOrder ?? idx,
+    };
+  });
+  return { subtotal: Number(subtotal.toFixed(2)), processed };
+}
 
 export async function getInvoices(
-  userId: number,
+  orgId: string,
   opts?: {
     status?: string;
-    clientId?: number;
+    clientId?: string;
     search?: string;
     limit?: number;
     offset?: number;
   }
 ) {
-  const db = await getDb();
-  if (!db) return [];
-
-  const conditions = [eq(invoices.userId, userId)];
+  const conditions = [eq(invoices.organizationId, orgId)];
   if (opts?.status && opts.status !== "all") {
-    conditions.push(eq(invoices.status, opts.status as any));
+    conditions.push(eq(invoices.status, opts.status as never));
   }
-  if (opts?.clientId) {
-    conditions.push(eq(invoices.clientId, opts.clientId));
-  }
-  if (opts?.search) {
-    conditions.push(
-      sql`(${invoices.invoiceNumber} LIKE ${`%${opts.search}%`})`
-    );
-  }
+  if (opts?.clientId) conditions.push(eq(invoices.clientId, opts.clientId));
+  if (opts?.search) conditions.push(ilike(invoices.number, `%${opts.search}%`));
 
   const rows = await db
     .select({
@@ -257,7 +296,7 @@ export async function getInvoices(
     .limit(opts?.limit ?? 50)
     .offset(opts?.offset ?? 0);
 
-  return rows.map((r) => ({
+  return rows.map(r => ({
     ...r.invoice,
     clientName: r.clientName,
     clientEmail: r.clientEmail,
@@ -266,34 +305,24 @@ export async function getInvoices(
 }
 
 export async function getInvoiceCount(
-  userId: number,
+  orgId: string,
   status?: string,
-  clientId?: number
+  clientId?: string
 ) {
-  const db = await getDb();
-  if (!db) return 0;
-
-  const conditions = [eq(invoices.userId, userId)];
+  const conditions = [eq(invoices.organizationId, orgId)];
   if (status && status !== "all") {
-    conditions.push(eq(invoices.status, status as any));
+    conditions.push(eq(invoices.status, status as never));
   }
-  if (clientId) {
-    conditions.push(eq(invoices.clientId, clientId));
-  }
-
-  const result = await db
-    .select({ count: sql<number>`count(*)` })
+  if (clientId) conditions.push(eq(invoices.clientId, clientId));
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
     .from(invoices)
     .where(and(...conditions));
-
-  return result[0]?.count ?? 0;
+  return row?.count ?? 0;
 }
 
-export async function getInvoiceById(id: number, userId: number) {
-  const db = await getDb();
-  if (!db) return undefined;
-
-  const rows = await db
+export async function getInvoiceById(id: string, orgId: string) {
+  const [row] = await db
     .select({
       invoice: invoices,
       clientName: clients.name,
@@ -307,10 +336,9 @@ export async function getInvoiceById(id: number, userId: number) {
     })
     .from(invoices)
     .leftJoin(clients, eq(invoices.clientId, clients.id))
-    .where(and(eq(invoices.id, id), eq(invoices.userId, userId)))
+    .where(and(eq(invoices.id, id), eq(invoices.organizationId, orgId)))
     .limit(1);
-
-  if (!rows[0]) return undefined;
+  if (!row) return undefined;
 
   const items = await db
     .select()
@@ -319,270 +347,184 @@ export async function getInvoiceById(id: number, userId: number) {
     .orderBy(asc(lineItems.sortOrder));
 
   return {
-    ...rows[0].invoice,
-    clientName: rows[0].clientName,
-    clientEmail: rows[0].clientEmail,
-    clientCompany: rows[0].clientCompany,
-    clientAddressLine1: rows[0].clientAddressLine1,
-    clientAddressLine2: rows[0].clientAddressLine2,
-    clientCity: rows[0].clientCity,
-    clientPostcode: rows[0].clientPostcode,
-    clientCountry: rows[0].clientCountry,
+    ...row.invoice,
+    clientName: row.clientName,
+    clientEmail: row.clientEmail,
+    clientCompany: row.clientCompany,
+    clientAddressLine1: row.clientAddressLine1,
+    clientAddressLine2: row.clientAddressLine2,
+    clientCity: row.clientCity,
+    clientPostcode: row.clientPostcode,
+    clientCountry: row.clientCountry,
     lineItems: items,
   };
 }
 
-export async function generateInvoiceNumber(userId: number): Promise<string> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
+async function nextInvoiceNumber(
+  tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+  orgId: string
+): Promise<string> {
+  const [org] = await tx
+    .update(organizations)
+    .set({ invoiceSeq: sql`${organizations.invoiceSeq} + 1` })
+    .where(eq(organizations.id, orgId))
+    .returning({ seq: organizations.invoiceSeq });
   const year = new Date().getFullYear();
-  const prefix = `INV-${year}-`;
-
-  const result = await db
-    .select({ invoiceNumber: invoices.invoiceNumber })
-    .from(invoices)
-    .where(
-      and(
-        eq(invoices.userId, userId),
-        sql`${invoices.invoiceNumber} LIKE ${`${prefix}%`}`
-      )
-    )
-    .orderBy(desc(invoices.invoiceNumber))
-    .limit(1);
-
-  let nextNum = 1;
-  if (result[0]) {
-    const lastNum = parseInt(result[0].invoiceNumber.replace(prefix, ""), 10);
-    if (!isNaN(lastNum)) nextNum = lastNum + 1;
-  }
-
-  return `${prefix}${String(nextNum).padStart(3, "0")}`;
-}
-
-export function calculateVat(subtotal: number, vatRate: number = 20) {
-  const vatAmount = Number(((subtotal * vatRate) / 100).toFixed(2));
-  const total = Number((subtotal + vatAmount).toFixed(2));
-  return { subtotal, vatRate, vatAmount, total };
+  return `INV-${year}-${String(org.seq).padStart(3, "0")}`;
 }
 
 export async function createInvoice(
-  data: Omit<InsertInvoice, "id" | "createdAt" | "updatedAt">,
-  items: Omit<InsertLineItem, "id" | "invoiceId" | "createdAt">[]
+  orgId: string,
+  data: InvoiceInput,
+  items: LineItemInput[]
 ) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  const { subtotal, processed } = priceLineItems(items);
+  const { vatRate, vatAmount, total } = calculateVat(subtotal, data.vatRate);
 
-  // Calculate line item amounts and subtotal
-  let subtotal = 0;
-  const processedItems = items.map((item, idx) => {
-    const amount = Number(
-      (Number(item.quantity) * Number(item.unitPrice)).toFixed(2)
-    );
-    subtotal += amount;
-    return {
-      ...item,
-      amount: String(amount),
-      quantity: String(item.quantity),
-      unitPrice: String(item.unitPrice),
-      sortOrder: item.sortOrder ?? idx,
-    };
+  const id = await db.transaction(async tx => {
+    const number = await nextInvoiceNumber(tx, orgId);
+    const [inv] = await tx
+      .insert(invoices)
+      .values({
+        organizationId: orgId,
+        clientId: data.clientId,
+        number,
+        currency: data.currency ?? "GBP",
+        issueDate: data.issueDate,
+        dueDate: data.dueDate,
+        notes: data.notes ?? null,
+        subtotal: String(subtotal),
+        taxRate: String(vatRate),
+        taxAmount: String(vatAmount),
+        total: String(total),
+      } satisfies InsertInvoice)
+      .returning({ id: invoices.id });
+    if (processed.length) {
+      await tx
+        .insert(lineItems)
+        .values(processed.map(p => ({ ...p, invoiceId: inv.id })));
+    }
+    return inv.id;
   });
 
-  const { vatRate, vatAmount, total } = calculateVat(
-    subtotal,
-    Number(data.vatRate ?? 20)
-  );
-
-  const result = await db.insert(invoices).values({
-    ...data,
-    subtotal: String(subtotal),
-    vatRate: String(vatRate),
-    vatAmount: String(vatAmount),
-    total: String(total),
-  });
-
-  const invoiceId = result[0].insertId;
-
-  if (processedItems.length > 0) {
-    await db.insert(lineItems).values(
-      processedItems.map((item) => ({
-        ...item,
-        invoiceId,
-      }))
-    );
-  }
-
-  return getInvoiceById(invoiceId, data.userId);
+  return getInvoiceById(id, orgId);
 }
 
 export async function updateInvoice(
-  id: number,
-  userId: number,
-  data: Partial<Omit<InsertInvoice, "id" | "userId" | "createdAt">>,
-  items?: Omit<InsertLineItem, "id" | "invoiceId" | "createdAt">[]
+  id: string,
+  orgId: string,
+  data: Partial<InvoiceInput>,
+  items?: LineItemInput[]
 ) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  const patch: Record<string, unknown> = { updatedAt: new Date() };
+  if (data.clientId) patch.clientId = data.clientId;
+  if (data.issueDate) patch.issueDate = data.issueDate;
+  if (data.dueDate) patch.dueDate = data.dueDate;
+  if (data.notes !== undefined) patch.notes = data.notes;
 
   if (items !== undefined) {
-    // Recalculate totals from line items
-    let subtotal = 0;
-    const processedItems = items.map((item, idx) => {
-      const amount = Number(
-        (Number(item.quantity) * Number(item.unitPrice)).toFixed(2)
-      );
-      subtotal += amount;
-      return {
-        ...item,
-        amount: String(amount),
-        quantity: String(item.quantity),
-        unitPrice: String(item.unitPrice),
-        sortOrder: item.sortOrder ?? idx,
-      };
-    });
-
+    const { subtotal, processed } = priceLineItems(items);
     const { vatRate, vatAmount, total } = calculateVat(
       subtotal,
-      Number(data.vatRate ?? 20)
+      data.vatRate ?? 20
     );
-
-    // Delete old line items and insert new ones
-    await db.delete(lineItems).where(eq(lineItems.invoiceId, id));
-
-    if (processedItems.length > 0) {
-      await db.insert(lineItems).values(
-        processedItems.map((item) => ({
-          ...item,
-          invoiceId: id,
-        }))
-      );
-    }
-
-    await db
-      .update(invoices)
-      .set({
-        ...data,
-        subtotal: String(subtotal),
-        vatRate: String(vatRate),
-        vatAmount: String(vatAmount),
-        total: String(total),
-      })
-      .where(and(eq(invoices.id, id), eq(invoices.userId, userId)));
+    await db.transaction(async tx => {
+      await tx.delete(lineItems).where(eq(lineItems.invoiceId, id));
+      if (processed.length) {
+        await tx
+          .insert(lineItems)
+          .values(processed.map(p => ({ ...p, invoiceId: id })));
+      }
+      await tx
+        .update(invoices)
+        .set({
+          ...patch,
+          subtotal: String(subtotal),
+          taxRate: String(vatRate),
+          taxAmount: String(vatAmount),
+          total: String(total),
+        })
+        .where(and(eq(invoices.id, id), eq(invoices.organizationId, orgId)));
+    });
   } else {
     await db
       .update(invoices)
-      .set(data)
-      .where(and(eq(invoices.id, id), eq(invoices.userId, userId)));
+      .set(patch)
+      .where(and(eq(invoices.id, id), eq(invoices.organizationId, orgId)));
   }
-
-  return getInvoiceById(id, userId);
+  return getInvoiceById(id, orgId);
 }
 
 export async function updateInvoiceStatus(
-  id: number,
-  userId: number,
+  id: string,
+  orgId: string,
   status: "draft" | "sent" | "paid" | "overdue"
 ) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  const updateData: Record<string, any> = { status };
-  if (status === "sent") updateData.sentAt = new Date();
-  if (status === "paid") updateData.paidAt = new Date();
-
+  const patch: Record<string, unknown> = { status, updatedAt: new Date() };
+  if (status === "sent") patch.sentAt = new Date();
+  if (status === "paid") patch.paidAt = new Date();
   await db
     .update(invoices)
-    .set(updateData)
-    .where(and(eq(invoices.id, id), eq(invoices.userId, userId)));
-
-  return getInvoiceById(id, userId);
+    .set(patch)
+    .where(and(eq(invoices.id, id), eq(invoices.organizationId, orgId)));
+  return getInvoiceById(id, orgId);
 }
 
-export async function deleteInvoice(id: number, userId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  // Delete line items first
-  await db.delete(lineItems).where(eq(lineItems.invoiceId, id));
-  // Delete invoice
+export async function deleteInvoice(id: string, orgId: string) {
   await db
     .delete(invoices)
-    .where(and(eq(invoices.id, id), eq(invoices.userId, userId)));
-
+    .where(and(eq(invoices.id, id), eq(invoices.organizationId, orgId)));
   return { success: true };
 }
 
-// ─── Dashboard Stats ────────────────────────────────────────────────────────
+export async function updateInvoicePdf(
+  id: string,
+  orgId: string,
+  pdfPath: string
+) {
+  await db
+    .update(invoices)
+    .set({ pdfPath })
+    .where(and(eq(invoices.id, id), eq(invoices.organizationId, orgId)));
+}
 
-export async function getDashboardStats(userId: number) {
-  const db = await getDb();
-  if (!db)
-    return {
-      totalRevenue: 0,
-      outstanding: 0,
-      overdueCount: 0,
-      paidCount: 0,
-      clientCount: 0,
-      invoiceCount: 0,
-    };
+/* ── dashboard & jobs ───────────────────────────────────────────────────── */
 
-  const [revenueResult] = await db
+export async function getDashboardStats(orgId: string) {
+  const [rev] = await db
     .select({
-      totalPaid: sql<string>`COALESCE(SUM(CASE WHEN ${invoices.status} = 'paid' THEN ${invoices.total} ELSE 0 END), 0)`,
-      totalOutstanding: sql<string>`COALESCE(SUM(CASE WHEN ${invoices.status} IN ('sent', 'overdue') THEN ${invoices.total} ELSE 0 END), 0)`,
-      overdueCount: sql<number>`SUM(CASE WHEN ${invoices.status} = 'overdue' THEN 1 ELSE 0 END)`,
-      paidCount: sql<number>`SUM(CASE WHEN ${invoices.status} = 'paid' THEN 1 ELSE 0 END)`,
-      invoiceCount: sql<number>`count(*)`,
+      totalPaid: sql<string>`coalesce(sum(case when ${invoices.status} = 'paid' then ${invoices.total} else 0 end), 0)`,
+      totalOutstanding: sql<string>`coalesce(sum(case when ${invoices.status} in ('sent','overdue') then ${invoices.total} else 0 end), 0)`,
+      overdueCount: sql<number>`coalesce(sum(case when ${invoices.status} = 'overdue' then 1 else 0 end), 0)::int`,
+      paidCount: sql<number>`coalesce(sum(case when ${invoices.status} = 'paid' then 1 else 0 end), 0)::int`,
+      invoiceCount: sql<number>`count(*)::int`,
     })
     .from(invoices)
-    .where(eq(invoices.userId, userId));
+    .where(eq(invoices.organizationId, orgId));
 
-  const [clientResult] = await db
-    .select({ count: sql<number>`count(*)` })
+  const [cl] = await db
+    .select({ count: sql<number>`count(*)::int` })
     .from(clients)
-    .where(eq(clients.userId, userId));
+    .where(eq(clients.organizationId, orgId));
 
   return {
-    totalRevenue: Number(revenueResult?.totalPaid ?? 0),
-    outstanding: Number(revenueResult?.totalOutstanding ?? 0),
-    overdueCount: Number(revenueResult?.overdueCount ?? 0),
-    paidCount: Number(revenueResult?.paidCount ?? 0),
-    clientCount: Number(clientResult?.count ?? 0),
-    invoiceCount: Number(revenueResult?.invoiceCount ?? 0),
+    totalRevenue: Number(rev?.totalPaid ?? 0),
+    outstanding: Number(rev?.totalOutstanding ?? 0),
+    overdueCount: Number(rev?.overdueCount ?? 0),
+    paidCount: Number(rev?.paidCount ?? 0),
+    clientCount: Number(cl?.count ?? 0),
+    invoiceCount: Number(rev?.invoiceCount ?? 0),
   };
 }
 
-// ─── Overdue Check ──────────────────────────────────────────────────────────
-
+/** Flip sent invoices past their due date to overdue (all orgs). */
 export async function flagOverdueInvoices() {
-  const db = await getDb();
-  if (!db) return 0;
-
-  const result = await db
+  const rows = await db
     .update(invoices)
     .set({ status: "overdue" })
     .where(
-      and(
-        eq(invoices.status, "sent"),
-        sql`${invoices.dueDate} < NOW()`
-      )
-    );
-
-  return result[0].affectedRows ?? 0;
-}
-
-export async function updateInvoicePdf(
-  id: number,
-  userId: number,
-  pdfUrl: string,
-  pdfKey: string
-) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  await db
-    .update(invoices)
-    .set({ pdfUrl, pdfKey })
-    .where(and(eq(invoices.id, id), eq(invoices.userId, userId)));
+      and(eq(invoices.status, "sent"), sql`${invoices.dueDate} < current_date`)
+    )
+    .returning({ id: invoices.id });
+  return rows.length;
 }

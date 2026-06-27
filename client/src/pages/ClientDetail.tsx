@@ -9,11 +9,18 @@ import { toast } from "sonner";
 
 function formatCurrency(value: number | string): string {
   const num = typeof value === "string" ? parseFloat(value) : value;
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(num);
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+  }).format(num);
 }
 
 function formatDate(date: Date | string): string {
-  return new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(date));
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(date));
 }
 
 const statusColors: Record<string, string> = {
@@ -26,16 +33,16 @@ const statusColors: Record<string, string> = {
 export default function ClientDetailPage() {
   const params = useParams<{ id: string }>();
   const [, setLocation] = useLocation();
-  const clientId = parseInt(params.id || "0", 10);
+  const clientId = params.id ?? "";
 
   const { data: client, isLoading } = trpc.clients.getById.useQuery(
     { id: clientId },
-    { enabled: clientId > 0 }
+    { enabled: !!clientId }
   );
 
   const { data: invoicesData } = trpc.invoice.list.useQuery(
     { clientId, limit: 20, offset: 0, status: "all" },
-    { enabled: clientId > 0 }
+    { enabled: !!clientId }
   );
 
   const deleteClient = trpc.clients.delete.useMutation({
@@ -43,7 +50,7 @@ export default function ClientDetailPage() {
       toast.success("Client deleted");
       setLocation("/clients");
     },
-    onError: (err) => toast.error(err.message),
+    onError: err => toast.error(err.message),
   });
 
   if (isLoading) {
@@ -59,7 +66,11 @@ export default function ClientDetailPage() {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">Client not found</p>
-        <Button variant="outline" className="mt-4" onClick={() => setLocation("/clients")}>
+        <Button
+          variant="outline"
+          className="mt-4"
+          onClick={() => setLocation("/clients")}
+        >
           Back to Clients
         </Button>
       </div>
@@ -69,13 +80,19 @@ export default function ClientDetailPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setLocation("/clients")}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setLocation("/clients")}
+        >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold tracking-tight">{client.name}</h1>
           {client.company && (
-            <p className="text-sm text-muted-foreground mt-1">{client.company}</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {client.company}
+            </p>
           )}
         </div>
         <div className="flex gap-2">
@@ -110,27 +127,37 @@ export default function ClientDetailPage() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div>
-              <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">Email</span>
+              <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">
+                Email
+              </span>
               <span>{client.email}</span>
             </div>
             {client.phone && (
               <div>
-                <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">Phone</span>
+                <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">
+                  Phone
+                </span>
                 <span>{client.phone}</span>
               </div>
             )}
             <div>
-              <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">Payment Terms</span>
+              <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">
+                Payment Terms
+              </span>
               <span>{client.paymentTerms} days</span>
             </div>
             {(client.addressLine1 || client.city) && (
               <div>
-                <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">Address</span>
+                <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">
+                  Address
+                </span>
                 {client.addressLine1 && <p>{client.addressLine1}</p>}
                 {client.addressLine2 && <p>{client.addressLine2}</p>}
                 {(client.city || client.postcode) && (
                   <p>
-                    {client.city}{client.city && client.postcode ? ", " : ""}{client.postcode}
+                    {client.city}
+                    {client.city && client.postcode ? ", " : ""}
+                    {client.postcode}
                   </p>
                 )}
                 {client.country && <p>{client.country}</p>}
@@ -138,7 +165,9 @@ export default function ClientDetailPage() {
             )}
             {client.notes && (
               <div>
-                <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">Notes</span>
+                <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">
+                  Notes
+                </span>
                 <p className="text-muted-foreground">{client.notes}</p>
               </div>
             )}
@@ -167,10 +196,18 @@ export default function ClientDetailPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider py-2 px-2">Invoice</th>
-                    <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider py-2 px-2">Total</th>
-                    <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider py-2 px-2">Status</th>
-                    <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider py-2 px-2">Due</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider py-2 px-2">
+                      Invoice
+                    </th>
+                    <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider py-2 px-2">
+                      Total
+                    </th>
+                    <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider py-2 px-2">
+                      Status
+                    </th>
+                    <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider py-2 px-2">
+                      Due
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -180,14 +217,23 @@ export default function ClientDetailPage() {
                       className="border-b last:border-0 hover:bg-muted/50 cursor-pointer transition-colors"
                       onClick={() => setLocation(`/invoices/${inv.id}`)}
                     >
-                      <td className="py-3 px-2 font-mono text-sm font-medium">{inv.invoiceNumber}</td>
-                      <td className="py-3 px-2 text-sm font-mono text-right">{formatCurrency(inv.total)}</td>
+                      <td className="py-3 px-2 font-mono text-sm font-medium">
+                        {inv.number}
+                      </td>
+                      <td className="py-3 px-2 text-sm font-mono text-right">
+                        {formatCurrency(inv.total)}
+                      </td>
                       <td className="py-3 px-2 text-center">
-                        <Badge variant="secondary" className={`${statusColors[inv.status]} text-xs capitalize`}>
+                        <Badge
+                          variant="secondary"
+                          className={`${statusColors[inv.status]} text-xs capitalize`}
+                        >
                           {inv.status}
                         </Badge>
                       </td>
-                      <td className="py-3 px-2 text-sm text-muted-foreground text-right">{formatDate(inv.dueDate)}</td>
+                      <td className="py-3 px-2 text-sm text-muted-foreground text-right">
+                        {formatDate(inv.dueDate)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

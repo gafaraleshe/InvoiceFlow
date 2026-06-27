@@ -19,7 +19,7 @@ export const createClientSchema = z.object({
 export const updateClientSchema = createClientSchema.partial();
 
 export const clientIdSchema = z.object({
-  id: z.number().int().positive(),
+  id: z.string().uuid(),
 });
 
 // ─── Line Item Schemas ──────────────────────────────────────────────────────
@@ -34,16 +34,18 @@ export const lineItemSchema = z.object({
 // ─── Invoice Schemas ────────────────────────────────────────────────────────
 
 export const createInvoiceSchema = z.object({
-  clientId: z.number().int().positive("Client is required"),
+  clientId: z.string().uuid("Client is required"),
   issueDate: z.number().int().positive("Issue date is required"), // UTC timestamp ms
   dueDate: z.number().int().positive("Due date is required"), // UTC timestamp ms
   vatRate: z.number().min(0).max(100).default(20),
   notes: z.string().optional().nullable(),
-  lineItems: z.array(lineItemSchema).min(1, "At least one line item is required"),
+  lineItems: z
+    .array(lineItemSchema)
+    .min(1, "At least one line item is required"),
 });
 
 export const updateInvoiceSchema = z.object({
-  clientId: z.number().int().positive().optional(),
+  clientId: z.string().uuid().optional(),
   issueDate: z.number().int().positive().optional(),
   dueDate: z.number().int().positive().optional(),
   vatRate: z.number().min(0).max(100).optional(),
@@ -53,11 +55,11 @@ export const updateInvoiceSchema = z.object({
 });
 
 export const invoiceIdSchema = z.object({
-  id: z.number().int().positive(),
+  id: z.string().uuid(),
 });
 
 export const invoiceStatusSchema = z.object({
-  id: z.number().int().positive(),
+  id: z.string().uuid(),
   status: z.enum(["draft", "sent", "paid", "overdue"]),
 });
 
@@ -71,13 +73,23 @@ export const listQuerySchema = z.object({
 
 export const invoiceListQuerySchema = listQuerySchema.extend({
   status: z.enum(["all", "draft", "sent", "paid", "overdue"]).default("all"),
-  clientId: z.number().int().positive().optional(),
+  clientId: z.string().uuid().optional(),
 });
 
 // ─── Email Schema ───────────────────────────────────────────────────────────
 
 export const sendInvoiceEmailSchema = z.object({
-  id: z.number().int().positive(),
+  id: z.string().uuid(),
   to: z.string().email().optional(), // Override client email
   message: z.string().optional(),
+});
+
+// ─── Organization Schemas ────────────────────────────────────────────────────
+
+export const createOrganizationSchema = z.object({
+  name: z.string().min(1, "Name is required").max(255),
+});
+
+export const switchOrganizationSchema = z.object({
+  organizationId: z.string().uuid(),
 });

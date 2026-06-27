@@ -10,11 +10,18 @@ import { useLocation } from "wouter";
 
 function formatCurrency(value: number | string): string {
   const num = typeof value === "string" ? parseFloat(value) : value;
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(num);
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+  }).format(num);
 }
 
 function formatDate(date: Date | string): string {
-  return new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(date));
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(date));
 }
 
 const statusColors: Record<string, string> = {
@@ -65,12 +72,12 @@ export default function InvoicesPage() {
           <Input
             placeholder="Search invoices..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             className="pl-9"
           />
         </div>
         <div className="flex gap-1.5">
-          {statusFilters.map((s) => (
+          {statusFilters.map(s => (
             <Button
               key={s}
               variant={statusFilter === s ? "default" : "outline"}
@@ -89,7 +96,7 @@ export default function InvoicesPage() {
         <CardContent className="p-0">
           {isLoading ? (
             <div className="p-6 space-y-3">
-              {[1, 2, 3, 4, 5].map((i) => (
+              {[1, 2, 3, 4, 5].map(i => (
                 <Skeleton key={i} className="h-12 w-full" />
               ))}
             </div>
@@ -97,14 +104,24 @@ export default function InvoicesPage() {
             <div className="text-center py-12 text-muted-foreground">
               <FileText className="h-10 w-10 mx-auto mb-3 opacity-40" />
               <p className="text-sm font-medium">No invoices found</p>
-              <p className="text-xs mt-1">Create your first invoice to get started</p>
+              <p className="text-xs mt-1">
+                Create your first invoice to get started
+              </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b bg-muted/30">
-                    {["Invoice", "Client", "Net", "VAT", "Total", "Status", "Due Date"].map((h) => (
+                    {[
+                      "Invoice",
+                      "Client",
+                      "Net",
+                      "VAT",
+                      "Total",
+                      "Status",
+                      "Due Date",
+                    ].map(h => (
                       <th
                         key={h}
                         className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider py-3 px-4"
@@ -122,9 +139,13 @@ export default function InvoicesPage() {
                       onClick={() => setLocation(`/invoices/${inv.id}`)}
                     >
                       <td className="py-3 px-4">
-                        <span className="font-mono text-sm font-medium">{inv.invoiceNumber}</span>
+                        <span className="font-mono text-sm font-medium">
+                          {inv.invoiceNumber}
+                        </span>
                       </td>
-                      <td className="py-3 px-4 text-sm">{inv.clientName || "—"}</td>
+                      <td className="py-3 px-4 text-sm">
+                        {inv.clientName || "—"}
+                      </td>
                       <td className="py-3 px-4 text-sm font-mono text-muted-foreground">
                         {formatCurrency(inv.subtotal)}
                       </td>
@@ -135,11 +156,16 @@ export default function InvoicesPage() {
                         {formatCurrency(inv.total)}
                       </td>
                       <td className="py-3 px-4">
-                        <Badge variant="secondary" className={`${statusColors[inv.status] || ""} text-xs capitalize`}>
+                        <Badge
+                          variant="secondary"
+                          className={`${statusColors[inv.status] || ""} text-xs capitalize`}
+                        >
                           {inv.status}
                         </Badge>
                       </td>
-                      <td className="py-3 px-4 text-sm text-muted-foreground">{formatDate(inv.dueDate)}</td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">
+                        {formatDate(inv.dueDate)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

@@ -20,20 +20,25 @@ const connectionString =
   process.env.POSTGRES_PRISMA_URL ??
   "";
 
-if (!connectionString) {
-  // Don't throw at import time — the marketing site and build must not require
-  // a database. Routes that actually query will surface a clear error instead.
+export const dbConfigured = Boolean(connectionString);
+
+if (!dbConfigured) {
+  // The marketing site and the build must not require a database. The client is
+  // still constructed (postgres-js connects lazily), so importing this module
+  // never throws; queries simply fail clearly until a connection is configured.
   console.warn(
     "[db] No Postgres connection string set (DATABASE_URL / POSTGRES_URL). " +
       "Database features are disabled until it is configured."
   );
 }
 
-// A single shared client per serverless instance.
-const client = connectionString
-  ? postgres(connectionString, { prepare: false, max: 1 })
-  : // Lazy stub: any query without a connection string fails loudly.
-    (undefined as unknown as ReturnType<typeof postgres>);
+// Non-connecting placeholder when unconfigured — postgres-js only dials on the
+// first query, so construction is always safe.
+const client = postgres(
+  connectionString ||
+    "postgres://placeholder:placeholder@127.0.0.1:5432/placeholder",
+  { prepare: false, max: 1, connect_timeout: 10 }
+);
 
 export const db = drizzle(client, { schema });
 export { schema };

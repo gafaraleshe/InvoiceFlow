@@ -17,11 +17,18 @@ import { toast } from "sonner";
 
 function formatCurrency(value: number | string): string {
   const num = typeof value === "string" ? parseFloat(value) : value;
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(num);
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+  }).format(num);
 }
 
 function formatDate(date: Date | string): string {
-  return new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "long", year: "numeric" }).format(new Date(date));
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(date));
 }
 
 const statusColors: Record<string, string> = {
@@ -34,31 +41,31 @@ const statusColors: Record<string, string> = {
 export default function InvoiceDetailPage() {
   const params = useParams<{ id: string }>();
   const [, setLocation] = useLocation();
-  const invoiceId = parseInt(params.id || "0", 10);
+  const invoiceId = params.id ?? "";
   const utils = trpc.useUtils();
 
   const { data: invoice, isLoading } = trpc.invoice.getById.useQuery(
     { id: invoiceId },
-    { enabled: invoiceId > 0 }
+    { enabled: !!invoiceId }
   );
 
   const generatePdf = trpc.invoice.generatePdf.useMutation({
-    onSuccess: (data) => {
-      if (data.pdfUrl) {
-        window.open(data.pdfUrl, "_blank");
+    onSuccess: data => {
+      if (data.pdfPath) {
+        window.open(data.pdfPath, "_blank");
       }
       toast.success("PDF generated successfully");
       utils.invoice.getById.invalidate({ id: invoiceId });
     },
-    onError: (err) => toast.error(err.message),
+    onError: err => toast.error(err.message),
   });
 
   const sendEmail = trpc.invoice.sendEmail.useMutation({
-    onSuccess: (data) => {
+    onSuccess: data => {
       toast.success(`Invoice sent to ${data.sentTo}`);
       utils.invoice.getById.invalidate({ id: invoiceId });
     },
-    onError: (err) => toast.error(err.message),
+    onError: err => toast.error(err.message),
   });
 
   const updateStatus = trpc.invoice.updateStatus.useMutation({
@@ -66,7 +73,7 @@ export default function InvoiceDetailPage() {
       toast.success("Status updated");
       utils.invoice.getById.invalidate({ id: invoiceId });
     },
-    onError: (err) => toast.error(err.message),
+    onError: err => toast.error(err.message),
   });
 
   const deleteInvoice = trpc.invoice.delete.useMutation({
@@ -74,7 +81,7 @@ export default function InvoiceDetailPage() {
       toast.success("Invoice deleted");
       setLocation("/invoices");
     },
-    onError: (err) => toast.error(err.message),
+    onError: err => toast.error(err.message),
   });
 
   if (isLoading) {
@@ -90,7 +97,11 @@ export default function InvoiceDetailPage() {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">Invoice not found</p>
-        <Button variant="outline" className="mt-4" onClick={() => setLocation("/invoices")}>
+        <Button
+          variant="outline"
+          className="mt-4"
+          onClick={() => setLocation("/invoices")}
+        >
           Back to Invoices
         </Button>
       </div>
@@ -101,20 +112,28 @@ export default function InvoiceDetailPage() {
     <div className="space-y-6 max-w-4xl">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setLocation("/invoices")}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setLocation("/invoices")}
+        >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold tracking-tight font-mono">
-              {invoice.invoiceNumber}
+              {invoice.number}
             </h1>
-            <Badge variant="secondary" className={`${statusColors[invoice.status]} capitalize`}>
+            <Badge
+              variant="secondary"
+              className={`${statusColors[invoice.status]} capitalize`}
+            >
               {invoice.status}
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            {invoice.clientName} {invoice.clientCompany ? `(${invoice.clientCompany})` : ""}
+            {invoice.clientName}{" "}
+            {invoice.clientCompany ? `(${invoice.clientCompany})` : ""}
           </p>
         </div>
         <div className="flex gap-2">
@@ -149,7 +168,9 @@ export default function InvoiceDetailPage() {
           {invoice.status !== "paid" && (
             <Button
               size="sm"
-              onClick={() => updateStatus.mutate({ id: invoice.id, status: "paid" })}
+              onClick={() =>
+                updateStatus.mutate({ id: invoice.id, status: "paid" })
+              }
               disabled={updateStatus.isPending}
               className="bg-emerald-600 hover:bg-emerald-700"
             >
@@ -208,18 +229,24 @@ export default function InvoiceDetailPage() {
               <div className="w-64 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-mono">{formatCurrency(invoice.subtotal)}</span>
+                  <span className="font-mono">
+                    {formatCurrency(invoice.subtotal)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">
-                    VAT ({Number(invoice.vatRate).toFixed(0)}%)
+                    VAT ({Number(invoice.taxRate).toFixed(0)}%)
                   </span>
-                  <span className="font-mono">{formatCurrency(invoice.vatAmount)}</span>
+                  <span className="font-mono">
+                    {formatCurrency(invoice.taxAmount)}
+                  </span>
                 </div>
                 <Separator />
                 <div className="flex justify-between text-base font-bold">
                   <span>Total</span>
-                  <span className="font-mono">{formatCurrency(invoice.total)}</span>
+                  <span className="font-mono">
+                    {formatCurrency(invoice.total)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -275,8 +302,12 @@ export default function InvoiceDetailPage() {
               {invoice.clientEmail && (
                 <p className="text-muted-foreground">{invoice.clientEmail}</p>
               )}
-              {invoice.clientAddressLine1 && <p>{invoice.clientAddressLine1}</p>}
-              {invoice.clientAddressLine2 && <p>{invoice.clientAddressLine2}</p>}
+              {invoice.clientAddressLine1 && (
+                <p>{invoice.clientAddressLine1}</p>
+              )}
+              {invoice.clientAddressLine2 && (
+                <p>{invoice.clientAddressLine2}</p>
+              )}
               {(invoice.clientCity || invoice.clientPostcode) && (
                 <p>
                   {invoice.clientCity}

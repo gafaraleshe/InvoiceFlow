@@ -13,11 +13,11 @@ import { toast } from "sonner";
 export default function EditClientPage() {
   const params = useParams<{ id: string }>();
   const [, setLocation] = useLocation();
-  const clientId = parseInt(params.id || "0", 10);
+  const clientId = params.id ?? "";
 
   const { data: client, isLoading } = trpc.clients.getById.useQuery(
     { id: clientId },
-    { enabled: clientId > 0 }
+    { enabled: !!clientId }
   );
 
   const [name, setName] = useState("");
@@ -55,7 +55,7 @@ export default function EditClientPage() {
       toast.success("Client updated");
       setLocation(`/clients/${clientId}`);
     },
-    onError: (err) => toast.error(err.message),
+    onError: err => toast.error(err.message),
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -100,7 +100,11 @@ export default function EditClientPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setLocation(`/clients/${clientId}`)}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setLocation(`/clients/${clientId}`)}
+        >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
@@ -120,21 +124,28 @@ export default function EditClientPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Name *</Label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} />
+                <Input value={name} onChange={e => setName(e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label>Email *</Label>
-                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                />
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Company</Label>
-                <Input value={company} onChange={(e) => setCompany(e.target.value)} />
+                <Input
+                  value={company}
+                  onChange={e => setCompany(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Phone</Label>
-                <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+                <Input value={phone} onChange={e => setPhone(e.target.value)} />
               </div>
             </div>
           </CardContent>
@@ -147,24 +158,36 @@ export default function EditClientPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Address Line 1</Label>
-              <Input value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} />
+              <Input
+                value={addressLine1}
+                onChange={e => setAddressLine1(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <Label>Address Line 2</Label>
-              <Input value={addressLine2} onChange={(e) => setAddressLine2(e.target.value)} />
+              <Input
+                value={addressLine2}
+                onChange={e => setAddressLine2(e.target.value)}
+              />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>City</Label>
-                <Input value={city} onChange={(e) => setCity(e.target.value)} />
+                <Input value={city} onChange={e => setCity(e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label>Postcode</Label>
-                <Input value={postcode} onChange={(e) => setPostcode(e.target.value)} />
+                <Input
+                  value={postcode}
+                  onChange={e => setPostcode(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Country</Label>
-                <Input value={country} onChange={(e) => setCountry(e.target.value)} />
+                <Input
+                  value={country}
+                  onChange={e => setCountry(e.target.value)}
+                />
               </div>
             </div>
           </CardContent>
@@ -177,17 +200,31 @@ export default function EditClientPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Payment Terms (days)</Label>
-              <Input type="number" value={paymentTerms} onChange={(e) => setPaymentTerms(Number(e.target.value))} min={1} max={365} />
+              <Input
+                type="number"
+                value={paymentTerms}
+                onChange={e => setPaymentTerms(Number(e.target.value))}
+                min={1}
+                max={365}
+              />
             </div>
             <div className="space-y-2">
               <Label>Notes</Label>
-              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
+              <Textarea
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
+                rows={3}
+              />
             </div>
           </CardContent>
         </Card>
 
         <div className="flex justify-end gap-3">
-          <Button type="button" variant="outline" onClick={() => setLocation(`/clients/${clientId}`)}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setLocation(`/clients/${clientId}`)}
+          >
             Cancel
           </Button>
           <Button type="submit" disabled={updateClient.isPending}>
