@@ -12,7 +12,20 @@ import { ArrowRight, Check, Minus, Sparkles } from "lucide-react";
 
 type Billing = "monthly" | "annual";
 
-const tiers = [
+type Tier = {
+  name: string;
+  description: string;
+  monthly: number | null;
+  annual: number | null;
+  priceLabel?: string;
+  priceNote?: string;
+  cta: string;
+  ctaHref?: string;
+  highlighted: boolean;
+  features: string[];
+};
+
+const tiers: Tier[] = [
   {
     name: "Starter",
     description:
@@ -57,9 +70,30 @@ const tiers = [
       "Everything in Pro",
       "Role-based access control",
       "Approval workflows",
+      "REST API & webhooks",
       "Audit log & exports",
       "Priority support",
       "Unlimited team members",
+    ],
+  },
+  {
+    name: "Enterprise",
+    description:
+      "For finance and RevOps teams that run billing alongside their CRM.",
+    monthly: null,
+    annual: null,
+    priceLabel: "Custom",
+    priceNote: "annual contract",
+    cta: "Talk to sales",
+    ctaHref: "/contact",
+    highlighted: false,
+    features: [
+      "Everything in Business",
+      "Salesforce & HubSpot sync",
+      "Two-way contact & deal sync",
+      "SSO / SAML & SCIM provisioning",
+      "Dedicated success manager",
+      "99.9% uptime SLA",
     ],
   },
 ];
@@ -71,28 +105,55 @@ const comparison: {
   {
     group: "Invoicing",
     rows: [
-      { label: "Invoices per month", values: ["20", "Unlimited", "Unlimited"] },
-      { label: "Clients", values: ["5", "Unlimited", "Unlimited"] },
-      { label: "Branded PDF invoices", values: [true, true, true] },
-      { label: "Multi-currency & VAT", values: [false, true, true] },
-      { label: "Recurring invoices", values: [false, true, true] },
+      {
+        label: "Invoices per month",
+        values: ["20", "Unlimited", "Unlimited", "Unlimited"],
+      },
+      { label: "Clients", values: ["5", "Unlimited", "Unlimited", "Unlimited"] },
+      { label: "Branded PDF invoices", values: [true, true, true, true] },
+      { label: "Multi-currency & VAT", values: [false, true, true, true] },
+      { label: "Recurring invoices", values: [false, true, true, true] },
     ],
   },
   {
     group: "Payments & automation",
     rows: [
-      { label: "Hosted payment links", values: [false, true, true] },
-      { label: "Automated reminders", values: [false, true, true] },
-      { label: "Approval workflows", values: [false, false, true] },
+      { label: "Hosted payment links", values: [false, true, true, true] },
+      { label: "Automated reminders", values: [false, true, true, true] },
+      { label: "Approval workflows", values: [false, false, true, true] },
+    ],
+  },
+  {
+    group: "CRM & integrations",
+    rows: [
+      { label: "REST API access", values: [false, false, true, true] },
+      { label: "Webhooks & events", values: [false, false, true, true] },
+      {
+        label: "Salesforce & HubSpot sync",
+        values: [false, false, false, true],
+      },
+      {
+        label: "Two-way contact & deal sync",
+        values: [false, false, false, true],
+      },
+      {
+        label: "Pipedrive & Zoho connectors",
+        values: [false, false, false, true],
+      },
     ],
   },
   {
     group: "Team & security",
     rows: [
-      { label: "Team members", values: ["1", "5", "Unlimited"] },
-      { label: "Role-based access", values: [false, false, true] },
-      { label: "Audit log & exports", values: [false, false, true] },
-      { label: "Priority support", values: [false, false, true] },
+      { label: "Team members", values: ["1", "5", "Unlimited", "Unlimited"] },
+      { label: "Role-based access", values: [false, false, true, true] },
+      { label: "Audit log & exports", values: [false, false, true, true] },
+      { label: "SSO / SAML & SCIM", values: [false, false, false, true] },
+      {
+        label: "Dedicated success manager",
+        values: [false, false, false, true],
+      },
+      { label: "Uptime SLA", values: [false, false, false, "99.9%"] },
     ],
   },
 ];
@@ -113,6 +174,14 @@ const faqs = [
   {
     q: "Do you charge per invoice?",
     a: "No. Paid plans include unlimited invoices. We never take a percentage of the payments you collect.",
+  },
+  {
+    q: "Which CRMs does the Enterprise plan integrate with?",
+    a: "Enterprise includes native two-way sync with Salesforce and HubSpot, plus connectors for Pipedrive and Zoho. Clients, contacts, deals, and paid-invoice events flow both ways automatically. Pro and Business plans can build any custom integration on our REST API and webhooks.",
+  },
+  {
+    q: "How does Enterprise pricing work?",
+    a: "Enterprise is a custom annual contract priced on your seat count, integration needs, and support level (dedicated CSM, SSO/SAML, SCIM provisioning, and a 99.9% uptime SLA). Talk to sales for a tailored quote.",
   },
   {
     q: "Can I cancel anytime?",
@@ -183,8 +252,9 @@ export default function Pricing() {
       {/* Tiers */}
       <section className="pb-20">
         <Container>
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
             {tiers.map(tier => {
+              const isCustom = tier.monthly === null;
               const price = billing === "monthly" ? tier.monthly : tier.annual;
               return (
                 <div
@@ -212,14 +282,26 @@ export default function Pricing() {
                   </p>
 
                   <div className="mt-5 flex items-end gap-1">
-                    <span className="mkt-display text-[44px] text-[#f7f8f8]">
-                      £{price}
-                    </span>
-                    <span className="mb-2 text-[14px] text-[#62666d]">
-                      {price === 0 ? "forever" : "/ mo"}
-                    </span>
+                    {isCustom ? (
+                      <span className="mkt-display text-[44px] text-[#f7f8f8]">
+                        {tier.priceLabel}
+                      </span>
+                    ) : (
+                      <>
+                        <span className="mkt-display text-[44px] text-[#f7f8f8]">
+                          £{price}
+                        </span>
+                        <span className="mb-2 text-[14px] text-[#62666d]">
+                          {price === 0 ? "forever" : "/ mo"}
+                        </span>
+                      </>
+                    )}
                   </div>
-                  {price > 0 ? (
+                  {isCustom ? (
+                    <div className="mt-1 text-[12px] text-[#62666d]">
+                      {tier.priceNote}
+                    </div>
+                  ) : price && price > 0 ? (
                     <div className="mt-1 text-[12px] text-[#62666d]">
                       {billing === "annual"
                         ? "billed annually"
@@ -234,7 +316,7 @@ export default function Pricing() {
                   <MButton
                     variant={tier.highlighted ? "primary" : "secondary"}
                     size="lg"
-                    href={getLoginUrl()}
+                    href={tier.ctaHref ?? getLoginUrl()}
                     className="mt-6 w-full"
                   >
                     {tier.cta}
@@ -270,7 +352,7 @@ export default function Pricing() {
           />
           <div className="mt-12 overflow-hidden rounded-2xl border border-[#23252a]">
             {/* Sticky header */}
-            <div className="grid grid-cols-[1.6fr_1fr_1fr_1fr] border-b border-[#23252a] bg-[#0f1011]">
+            <div className="grid grid-cols-[1.6fr_1fr_1fr_1fr_1fr] border-b border-[#23252a] bg-[#0f1011]">
               <div className="px-5 py-4 text-[13px] font-medium text-[#8a8f98]">
                 Features
               </div>
@@ -295,7 +377,7 @@ export default function Pricing() {
                 {section.rows.map(row => (
                   <div
                     key={row.label}
-                    className="grid grid-cols-[1.6fr_1fr_1fr_1fr] items-center border-t border-[#161719]"
+                    className="grid grid-cols-[1.6fr_1fr_1fr_1fr_1fr] items-center border-t border-[#161719]"
                   >
                     <div className="px-5 py-3 text-[14px] text-[#d0d6e0]">
                       {row.label}
