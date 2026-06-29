@@ -426,13 +426,18 @@ export default function Docs() {
                 ],
                 [
                   "Business",
-                  "everything in Pro plus roles, approvals, audit log, and priority support",
+                  "everything in Pro plus roles, approvals, audit log, the REST API, and priority support",
+                ],
+                [
+                  "Enterprise",
+                  "everything in Business plus CRM sync (Salesforce/HubSpot), SSO/SAML & SCIM, a dedicated success manager, and an uptime SLA",
                 ],
               ]}
             />
             <P>
               Subscriptions and tax are handled by Polar.sh; manage or cancel
-              your plan anytime from billing settings.
+              your plan anytime from billing settings. Enterprise is a custom
+              annual contract — <Link href="/contact" className="text-[#828fff] hover:underline">talk to sales</Link>.
             </P>
           </Section>
 
@@ -501,6 +506,17 @@ export default function Docs() {
               OpenAPI spec — lives in <Code>docs/API.md</Code> in the
               repository.
             </Note>
+            <H3>CRM integrations</H3>
+            <P>
+              Enterprise adds managed, two-way sync with{" "}
+              <strong>Salesforce</strong> and <strong>HubSpot</strong> (plus
+              Pipedrive and Zoho connectors): clients, contacts, deals, and
+              paid-invoice events stay aligned in both directions with no
+              rekeying. On any paid plan you can build the same flows yourself —
+              subscribe to <Code>invoice.paid</Code> and{" "}
+              <Code>payment.succeeded</Code> webhooks and push records into your
+              CRM via its API.
+            </P>
           </Section>
 
           <Section id="setup" icon={Server} title="Setup & deploy">

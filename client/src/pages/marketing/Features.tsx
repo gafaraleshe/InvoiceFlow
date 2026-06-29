@@ -25,6 +25,10 @@ import {
   FileDown,
   KeyRound,
   Workflow,
+  Plug,
+  Webhook,
+  RefreshCw,
+  Lock,
 } from "lucide-react";
 
 const allFeatures = [
@@ -79,6 +83,21 @@ const allFeatures = [
     body: "Route invoices for review before they go out the door on Business plans.",
   },
   {
+    icon: Plug,
+    title: "CRM sync",
+    body: "Native two-way sync with Salesforce and HubSpot keeps clients and deals aligned automatically.",
+  },
+  {
+    icon: Webhook,
+    title: "REST API & webhooks",
+    body: "Build any workflow on our API, and subscribe to real-time events the moment an invoice is paid.",
+  },
+  {
+    icon: Lock,
+    title: "SSO, SAML & SCIM",
+    body: "Single sign-on and automated user provisioning for Enterprise teams that need it.",
+  },
+  {
     icon: ShieldCheck,
     title: "Security & audit",
     body: "OAuth sign-in, encrypted storage, and a full audit log of every change.",
@@ -88,6 +107,15 @@ const allFeatures = [
     title: "One-click delivery",
     body: "Send by email with a payment link attached, or share a hosted invoice URL.",
   },
+];
+
+const crmConnectors = ["Salesforce", "HubSpot", "Pipedrive", "Zoho"];
+
+const crmPoints = [
+  "Two-way sync of clients, contacts, and deals — no copy-paste",
+  "Push paid-invoice and revenue events straight into your pipeline",
+  "Map InvoiceFlow fields to your CRM's custom objects",
+  "Real-time webhooks and a full REST API for anything bespoke",
 ];
 
 const spotlights = [
@@ -185,6 +213,82 @@ export default function Features() {
           </Container>
         </section>
       ))}
+
+      {/* CRM & integrations */}
+      <section className="border-t border-[#1c1d20] py-24">
+        <Container>
+          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+            <div>
+              <Eyebrow>Integrations</Eyebrow>
+              <h2 className="mkt-display mt-4 text-[clamp(26px,3.6vw,40px)] text-[#f7f8f8]">
+                Connect billing to your CRM
+              </h2>
+              <p className="mt-5 text-[17px] leading-relaxed text-[#8a8f98]">
+                On Enterprise, InvoiceFlow syncs both ways with the CRM your
+                revenue team already lives in — so a closed deal becomes an
+                invoice, and a paid invoice updates the pipeline, without anyone
+                rekeying data.
+              </p>
+              <ul className="mt-6 space-y-3">
+                {crmPoints.map(p => (
+                  <li
+                    key={p}
+                    className="flex items-start gap-3 text-[15px] text-[#d0d6e0]"
+                  >
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#5e6ad2]/15">
+                      <Check className="h-3 w-3 text-[#828fff]" />
+                    </span>
+                    {p}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8">
+                <MButton variant="secondary" size="lg" href="/contact">
+                  Talk to sales
+                  <ArrowRight className="h-4 w-4" />
+                </MButton>
+              </div>
+            </div>
+
+            <div className="mkt-panel rounded-2xl p-8">
+              <div className="flex items-center justify-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#23252a] bg-[#141516] text-[#828fff]">
+                  <Plug className="h-5 w-5" />
+                </div>
+                <div className="flex items-center gap-2 text-[#62666d]">
+                  <RefreshCw className="h-4 w-4" />
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#5e6ad2]/50 bg-[#5e6ad2]/10 text-[#828fff]">
+                  <FileText className="h-5 w-5" />
+                </div>
+              </div>
+              <p className="mt-5 text-center text-[13px] text-[#62666d]">
+                Two-way sync with the tools you already use
+              </p>
+              <div className="mt-6 grid grid-cols-2 gap-3">
+                {crmConnectors.map(name => (
+                  <div
+                    key={name}
+                    className="flex items-center gap-3 rounded-xl border border-[#23252a] bg-[#0f1011] px-4 py-3"
+                  >
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#5e6ad2]/15 text-[12px] font-semibold text-[#828fff]">
+                      {name[0]}
+                    </span>
+                    <span className="text-[14px] font-medium text-[#d0d6e0]">
+                      {name}
+                    </span>
+                    <Check className="ml-auto h-4 w-4 text-[#27a644]" />
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 flex items-center justify-center gap-2 rounded-xl border border-dashed border-[#23252a] px-4 py-3 text-[13px] text-[#8a8f98]">
+                <Webhook className="h-4 w-4 text-[#828fff]" />
+                + REST API & webhooks for anything custom
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
 
       {/* Full grid */}
       <section className="border-t border-[#1c1d20] py-24">
