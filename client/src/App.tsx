@@ -15,6 +15,7 @@ import ClientsPage from "./pages/Clients";
 import ClientDetailPage from "./pages/ClientDetail";
 import CreateClientPage from "./pages/CreateClient";
 import EditClientPage from "./pages/EditClient";
+import IntegrationsPage from "./pages/Integrations";
 import MarketingLayout from "./marketing/MarketingLayout";
 import Landing from "./pages/marketing/Landing";
 import Pricing from "./pages/marketing/Pricing";
@@ -27,7 +28,7 @@ import Login from "./pages/Login";
 
 // Path prefixes that belong to the authenticated dashboard app. Everything
 // else is served by the public marketing site.
-const APP_PREFIXES = ["/dashboard", "/invoices", "/clients"];
+const APP_PREFIXES = ["/dashboard", "/invoices", "/clients", "/settings"];
 
 function isAppPath(location: string) {
   return APP_PREFIXES.some(
@@ -73,6 +74,7 @@ function AppArea() {
         <Route path="/clients/new" component={CreateClientPage} />
         <Route path="/clients/:id/edit" component={EditClientPage} />
         <Route path="/clients/:id" component={ClientDetailPage} />
+        <Route path="/settings/integrations" component={IntegrationsPage} />
         <Route component={NotFound} />
       </Switch>
     </DashboardLayout>

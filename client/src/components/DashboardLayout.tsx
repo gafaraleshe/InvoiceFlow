@@ -25,6 +25,7 @@ import {
   LayoutDashboard,
   FileText,
   Users,
+  Plug,
   LogOut,
   PanelLeft,
 } from "lucide-react";
@@ -37,6 +38,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
   { icon: FileText, label: "Invoices", path: "/invoices" },
   { icon: Users, label: "Clients", path: "/clients" },
+  { icon: Plug, label: "Integrations", path: "/settings/integrations" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
