@@ -165,10 +165,10 @@ export default function Features() {
         <div className="mkt-grid-bg pointer-events-none absolute inset-0 opacity-50" />
         <Container className="relative flex flex-col items-center text-center">
           <Eyebrow>Features</Eyebrow>
-          <h1 className="mkt-display mt-4 max-w-[20ch] text-[clamp(36px,6vw,64px)] text-[#f7f8f8]">
+          <h1 className="mkt-display mt-4 max-w-[20ch] text-[clamp(36px,6vw,64px)] text-[var(--mkt-ink)]">
             Everything you need to bill and get paid
           </h1>
-          <p className="mt-5 max-w-[56ch] text-[18px] leading-relaxed text-[#8a8f98]">
+          <p className="mt-5 max-w-[56ch] text-[18px] leading-relaxed text-[var(--mkt-ink-subtle)]">
             One focused workspace for the entire billing lifecycle — from the
             first draft to the final payment, with automation doing the chasing.
           </p>
@@ -188,20 +188,20 @@ export default function Features() {
             <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
               <div className={s.reverse ? "lg:order-2" : ""}>
                 <Eyebrow>{s.eyebrow}</Eyebrow>
-                <h2 className="mkt-display mt-4 text-[clamp(26px,3.6vw,40px)] text-[#f7f8f8]">
+                <h2 className="mkt-display mt-4 text-[clamp(26px,3.6vw,40px)] text-[var(--mkt-ink)]">
                   {s.title}
                 </h2>
-                <p className="mt-5 text-[17px] leading-relaxed text-[#8a8f98]">
+                <p className="mt-5 text-[17px] leading-relaxed text-[var(--mkt-ink-subtle)]">
                   {s.body}
                 </p>
                 <ul className="mt-6 space-y-3">
                   {s.points.map(p => (
                     <li
                       key={p}
-                      className="flex items-center gap-3 text-[15px] text-[#d0d6e0]"
+                      className="flex items-center gap-3 text-[15px] text-[var(--mkt-ink-muted)]"
                     >
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5e6ad2]/15">
-                        <Check className="h-3 w-3 text-[#828fff]" />
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--mkt-primary)]/15">
+                        <Check className="h-3 w-3 text-[var(--mkt-primary-hover)]" />
                       </span>
                       {p}
                     </li>
@@ -215,15 +215,15 @@ export default function Features() {
       ))}
 
       {/* CRM & integrations */}
-      <section className="border-t border-[#1c1d20] py-24">
+      <section className="border-t border-[var(--mkt-hairline-soft)] py-24">
         <Container>
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
             <div>
               <Eyebrow>Integrations</Eyebrow>
-              <h2 className="mkt-display mt-4 text-[clamp(26px,3.6vw,40px)] text-[#f7f8f8]">
+              <h2 className="mkt-display mt-4 text-[clamp(26px,3.6vw,40px)] text-[var(--mkt-ink)]">
                 Connect billing to your CRM
               </h2>
-              <p className="mt-5 text-[17px] leading-relaxed text-[#8a8f98]">
+              <p className="mt-5 text-[17px] leading-relaxed text-[var(--mkt-ink-subtle)]">
                 On Enterprise, InvoiceFlow syncs both ways with the CRM your
                 revenue team already lives in — so a closed deal becomes an
                 invoice, and a paid invoice updates the pipeline, without anyone
@@ -233,10 +233,10 @@ export default function Features() {
                 {crmPoints.map(p => (
                   <li
                     key={p}
-                    className="flex items-start gap-3 text-[15px] text-[#d0d6e0]"
+                    className="flex items-start gap-3 text-[15px] text-[var(--mkt-ink-muted)]"
                   >
-                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#5e6ad2]/15">
-                      <Check className="h-3 w-3 text-[#828fff]" />
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--mkt-primary)]/15">
+                      <Check className="h-3 w-3 text-[var(--mkt-primary-hover)]" />
                     </span>
                     {p}
                   </li>
@@ -252,37 +252,37 @@ export default function Features() {
 
             <div className="mkt-panel rounded-2xl p-8">
               <div className="flex items-center justify-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#23252a] bg-[#141516] text-[#828fff]">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-2)] text-[var(--mkt-primary-hover)]">
                   <Plug className="h-5 w-5" />
                 </div>
-                <div className="flex items-center gap-2 text-[#62666d]">
+                <div className="flex items-center gap-2 text-[var(--mkt-ink-tertiary)]">
                   <RefreshCw className="h-4 w-4" />
                 </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#5e6ad2]/50 bg-[#5e6ad2]/10 text-[#828fff]">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--mkt-primary)]/50 bg-[var(--mkt-primary)]/10 text-[var(--mkt-primary-hover)]">
                   <FileText className="h-5 w-5" />
                 </div>
               </div>
-              <p className="mt-5 text-center text-[13px] text-[#62666d]">
+              <p className="mt-5 text-center text-[13px] text-[var(--mkt-ink-tertiary)]">
                 Two-way sync with the tools you already use
               </p>
               <div className="mt-6 grid grid-cols-2 gap-3">
                 {crmConnectors.map(name => (
                   <div
                     key={name}
-                    className="flex items-center gap-3 rounded-xl border border-[#23252a] bg-[#0f1011] px-4 py-3"
+                    className="flex items-center gap-3 rounded-xl border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] px-4 py-3"
                   >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#5e6ad2]/15 text-[12px] font-semibold text-[#828fff]">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--mkt-primary)]/15 text-[12px] font-semibold text-[var(--mkt-primary-hover)]">
                       {name[0]}
                     </span>
-                    <span className="text-[14px] font-medium text-[#d0d6e0]">
+                    <span className="text-[14px] font-medium text-[var(--mkt-ink-muted)]">
                       {name}
                     </span>
-                    <Check className="ml-auto h-4 w-4 text-[#27a644]" />
+                    <Check className="ml-auto h-4 w-4 text-[var(--mkt-success)]" />
                   </div>
                 ))}
               </div>
-              <div className="mt-4 flex items-center justify-center gap-2 rounded-xl border border-dashed border-[#23252a] px-4 py-3 text-[13px] text-[#8a8f98]">
-                <Webhook className="h-4 w-4 text-[#828fff]" />
+              <div className="mt-4 flex items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--mkt-hairline)] px-4 py-3 text-[13px] text-[var(--mkt-ink-subtle)]">
+                <Webhook className="h-4 w-4 text-[var(--mkt-primary-hover)]" />
                 + REST API & webhooks for anything custom
               </div>
             </div>
@@ -291,7 +291,7 @@ export default function Features() {
       </section>
 
       {/* Full grid */}
-      <section className="border-t border-[#1c1d20] py-24">
+      <section className="border-t border-[var(--mkt-hairline-soft)] py-24">
         <Container>
           <SectionHeading
             eyebrow="And much more"
@@ -301,15 +301,15 @@ export default function Features() {
             {allFeatures.map(f => (
               <div
                 key={f.title}
-                className="mkt-panel rounded-xl p-6 transition-colors hover:border-[#34343a]"
+                className="mkt-panel rounded-xl p-6 transition-colors hover:border-[var(--mkt-hairline-strong)]"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#23252a] bg-[#141516] text-[#828fff]">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-2)] text-[var(--mkt-primary-hover)]">
                   <f.icon className="h-[18px] w-[18px]" />
                 </div>
-                <h3 className="mt-4 text-[16px] font-medium tracking-tight text-[#f7f8f8]">
+                <h3 className="mt-4 text-[16px] font-medium tracking-tight text-[var(--mkt-ink)]">
                   {f.title}
                 </h3>
-                <p className="mt-2 text-[13px] leading-relaxed text-[#8a8f98]">
+                <p className="mt-2 text-[13px] leading-relaxed text-[var(--mkt-ink-subtle)]">
                   {f.body}
                 </p>
               </div>
@@ -321,11 +321,11 @@ export default function Features() {
       {/* CTA */}
       <section className="pb-28">
         <Container>
-          <div className="rounded-2xl border border-[#23252a] bg-[#0f1011] px-8 py-14 text-center">
-            <h2 className="mkt-display mx-auto max-w-[20ch] text-[clamp(26px,4vw,40px)] text-[#f7f8f8]">
+          <div className="rounded-2xl border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] px-8 py-14 text-center">
+            <h2 className="mkt-display mx-auto max-w-[20ch] text-[clamp(26px,4vw,40px)] text-[var(--mkt-ink)]">
               See it in action
             </h2>
-            <p className="mx-auto mt-4 max-w-[48ch] text-[16px] text-[#8a8f98]">
+            <p className="mx-auto mt-4 max-w-[48ch] text-[16px] text-[var(--mkt-ink-subtle)]">
               Create your first invoice in under two minutes. Free to start.
             </p>
             <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">

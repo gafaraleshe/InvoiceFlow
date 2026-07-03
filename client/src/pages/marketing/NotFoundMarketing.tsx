@@ -6,13 +6,13 @@ export default function NotFoundMarketing() {
     <section className="relative overflow-hidden py-32">
       <div className="mkt-grid-bg pointer-events-none absolute inset-0 opacity-50" />
       <Container className="relative flex flex-col items-center text-center">
-        <div className="mkt-display text-[clamp(80px,18vw,160px)] leading-none text-[#f7f8f8]">
+        <div className="mkt-display text-[clamp(80px,18vw,160px)] leading-none text-[var(--mkt-ink)]">
           404
         </div>
-        <h1 className="mkt-display mt-4 text-[clamp(24px,4vw,36px)] text-[#f7f8f8]">
+        <h1 className="mkt-display mt-4 text-[clamp(24px,4vw,36px)] text-[var(--mkt-ink)]">
           This page took an unpaid invoice
         </h1>
-        <p className="mt-4 max-w-[44ch] text-[16px] text-[#8a8f98]">
+        <p className="mt-4 max-w-[44ch] text-[16px] text-[var(--mkt-ink-subtle)]">
           The page you're looking for doesn't exist or may have moved. Let's get
           you back to somewhere useful.
         </p>

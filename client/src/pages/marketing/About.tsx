@@ -76,10 +76,10 @@ export default function About() {
         />
         <Container className="relative flex flex-col items-center text-center">
           <Eyebrow>Our story</Eyebrow>
-          <h1 className="mkt-display mt-4 max-w-[20ch] text-[clamp(36px,6vw,64px)] text-[#f7f8f8]">
+          <h1 className="mkt-display mt-4 max-w-[20ch] text-[clamp(36px,6vw,64px)] text-[var(--mkt-ink)]">
             We're building the billing tool we always wanted
           </h1>
-          <p className="mt-5 max-w-[58ch] text-[18px] leading-relaxed text-[#8a8f98]">
+          <p className="mt-5 max-w-[58ch] text-[18px] leading-relaxed text-[var(--mkt-ink-subtle)]">
             InvoiceFlow started with a simple frustration: getting paid was
             harder than doing the work. So we built a focused, fast platform
             that makes invoicing effortless — and getting paid inevitable.
@@ -90,12 +90,12 @@ export default function About() {
       {/* Mission statement */}
       <section className="py-16">
         <Container className="max-w-[900px]">
-          <div className="rounded-2xl border border-[#23252a] bg-[#0f1011] p-10 text-center">
-            <p className="mkt-display text-[clamp(22px,3vw,32px)] leading-snug text-[#f7f8f8]">
+          <div className="rounded-2xl border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] p-10 text-center">
+            <p className="mkt-display text-[clamp(22px,3vw,32px)] leading-snug text-[var(--mkt-ink)]">
               "Every business deserves to be paid for the work it does —{" "}
-              <span className="text-[#828fff]">on time, every time.</span>"
+              <span className="text-[var(--mkt-primary-hover)]">on time, every time.</span>"
             </p>
-            <p className="mt-6 text-[14px] text-[#62666d]">
+            <p className="mt-6 text-[14px] text-[var(--mkt-ink-tertiary)]">
               — The InvoiceFlow team
             </p>
           </div>
@@ -112,13 +112,13 @@ export default function About() {
           <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {values.map(v => (
               <div key={v.title} className="mkt-panel rounded-xl p-7">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#23252a] bg-[#141516] text-[#828fff]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-2)] text-[var(--mkt-primary-hover)]">
                   <v.icon className="h-5 w-5" />
                 </div>
-                <h3 className="mt-4 text-[18px] font-medium tracking-tight text-[#f7f8f8]">
+                <h3 className="mt-4 text-[18px] font-medium tracking-tight text-[var(--mkt-ink)]">
                   {v.title}
                 </h3>
-                <p className="mt-2 text-[14px] leading-relaxed text-[#8a8f98]">
+                <p className="mt-2 text-[14px] leading-relaxed text-[var(--mkt-ink-subtle)]">
                   {v.body}
                 </p>
               </div>
@@ -134,13 +134,13 @@ export default function About() {
           <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {milestones.map(m => (
               <div key={m.year} className="mkt-panel rounded-xl p-6">
-                <div className="font-mono text-[13px] text-[#828fff]">
+                <div className="font-mono text-[13px] text-[var(--mkt-primary-hover)]">
                   {m.year}
                 </div>
-                <div className="mt-3 text-[18px] font-medium tracking-tight text-[#f7f8f8]">
+                <div className="mt-3 text-[18px] font-medium tracking-tight text-[var(--mkt-ink)]">
                   {m.title}
                 </div>
-                <p className="mt-2 text-[13px] leading-relaxed text-[#8a8f98]">
+                <p className="mt-2 text-[13px] leading-relaxed text-[var(--mkt-ink-subtle)]">
                   {m.body}
                 </p>
               </div>
@@ -162,13 +162,13 @@ export default function About() {
                 key={person.name}
                 className="mkt-panel flex flex-col items-center rounded-xl p-7 text-center"
               >
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#5e6ad2] to-[#828fff] text-[20px] font-semibold text-white">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[var(--mkt-primary)] to-[var(--mkt-primary-hover)] text-[20px] font-semibold text-white">
                   {person.name.charAt(0)}
                 </div>
-                <div className="mt-4 text-[15px] font-medium text-[#f7f8f8]">
+                <div className="mt-4 text-[15px] font-medium text-[var(--mkt-ink)]">
                   {person.name}
                 </div>
-                <div className="mt-1 text-[12px] text-[#62666d]">
+                <div className="mt-1 text-[12px] text-[var(--mkt-ink-tertiary)]">
                   {person.role}
                 </div>
               </div>
@@ -180,11 +180,11 @@ export default function About() {
       {/* CTA */}
       <section className="py-16 pb-28">
         <Container>
-          <div className="rounded-2xl border border-[#23252a] bg-[#0f1011] px-8 py-14 text-center">
-            <h2 className="mkt-display mx-auto max-w-[22ch] text-[clamp(26px,4vw,40px)] text-[#f7f8f8]">
+          <div className="rounded-2xl border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] px-8 py-14 text-center">
+            <h2 className="mkt-display mx-auto max-w-[22ch] text-[clamp(26px,4vw,40px)] text-[var(--mkt-ink)]">
               Come get paid with us
             </h2>
-            <p className="mx-auto mt-4 max-w-[48ch] text-[16px] text-[#8a8f98]">
+            <p className="mx-auto mt-4 max-w-[48ch] text-[16px] text-[var(--mkt-ink-subtle)]">
               Join thousands of teams who've made invoicing the easiest part of
               running their business.
             </p>
