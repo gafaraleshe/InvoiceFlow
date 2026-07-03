@@ -6,7 +6,7 @@ import { createRoot } from "react-dom/client";
 import superjson from "superjson";
 import App from "./App";
 import { getLoginUrl } from "./const";
-import { getAuthHeaders } from "./lib/supabase";
+import { getAuthHeaders } from "./lib/auth";
 import "./index.css";
 
 const queryClient = new QueryClient();

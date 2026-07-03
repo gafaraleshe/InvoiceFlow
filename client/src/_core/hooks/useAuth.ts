@@ -1,7 +1,7 @@
 import { trpc } from "@/lib/trpc";
-import { supabase, ACTIVE_ORG_KEY } from "@/lib/supabase";
-import { useCallback, useEffect, useState } from "react";
-import type { Session } from "@supabase/supabase-js";
+import { ACTIVE_ORG_KEY } from "@/lib/auth";
+import { useAuth as useClerkAuth, useUser } from "@clerk/clerk-react";
+import { useCallback, useEffect } from "react";
 
 type UseAuthOptions = {
   redirectOnUnauthenticated?: boolean;
@@ -9,36 +9,19 @@ type UseAuthOptions = {
 };
 
 /**
- * Auth state derived from the Supabase session. When signed in, `auth.me`
- * resolves the app user + active organization from the verified bearer token.
+ * Auth state derived from the Clerk session. When signed in, `auth.me` resolves
+ * the app user + active organization from the verified bearer token.
  */
 export function useAuth(options?: UseAuthOptions) {
   const { redirectOnUnauthenticated = false, redirectPath = "/login" } =
     options ?? {};
   const utils = trpc.useUtils();
 
-  const [session, setSession] = useState<Session | null>(null);
-  const [sessionLoading, setSessionLoading] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (!mounted) return;
-      setSession(data.session);
-      setSessionLoading(false);
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
-      setSession(next);
-      utils.auth.me.invalidate();
-    });
-    return () => {
-      mounted = false;
-      sub.subscription.unsubscribe();
-    };
-  }, [utils]);
+  const { isLoaded, isSignedIn, signOut } = useClerkAuth();
+  const { user: clerkUser } = useUser();
 
   const meQuery = trpc.auth.me.useQuery(undefined, {
-    enabled: Boolean(session),
+    enabled: isLoaded && Boolean(isSignedIn),
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -51,29 +34,30 @@ export function useAuth(options?: UseAuthOptions) {
   }, [meQuery.data?.organizationId]);
 
   const logout = useCallback(async () => {
-    await supabase.auth.signOut();
     localStorage.removeItem(ACTIVE_ORG_KEY);
     utils.auth.me.setData(undefined, null);
+    await signOut();
     await utils.auth.me.invalidate();
-  }, [utils]);
+  }, [signOut, utils]);
 
-  const user = session ? (meQuery.data ?? null) : null;
-  const loading = sessionLoading || (Boolean(session) && meQuery.isLoading);
+  const user = isSignedIn ? (meQuery.data ?? null) : null;
+  const loading =
+    !isLoaded || (Boolean(isSignedIn) && meQuery.isLoading);
 
   useEffect(() => {
     if (!redirectOnUnauthenticated) return;
-    if (loading) return;
-    if (session) return;
+    if (!isLoaded) return;
+    if (isSignedIn) return;
     if (typeof window === "undefined") return;
     if (window.location.pathname === redirectPath) return;
     window.location.href = redirectPath;
-  }, [redirectOnUnauthenticated, redirectPath, loading, session]);
+  }, [redirectOnUnauthenticated, redirectPath, isLoaded, isSignedIn]);
 
   return {
     user,
-    session,
+    session: isSignedIn ? clerkUser : null,
     loading,
-    isAuthenticated: Boolean(session && user),
+    isAuthenticated: Boolean(isSignedIn && user),
     error: meQuery.error ?? null,
     refresh: () => meQuery.refetch(),
     logout,

@@ -522,8 +522,8 @@ export default function Docs() {
           <Section id="setup" icon={Server} title="Setup & deploy">
             <P>
               InvoiceFlow is built in TypeScript end to end: React + Vite on the
-              front end, a tRPC + REST API, Supabase (Postgres, Auth, Storage),
-              and it deploys to Vercel. Run it locally with:
+              front end, a tRPC + REST API, Clerk for authentication, Supabase
+              Postgres for data, and it deploys to Vercel. Run it locally with:
             </P>
             <Pre>{`git clone https://github.com/gafaraleshe/InvoiceFlow.git
 cd InvoiceFlow
@@ -531,16 +531,14 @@ pnpm install
 cp .env.example .env   # fill in your keys
 pnpm dev               # http://localhost:3000`}</Pre>
             <P>
-              Connecting Supabase, Resend, Polar.sh, and Stripe is documented
-              step by step in <Code>docs/SETUP_GUIDE.md</Code>, and the full
-              architecture lives in <Code>docs/PRODUCT_PLAN.md</Code>.
+              Connecting Clerk, Supabase, Resend, Polar.sh, and Stripe is
+              documented step by step in <Code>docs/SETUP_GUIDE.md</Code>, and
+              the full architecture lives in <Code>docs/PRODUCT_PLAN.md</Code>.
             </P>
             <FeatureList
               rows={[
-                [
-                  "Supabase",
-                  "Postgres database, authentication, and file storage",
-                ],
+                ["Clerk", "authentication, sessions, and user management"],
+                ["Supabase", "Postgres database and file storage"],
                 [
                   "Resend",
                   "transactional email — invoices, receipts, reminders",

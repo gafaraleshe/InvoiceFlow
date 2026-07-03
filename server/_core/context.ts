@@ -1,15 +1,15 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import {
   bearerFromHeader,
-  verifySupabaseToken,
-  type SupabaseUser,
-} from "../auth/supabase";
+  verifyClerkToken,
+  type AuthUser,
+} from "../auth/clerk";
 import { resolveActiveContext, type ActiveContext } from "../db";
 
 export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
   res: CreateExpressContextOptions["res"];
-  user: SupabaseUser | null;
+  user: AuthUser | null;
   /** The caller's active organization + role, or null if unauthenticated. */
   active: ActiveContext | null;
 };
@@ -19,12 +19,12 @@ const ORG_HEADER = "x-organization-id";
 export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<TrpcContext> {
-  let user: SupabaseUser | null = null;
+  let user: AuthUser | null = null;
   let active: ActiveContext | null = null;
 
   try {
     const token = bearerFromHeader(opts.req.headers.authorization);
-    user = await verifySupabaseToken(token);
+    user = await verifyClerkToken(token);
 
     if (user) {
       const requestedOrg = opts.req.headers[ORG_HEADER];

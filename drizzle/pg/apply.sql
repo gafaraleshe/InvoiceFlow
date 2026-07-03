@@ -74,7 +74,7 @@ CREATE TABLE "line_items" (
 
 CREATE TABLE "memberships" (
 	"organization_id" uuid NOT NULL,
-	"user_id" uuid NOT NULL,
+	"user_id" varchar(255) NOT NULL,
 	"role" "member_role" DEFAULT 'member' NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "memberships_organization_id_user_id_pk" PRIMARY KEY("organization_id","user_id")
@@ -120,7 +120,7 @@ CREATE TABLE "subscriptions" (
 );
 
 CREATE TABLE "users" (
-	"id" uuid PRIMARY KEY NOT NULL,
+	"id" varchar(255) PRIMARY KEY NOT NULL,
 	"email" varchar(320) NOT NULL,
 	"full_name" text,
 	"avatar_url" text,
@@ -164,15 +164,16 @@ CREATE UNIQUE INDEX "webhook_events_provider_event_idx" ON "webhook_events" USIN
 -- ============ 2) ROW-LEVEL SECURITY ============
 -- Row-Level Security policies for InvoiceFlow (Supabase Postgres).
 --
--- The API connects as the `postgres` role, which BYPASSES RLS, and enforces
--- tenant scoping in the application layer. These policies are defense-in-depth:
--- they protect the anon/authenticated (PostgREST) access path so that even a
--- leaked anon key can only ever read/write rows for organizations the signed-in
--- user belongs to.
+-- Authentication runs through Clerk; the API connects as the `postgres` role,
+-- which BYPASSES RLS, and enforces tenant scoping in the application layer.
+-- These policies are defense-in-depth for the anon/authenticated (PostgREST)
+-- access path. With Clerk (not Supabase Auth) `auth.uid()` is normally unset on
+-- that path, so these effectively deny it by default — the app layer is the
+-- real trust boundary. User ids are Clerk strings, hence the ::text casts.
 --
 -- Apply AFTER the generated schema migration (0000_*.sql).
 
--- Is the current Supabase user a member of the given organization?
+-- Is the current PostgREST user a member of the given organization?
 create or replace function public.is_org_member(org uuid)
 returns boolean
 language sql
@@ -183,7 +184,7 @@ as $$
   select exists (
     select 1 from public.memberships m
     where m.organization_id = org
-      and m.user_id = auth.uid()
+      and m.user_id = auth.uid()::text
   );
 $$;
 
@@ -199,7 +200,7 @@ alter table public.payments       enable row level security;
 
 -- A user can see/update only their own profile row.
 create policy users_self on public.users
-  for all using (id = auth.uid()) with check (id = auth.uid());
+  for all using (id = auth.uid()::text) with check (id = auth.uid()::text);
 
 -- Members can read their organizations and memberships.
 create policy orgs_member_read on public.organizations
