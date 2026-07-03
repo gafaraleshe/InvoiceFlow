@@ -10,6 +10,7 @@ import {
   ProductDashboardMock,
   AutomationMock,
 } from "@/marketing/mockups";
+import { Stagger, StaggerItem } from "@/marketing/motion";
 import {
   ArrowRight,
   Check,
@@ -297,11 +298,11 @@ export default function Features() {
             eyebrow="And much more"
             title="Built for the way modern teams bill"
           />
-          <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Stagger className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {allFeatures.map(f => (
-              <div
+              <StaggerItem
                 key={f.title}
-                className="mkt-panel rounded-xl p-6 transition-colors hover:border-[var(--mkt-hairline-strong)]"
+                className="mkt-panel rounded-xl p-6 transition-[colors,transform] duration-300 hover:-translate-y-1 hover:border-[var(--mkt-hairline-strong)]"
               >
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-2)] text-[var(--mkt-primary-hover)]">
                   <f.icon className="h-[18px] w-[18px]" />
@@ -312,9 +313,9 @@ export default function Features() {
                 <p className="mt-2 text-[13px] leading-relaxed text-[var(--mkt-ink-subtle)]">
                   {f.body}
                 </p>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         </Container>
       </section>
 
