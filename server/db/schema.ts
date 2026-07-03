@@ -6,7 +6,8 @@
  * Row-Level Security (see drizzle/pg/policies.sql). Money is stored as
  * numeric(14,2) with an explicit ISO-4217 currency — never floats.
  *
- * `users.id` mirrors Supabase `auth.users.id` (uuid).
+ * `users.id` holds the Clerk user id (e.g. "user_2ab…"), so it is a varchar
+ * rather than a uuid.
  */
 import {
   pgTable,
@@ -63,9 +64,9 @@ const timestamps = {
     .notNull(),
 };
 
-/* ── users (mirror of Supabase auth.users) ──────────────────────────────── */
+/* ── users (mirror of the Clerk user directory) ─────────────────────────── */
 export const users = pgTable("users", {
-  id: uuid("id").primaryKey(), // = auth.users.id
+  id: varchar("id", { length: 255 }).primaryKey(), // = Clerk user id
   email: varchar("email", { length: 320 }).notNull(),
   fullName: text("full_name"),
   avatarUrl: text("avatar_url"),
@@ -102,7 +103,7 @@ export const memberships = pgTable(
     organizationId: uuid("organization_id")
       .notNull()
       .references(() => organizations.id, { onDelete: "cascade" }),
-    userId: uuid("user_id")
+    userId: varchar("user_id", { length: 255 })
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     role: memberRole("role").default("member").notNull(),

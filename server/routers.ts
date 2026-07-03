@@ -323,7 +323,7 @@ export const appRouter = router({
         role: ctx.active.role,
       };
     }),
-    // Sign-out is handled client-side via the Supabase SDK; this is a no-op
+    // Sign-out is handled client-side via the Clerk SDK; this is a no-op
     // kept for API compatibility.
     logout: publicProcedure.mutation(() => {
       return { success: true } as const;

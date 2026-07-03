@@ -5,6 +5,7 @@ import { Route, Switch, useLocation } from "wouter";
 import { useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import DashboardLayout from "./components/DashboardLayout";
+import { ClerkGate } from "./_core/ClerkGate";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import InvoicesPage from "./pages/Invoices";
@@ -83,8 +84,21 @@ function AppArea() {
 
 function Router() {
   const [location] = useLocation();
-  if (location === "/login") return <Login />;
-  return isAppPath(location) ? <AppArea /> : <MarketingArea />;
+  // Clerk only wraps the authenticated app and the login page; marketing pages
+  // render without it so the public site never depends on auth being configured.
+  if (location === "/login")
+    return (
+      <ClerkGate>
+        <Login />
+      </ClerkGate>
+    );
+  return isAppPath(location) ? (
+    <ClerkGate>
+      <AppArea />
+    </ClerkGate>
+  ) : (
+    <MarketingArea />
+  );
 }
 
 function App() {

@@ -12,7 +12,7 @@ function unauthContext(): TrpcContext {
 }
 
 describe("auth.logout", () => {
-  it("reports success (sign-out is handled client-side via Supabase)", async () => {
+  it("reports success (sign-out is handled client-side via Clerk)", async () => {
     const caller = appRouter.createCaller(unauthContext());
     const result = await caller.auth.logout();
     expect(result).toEqual({ success: true });
