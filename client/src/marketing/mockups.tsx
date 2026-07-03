@@ -13,7 +13,12 @@ import {
   Send,
   Clock,
 } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+import { CountUp, EASE, Stagger, StaggerItem } from "./motion";
 import type { ReactNode } from "react";
+
+const gbp = (v: number) => `£${Math.round(v).toLocaleString("en-GB")}`;
+const num = (v: number) => Math.round(v).toLocaleString("en-GB");
 
 /**
  * Faux product-UI "screenshots". Per DESIGN.md, product screenshots are the
@@ -66,13 +71,20 @@ const sidebarNav = [
 const stats = [
   {
     label: "Total Revenue",
-    value: "£248,910",
+    n: 248910,
+    fmt: gbp,
     delta: "+18.2%",
     accent: "var(--mkt-success)",
   },
-  { label: "Outstanding", value: "£32,540", delta: "+4.1%", accent: "#d8a200" },
-  { label: "Invoices", value: "1,284", delta: "+96", accent: "var(--mkt-primary)" },
-  { label: "Overdue", value: "7", delta: "−3", accent: "#c75d5d" },
+  { label: "Outstanding", n: 32540, fmt: gbp, delta: "+4.1%", accent: "#d8a200" },
+  {
+    label: "Invoices",
+    n: 1284,
+    fmt: num,
+    delta: "+96",
+    accent: "var(--mkt-primary)",
+  },
+  { label: "Overdue", n: 7, fmt: num, delta: "−3", accent: "#c75d5d" },
 ];
 
 type Row = {
@@ -147,22 +159,27 @@ const StatusBadge = ({ status }: { status: Row["status"] }) => {
   );
 };
 
-/** Mini revenue bar chart rendered with divs. */
+/** Mini revenue bar chart rendered with divs — bars grow in when in view. */
 function MiniChart() {
   const bars = [38, 52, 44, 61, 49, 72, 66, 81, 70, 88, 79, 96];
+  const reduce = useReducedMotion();
   return (
     <div className="flex h-[120px] items-end gap-1.5 sm:gap-2">
       {bars.map((h, i) => (
         <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
-          <div
-            className="w-full rounded-[3px]"
+          <motion.div
+            className="w-full origin-bottom rounded-[3px]"
             style={{
-              height: `${h}%`,
               background:
                 i === bars.length - 1
                   ? "var(--mkt-primary)"
                   : "linear-gradient(180deg, rgba(94,106,210,0.55), rgba(94,106,210,0.12))",
             }}
+            initial={reduce ? false : { height: 0 }}
+            whileInView={reduce ? undefined : { height: `${h}%` }}
+            viewport={{ once: true, margin: "-40px" }}
+            animate={reduce ? { height: `${h}%` } : undefined}
+            transition={{ duration: 0.7, delay: i * 0.04, ease: EASE }}
           />
         </div>
       ))}
@@ -256,9 +273,11 @@ export function ProductDashboardMock({ className }: { className?: string }) {
                   className="rounded-lg border border-[var(--mkt-mock-2)] bg-[var(--mkt-surface-1)] p-3"
                 >
                   <div className="text-[11px] text-[var(--mkt-ink-tertiary)]">{s.label}</div>
-                  <div className="mt-1.5 text-[18px] font-semibold tracking-tight text-[var(--mkt-ink)]">
-                    {s.value}
-                  </div>
+                  <CountUp
+                    to={s.n}
+                    format={s.fmt}
+                    className="mt-1.5 block text-[18px] font-semibold tracking-tight text-[var(--mkt-ink)]"
+                  />
                   <div
                     className="mt-1 inline-flex items-center gap-1 text-[10px] font-medium"
                     style={{ color: s.accent }}
@@ -293,9 +312,9 @@ export function ProductDashboardMock({ className }: { className?: string }) {
                     View all <ArrowUpRight className="h-2.5 w-2.5" />
                   </span>
                 </div>
-                <div className="divide-y divide-[var(--mkt-line-soft)]">
+                <Stagger className="divide-y divide-[var(--mkt-line-soft)]">
                   {rows.map(r => (
-                    <div
+                    <StaggerItem
                       key={r.number}
                       className="grid grid-cols-[1.1fr_1.2fr_0.9fr_0.8fr] items-center gap-2 px-4 py-2.5 text-[11px]"
                     >
@@ -311,9 +330,9 @@ export function ProductDashboardMock({ className }: { className?: string }) {
                       <span className="flex justify-end">
                         <StatusBadge status={r.status} />
                       </span>
-                    </div>
+                    </StaggerItem>
                   ))}
-                </div>
+                </Stagger>
               </div>
             </div>
           </div>
@@ -474,9 +493,9 @@ export function AutomationMock({ className }: { className?: string }) {
           <span className="h-1.5 w-1.5 rounded-full bg-[var(--mkt-success)]" /> Active
         </span>
       </div>
-      <div className="mt-4 space-y-2.5">
+      <Stagger className="mt-4 space-y-2.5">
         {steps.map((s, i) => (
-          <div
+          <StaggerItem
             key={i}
             className="flex items-center gap-3 rounded-lg border border-[var(--mkt-mock-2)] bg-[var(--mkt-surface-0)] px-3 py-2.5"
           >
@@ -494,9 +513,9 @@ export function AutomationMock({ className }: { className?: string }) {
             <span className="font-mono text-[11px] text-[var(--mkt-ink-tertiary)]">
               {s.time}
             </span>
-          </div>
+          </StaggerItem>
         ))}
-      </div>
+      </Stagger>
     </div>
   );
 }

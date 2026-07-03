@@ -9,6 +9,7 @@ import {
   SectionHeading,
 } from "@/marketing/primitives";
 import { ArrowRight, Check, Minus, Sparkles } from "lucide-react";
+import { Stagger, StaggerItem } from "@/marketing/motion";
 
 type Billing = "monthly" | "annual";
 
@@ -252,12 +253,12 @@ export default function Pricing() {
       {/* Tiers */}
       <section className="pb-20">
         <Container>
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
+          <Stagger className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
             {tiers.map(tier => {
               const isCustom = tier.monthly === null;
               const price = billing === "monthly" ? tier.monthly : tier.annual;
               return (
-                <div
+                <StaggerItem
                   key={tier.name}
                   className={cn(
                     "relative flex flex-col rounded-2xl border p-7",
@@ -336,10 +337,10 @@ export default function Pricing() {
                       </li>
                     ))}
                   </ul>
-                </div>
+                </StaggerItem>
               );
             })}
-          </div>
+          </Stagger>
         </Container>
       </section>
 

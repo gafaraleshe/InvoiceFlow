@@ -27,6 +27,8 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { motion, useReducedMotion } from "motion/react";
+import { ProductShowcase } from "@/marketing/ProductShowcase";
+import { CountUp, Reveal, Stagger, StaggerItem } from "@/marketing/motion";
 
 const logos = [
   "Northwind",
@@ -73,10 +75,26 @@ const features = [
 ];
 
 const stats = [
-  { value: "£2.4B+", label: "Invoiced through InvoiceFlow" },
-  { value: "11 days", label: "Faster average payment" },
-  { value: "99.99%", label: "Uptime, every quarter" },
-  { value: "12,000+", label: "Teams getting paid" },
+  {
+    n: 2.4,
+    fmt: (v: number) => `£${v.toFixed(1)}B+`,
+    label: "Invoiced through InvoiceFlow",
+  },
+  {
+    n: 11,
+    fmt: (v: number) => `${Math.round(v)} days`,
+    label: "Faster average payment",
+  },
+  {
+    n: 99.99,
+    fmt: (v: number) => `${v.toFixed(2)}%`,
+    label: "Uptime, every quarter",
+  },
+  {
+    n: 12000,
+    fmt: (v: number) => `${Math.round(v).toLocaleString("en-GB")}+`,
+    label: "Teams getting paid",
+  },
 ];
 
 const testimonials = [
@@ -198,6 +216,9 @@ export default function Landing() {
         </Container>
       </section>
 
+      {/* ===== Product in action ===== */}
+      <ProductShowcase />
+
       {/* ===== Feature grid ===== */}
       <section className="py-24">
         <Container>
@@ -206,11 +227,11 @@ export default function Landing() {
             title="A complete billing workflow, end to end"
             description="From the first draft to the final payment, InvoiceFlow handles the entire lifecycle so you can stop chasing and start collecting."
           />
-          <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Stagger className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {features.map(f => (
-              <div
+              <StaggerItem
                 key={f.title}
-                className="mkt-panel group rounded-xl p-6 transition-colors hover:border-[var(--mkt-hairline-strong)]"
+                className="mkt-panel group rounded-xl p-6 transition-[colors,transform] duration-300 hover:-translate-y-1 hover:border-[var(--mkt-hairline-strong)]"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-2)] text-[var(--mkt-primary-hover)] transition-colors group-hover:border-[var(--mkt-primary)]/40">
                   <f.icon className="h-5 w-5" />
@@ -221,9 +242,9 @@ export default function Landing() {
                 <p className="mt-2 text-[14px] leading-relaxed text-[var(--mkt-ink-subtle)]">
                   {f.body}
                 </p>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         </Container>
       </section>
 
@@ -265,7 +286,9 @@ export default function Landing() {
                 </MButton>
               </div>
             </div>
-            <InvoiceComposerMock />
+            <Reveal delay={0.05}>
+              <InvoiceComposerMock />
+            </Reveal>
           </div>
         </Container>
       </section>
@@ -274,9 +297,9 @@ export default function Landing() {
       <section className="py-24">
         <Container>
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-            <div className="order-2 lg:order-1">
+            <Reveal className="order-2 lg:order-1">
               <AutomationMock />
-            </div>
+            </Reveal>
             <div className="order-1 lg:order-2">
               <Eyebrow>Automate</Eyebrow>
               <h2 className="mkt-display mt-4 text-[clamp(28px,4vw,42px)] text-[var(--mkt-ink)]">
@@ -315,16 +338,18 @@ export default function Landing() {
       {/* ===== Stats band ===== */}
       <section className="border-y border-[var(--mkt-hairline-soft)] py-16">
         <Container>
-          <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
+          <Stagger className="grid grid-cols-2 gap-8 lg:grid-cols-4">
             {stats.map(s => (
-              <div key={s.label} className="text-center">
-                <div className="mkt-display text-[clamp(32px,5vw,48px)] text-[var(--mkt-ink)]">
-                  {s.value}
-                </div>
+              <StaggerItem key={s.label} className="text-center">
+                <CountUp
+                  to={s.n}
+                  format={s.fmt}
+                  className="mkt-display block text-[clamp(32px,5vw,48px)] text-[var(--mkt-ink)]"
+                />
                 <div className="mt-2 text-[14px] text-[var(--mkt-ink-subtle)]">{s.label}</div>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         </Container>
       </section>
 
@@ -335,9 +360,9 @@ export default function Landing() {
             eyebrow="Loved by teams"
             title="Teams that switched never look back"
           />
-          <div className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <Stagger className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-3">
             {testimonials.map(t => (
-              <figure
+              <StaggerItem
                 key={t.name}
                 className="mkt-panel flex flex-col rounded-xl p-7"
               >
@@ -360,9 +385,9 @@ export default function Landing() {
                     <div className="text-[12px] text-[var(--mkt-ink-tertiary)]">{t.role}</div>
                   </div>
                 </figcaption>
-              </figure>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         </Container>
       </section>
 
