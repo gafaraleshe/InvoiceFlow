@@ -29,6 +29,7 @@ import { Link } from "wouter";
 import { motion, useReducedMotion } from "motion/react";
 import { ProductShowcase } from "@/marketing/ProductShowcase";
 import { CountUp, Reveal, Stagger, StaggerItem } from "@/marketing/motion";
+import BorderGlow from "@/marketing/BorderGlow";
 
 const logos = [
   "Northwind",
@@ -394,7 +395,17 @@ export default function Landing() {
       {/* ===== CTA banner ===== */}
       <section className="pb-28">
         <Container>
-          <div className="relative overflow-hidden rounded-2xl border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] px-8 py-16 text-center sm:px-16">
+          <BorderGlow
+            className="px-8 py-16 text-center sm:px-16"
+            backgroundColor="var(--mkt-surface-1)"
+            borderRadius={24}
+            glowColor="232 60 68"
+            colors={["#5e6ad2", "#828fff", "#38bdf8"]}
+            glowRadius={48}
+            glowIntensity={1}
+            edgeSensitivity={34}
+            coneSpread={26}
+          >
             <div
               className="pointer-events-none absolute inset-0 opacity-40"
               style={{
@@ -429,7 +440,7 @@ export default function Landing() {
                 </Link>
               </p>
             </div>
-          </div>
+          </BorderGlow>
         </Container>
       </section>
     </>
