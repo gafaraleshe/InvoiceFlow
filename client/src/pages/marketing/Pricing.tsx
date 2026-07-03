@@ -191,12 +191,12 @@ const faqs = [
 
 function CellValue({ value }: { value: boolean | string }) {
   if (typeof value === "string") {
-    return <span className="text-[13px] text-[#d0d6e0]">{value}</span>;
+    return <span className="text-[13px] text-[var(--mkt-ink-muted)]">{value}</span>;
   }
   return value ? (
-    <Check className="mx-auto h-4 w-4 text-[#828fff]" />
+    <Check className="mx-auto h-4 w-4 text-[var(--mkt-primary-hover)]" />
   ) : (
-    <Minus className="mx-auto h-4 w-4 text-[#3e3e44]" />
+    <Minus className="mx-auto h-4 w-4 text-[var(--mkt-mock-faint-2)]" />
   );
 }
 
@@ -216,17 +216,17 @@ export default function Pricing() {
         />
         <Container className="relative flex flex-col items-center text-center">
           <Eyebrow>Pricing</Eyebrow>
-          <h1 className="mkt-display mt-4 max-w-[18ch] text-[clamp(36px,6vw,64px)] text-[#f7f8f8]">
+          <h1 className="mkt-display mt-4 max-w-[18ch] text-[clamp(36px,6vw,64px)] text-[var(--mkt-ink)]">
             Simple pricing that scales with you
           </h1>
-          <p className="mt-5 max-w-[52ch] text-[18px] leading-relaxed text-[#8a8f98]">
+          <p className="mt-5 max-w-[52ch] text-[18px] leading-relaxed text-[var(--mkt-ink-subtle)]">
             Start free, then pick the plan that fits. No per-invoice fees, no
             surprises — just everything you need to get paid.
           </p>
 
           {/* Billing toggle */}
           <div className="mt-8 flex items-center gap-3">
-            <div className="flex items-center gap-1 rounded-full border border-[#23252a] bg-[#0f1011] p-1">
+            <div className="flex items-center gap-1 rounded-full border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] p-1">
               {(["monthly", "annual"] as Billing[]).map(option => (
                 <button
                   key={option}
@@ -234,15 +234,15 @@ export default function Pricing() {
                   className={cn(
                     "rounded-full px-4 py-1.5 text-[13px] font-medium capitalize transition-colors",
                     billing === option
-                      ? "bg-[#141516] text-[#f7f8f8] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
-                      : "text-[#8a8f98] hover:text-[#d0d6e0]"
+                      ? "bg-[var(--mkt-surface-2)] text-[var(--mkt-ink)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                      : "text-[var(--mkt-ink-subtle)] hover:text-[var(--mkt-ink-muted)]"
                   )}
                 >
                   {option}
                 </button>
               ))}
             </div>
-            <Pill className="border-[#27a644]/30 bg-[#27a644]/10 text-[#7fe0a0]">
+            <Pill className="border-[var(--mkt-success)]/30 bg-[var(--mkt-success)]/10 text-[var(--mkt-success-ink)]">
               Save 20%
             </Pill>
           </div>
@@ -262,53 +262,53 @@ export default function Pricing() {
                   className={cn(
                     "relative flex flex-col rounded-2xl border p-7",
                     tier.highlighted
-                      ? "border-[#5e6ad2]/50 bg-[#141516] shadow-[0_0_0_1px_rgba(94,106,210,0.2),0_40px_120px_-60px_rgba(94,106,210,0.6)]"
-                      : "border-[#23252a] bg-[#0f1011]"
+                      ? "border-[var(--mkt-primary)]/50 bg-[var(--mkt-surface-2)] shadow-[0_0_0_1px_rgba(94,106,210,0.2),0_40px_120px_-60px_rgba(94,106,210,0.6)]"
+                      : "border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)]"
                   )}
                 >
                   {tier.highlighted ? (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[#5e6ad2] px-3 py-1 text-[12px] font-medium text-white">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--mkt-primary)] px-3 py-1 text-[12px] font-medium text-white">
                         <Sparkles className="h-3 w-3" /> Most popular
                       </span>
                     </div>
                   ) : null}
 
-                  <div className="text-[18px] font-semibold tracking-tight text-[#f7f8f8]">
+                  <div className="text-[18px] font-semibold tracking-tight text-[var(--mkt-ink)]">
                     {tier.name}
                   </div>
-                  <p className="mt-2 min-h-[40px] text-[14px] leading-relaxed text-[#8a8f98]">
+                  <p className="mt-2 min-h-[40px] text-[14px] leading-relaxed text-[var(--mkt-ink-subtle)]">
                     {tier.description}
                   </p>
 
                   <div className="mt-5 flex items-end gap-1">
                     {isCustom ? (
-                      <span className="mkt-display text-[44px] text-[#f7f8f8]">
+                      <span className="mkt-display text-[44px] text-[var(--mkt-ink)]">
                         {tier.priceLabel}
                       </span>
                     ) : (
                       <>
-                        <span className="mkt-display text-[44px] text-[#f7f8f8]">
+                        <span className="mkt-display text-[44px] text-[var(--mkt-ink)]">
                           £{price}
                         </span>
-                        <span className="mb-2 text-[14px] text-[#62666d]">
+                        <span className="mb-2 text-[14px] text-[var(--mkt-ink-tertiary)]">
                           {price === 0 ? "forever" : "/ mo"}
                         </span>
                       </>
                     )}
                   </div>
                   {isCustom ? (
-                    <div className="mt-1 text-[12px] text-[#62666d]">
+                    <div className="mt-1 text-[12px] text-[var(--mkt-ink-tertiary)]">
                       {tier.priceNote}
                     </div>
                   ) : price && price > 0 ? (
-                    <div className="mt-1 text-[12px] text-[#62666d]">
+                    <div className="mt-1 text-[12px] text-[var(--mkt-ink-tertiary)]">
                       {billing === "annual"
                         ? "billed annually"
                         : "billed monthly"}
                     </div>
                   ) : (
-                    <div className="mt-1 text-[12px] text-[#62666d]">
+                    <div className="mt-1 text-[12px] text-[var(--mkt-ink-tertiary)]">
                       no card required
                     </div>
                   )}
@@ -327,10 +327,10 @@ export default function Pricing() {
                     {tier.features.map(feature => (
                       <li
                         key={feature}
-                        className="flex items-start gap-3 text-[14px] text-[#d0d6e0]"
+                        className="flex items-start gap-3 text-[14px] text-[var(--mkt-ink-muted)]"
                       >
-                        <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#5e6ad2]/15">
-                          <Check className="h-2.5 w-2.5 text-[#828fff]" />
+                        <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[var(--mkt-primary)]/15">
+                          <Check className="h-2.5 w-2.5 text-[var(--mkt-primary-hover)]" />
                         </span>
                         {feature}
                       </li>
@@ -350,10 +350,10 @@ export default function Pricing() {
             eyebrow="Compare plans"
             title="Every detail, side by side"
           />
-          <div className="mt-12 overflow-hidden rounded-2xl border border-[#23252a]">
+          <div className="mt-12 overflow-hidden rounded-2xl border border-[var(--mkt-hairline)]">
             {/* Sticky header */}
-            <div className="grid grid-cols-[1.6fr_1fr_1fr_1fr_1fr] border-b border-[#23252a] bg-[#0f1011]">
-              <div className="px-5 py-4 text-[13px] font-medium text-[#8a8f98]">
+            <div className="grid grid-cols-[1.6fr_1fr_1fr_1fr_1fr] border-b border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)]">
+              <div className="px-5 py-4 text-[13px] font-medium text-[var(--mkt-ink-subtle)]">
                 Features
               </div>
               {tiers.map(t => (
@@ -361,7 +361,7 @@ export default function Pricing() {
                   key={t.name}
                   className={cn(
                     "px-3 py-4 text-center text-[14px] font-semibold",
-                    t.highlighted ? "text-[#828fff]" : "text-[#f7f8f8]"
+                    t.highlighted ? "text-[var(--mkt-primary-hover)]" : "text-[var(--mkt-ink)]"
                   )}
                 >
                   {t.name}
@@ -371,15 +371,15 @@ export default function Pricing() {
 
             {comparison.map(section => (
               <div key={section.group}>
-                <div className="bg-[#0b0b0c] px-5 py-2.5 text-[12px] font-medium uppercase tracking-wide text-[#62666d]">
+                <div className="bg-[var(--mkt-surface-0)] px-5 py-2.5 text-[12px] font-medium uppercase tracking-wide text-[var(--mkt-ink-tertiary)]">
                   {section.group}
                 </div>
                 {section.rows.map(row => (
                   <div
                     key={row.label}
-                    className="grid grid-cols-[1.6fr_1fr_1fr_1fr_1fr] items-center border-t border-[#161719]"
+                    className="grid grid-cols-[1.6fr_1fr_1fr_1fr_1fr] items-center border-t border-[var(--mkt-line-soft)]"
                   >
-                    <div className="px-5 py-3 text-[14px] text-[#d0d6e0]">
+                    <div className="px-5 py-3 text-[14px] text-[var(--mkt-ink-muted)]">
                       {row.label}
                     </div>
                     {row.values.map((v, i) => (
@@ -387,7 +387,7 @@ export default function Pricing() {
                         key={i}
                         className={cn(
                           "px-3 py-3 text-center",
-                          tiers[i].highlighted && "bg-[#5e6ad2]/[0.04]"
+                          tiers[i].highlighted && "bg-[var(--mkt-primary)]/[0.04]"
                         )}
                       >
                         <CellValue value={v} />
@@ -405,27 +405,27 @@ export default function Pricing() {
       <section className="py-16 pb-28">
         <Container className="max-w-[820px]">
           <SectionHeading eyebrow="FAQ" title="Questions, answered" />
-          <div className="mt-12 divide-y divide-[#1c1d20] border-y border-[#1c1d20]">
+          <div className="mt-12 divide-y divide-[var(--mkt-hairline-soft)] border-y border-[var(--mkt-hairline-soft)]">
             {faqs.map(faq => (
               <details key={faq.q} className="group py-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between text-[16px] font-medium text-[#f7f8f8] [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between text-[16px] font-medium text-[var(--mkt-ink)] [&::-webkit-details-marker]:hidden">
                   {faq.q}
-                  <span className="ml-4 text-[#62666d] transition-transform group-open:rotate-45">
+                  <span className="ml-4 text-[var(--mkt-ink-tertiary)] transition-transform group-open:rotate-45">
                     +
                   </span>
                 </summary>
-                <p className="mt-3 max-w-[68ch] text-[15px] leading-relaxed text-[#8a8f98]">
+                <p className="mt-3 max-w-[68ch] text-[15px] leading-relaxed text-[var(--mkt-ink-subtle)]">
                   {faq.a}
                 </p>
               </details>
             ))}
           </div>
 
-          <div className="mt-14 rounded-2xl border border-[#23252a] bg-[#0f1011] p-8 text-center">
-            <h3 className="text-[20px] font-semibold tracking-tight text-[#f7f8f8]">
+          <div className="mt-14 rounded-2xl border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] p-8 text-center">
+            <h3 className="text-[20px] font-semibold tracking-tight text-[var(--mkt-ink)]">
               Still deciding?
             </h3>
-            <p className="mx-auto mt-2 max-w-[48ch] text-[15px] text-[#8a8f98]">
+            <p className="mx-auto mt-2 max-w-[48ch] text-[15px] text-[var(--mkt-ink-subtle)]">
               Talk to our team and we'll help you find the right plan — or just
               start free and upgrade whenever you're ready.
             </p>

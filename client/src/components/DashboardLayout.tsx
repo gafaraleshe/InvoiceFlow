@@ -32,7 +32,11 @@ import {
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
+import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "./ui/button";
+
+const toggleDash =
+  "text-muted-foreground hover:bg-accent hover:text-foreground";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -185,6 +189,9 @@ function DashboardLayoutContent({
           </SidebarContent>
 
           <SidebarFooter className="p-3">
+            <div className="mb-1 flex px-1 group-data-[collapsible=icon]:justify-center">
+              <ThemeToggle className={toggleDash} />
+            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-3 rounded-lg px-1 py-1 hover:bg-accent/50 transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
@@ -238,6 +245,7 @@ function DashboardLayoutContent({
                 </div>
               </div>
             </div>
+            <ThemeToggle className={toggleDash} />
           </div>
         )}
         <main className="flex-1 p-6">{children}</main>

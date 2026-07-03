@@ -26,6 +26,7 @@ import {
   Globe,
 } from "lucide-react";
 import { Link } from "wouter";
+import { motion, useReducedMotion } from "motion/react";
 
 const logos = [
   "Northwind",
@@ -100,6 +101,19 @@ const testimonials = [
 ];
 
 export default function Landing() {
+  const reduce = useReducedMotion();
+  const rise = (delay: number) =>
+    reduce
+      ? {}
+      : {
+          initial: { opacity: 0, y: 18 },
+          animate: { opacity: 1, y: 0 },
+          transition: {
+            duration: 0.6,
+            delay,
+            ease: [0.22, 1, 0.36, 1] as const,
+          },
+        };
   return (
     <>
       {/* ===== Hero ===== */}
@@ -113,15 +127,18 @@ export default function Landing() {
           }}
         />
         <Container className="relative pt-20 pb-16 sm:pt-28">
-          <div className="flex flex-col items-center text-center">
+          <motion.div
+            className="flex flex-col items-center text-center"
+            {...rise(0)}
+          >
             <Pill className="mb-6">
-              <Sparkles className="h-3.5 w-3.5 text-[#828fff]" />
+              <Sparkles className="h-3.5 w-3.5 text-[var(--mkt-primary-hover)]" />
               Now with automated payment reminders
             </Pill>
-            <h1 className="mkt-display max-w-[16ch] text-[clamp(40px,7vw,80px)] text-[#f7f8f8]">
+            <h1 className="mkt-display max-w-[16ch] text-[clamp(40px,7vw,80px)] text-[var(--mkt-ink)]">
               Invoicing that gets you paid
             </h1>
-            <p className="mt-6 max-w-[56ch] text-[clamp(17px,2vw,20px)] leading-relaxed text-[#8a8f98]">
+            <p className="mt-6 max-w-[56ch] text-[clamp(17px,2vw,20px)] leading-relaxed text-[var(--mkt-ink-subtle)]">
               InvoiceFlow is the modern invoicing platform for teams that take
               billing seriously. Create polished invoices, automate follow-ups,
               and track every pound — all from one fast, focused workspace.
@@ -135,16 +152,19 @@ export default function Landing() {
                 View pricing
               </MButton>
             </div>
-            <div className="mt-5 flex items-center gap-2 text-[13px] text-[#62666d]">
-              <Check className="h-3.5 w-3.5 text-[#27a644]" />
+            <div className="mt-5 flex items-center gap-2 text-[13px] text-[var(--mkt-ink-tertiary)]">
+              <Check className="h-3.5 w-3.5 text-[var(--mkt-success)]" />
               No credit card required
-              <span className="mx-1 h-1 w-1 rounded-full bg-[#34343a]" />
+              <span className="mx-1 h-1 w-1 rounded-full bg-[var(--mkt-hairline-strong)]" />
               Free 14-day Pro trial
             </div>
-          </div>
+          </motion.div>
 
           {/* The product screenshot — the protagonist of the hero. */}
-          <div className="relative mx-auto mt-16 max-w-[1080px]">
+          <motion.div
+            className="relative mx-auto mt-16 max-w-[1080px]"
+            {...rise(0.15)}
+          >
             <div
               className="pointer-events-none absolute -inset-x-10 -top-10 bottom-0 -z-10 rounded-[32px] opacity-40 blur-[100px]"
               style={{
@@ -153,14 +173,14 @@ export default function Landing() {
               }}
             />
             <ProductDashboardMock />
-          </div>
+          </motion.div>
         </Container>
       </section>
 
       {/* ===== Logo marquee ===== */}
-      <section className="border-y border-[#1c1d20] py-12">
+      <section className="border-y border-[var(--mkt-hairline-soft)] py-12">
         <Container>
-          <p className="text-center text-[13px] text-[#62666d]">
+          <p className="text-center text-[13px] text-[var(--mkt-ink-tertiary)]">
             Trusted by finance and operations teams at fast-moving companies
           </p>
           <div className="relative mt-8 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
@@ -168,7 +188,7 @@ export default function Landing() {
               {[...logos, ...logos].map((name, i) => (
                 <span
                   key={i}
-                  className="whitespace-nowrap text-[18px] font-semibold tracking-tight text-[#5b5f66]"
+                  className="whitespace-nowrap text-[18px] font-semibold tracking-tight text-[var(--mkt-mock-ink-3)]"
                 >
                   {name}
                 </span>
@@ -190,15 +210,15 @@ export default function Landing() {
             {features.map(f => (
               <div
                 key={f.title}
-                className="mkt-panel group rounded-xl p-6 transition-colors hover:border-[#34343a]"
+                className="mkt-panel group rounded-xl p-6 transition-colors hover:border-[var(--mkt-hairline-strong)]"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#23252a] bg-[#141516] text-[#828fff] transition-colors group-hover:border-[#5e6ad2]/40">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-2)] text-[var(--mkt-primary-hover)] transition-colors group-hover:border-[var(--mkt-primary)]/40">
                   <f.icon className="h-5 w-5" />
                 </div>
-                <h3 className="mt-4 text-[18px] font-medium tracking-tight text-[#f7f8f8]">
+                <h3 className="mt-4 text-[18px] font-medium tracking-tight text-[var(--mkt-ink)]">
                   {f.title}
                 </h3>
-                <p className="mt-2 text-[14px] leading-relaxed text-[#8a8f98]">
+                <p className="mt-2 text-[14px] leading-relaxed text-[var(--mkt-ink-subtle)]">
                   {f.body}
                 </p>
               </div>
@@ -213,10 +233,10 @@ export default function Landing() {
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
             <div>
               <Eyebrow>Create</Eyebrow>
-              <h2 className="mkt-display mt-4 text-[clamp(28px,4vw,42px)] text-[#f7f8f8]">
+              <h2 className="mkt-display mt-4 text-[clamp(28px,4vw,42px)] text-[var(--mkt-ink)]">
                 Draft an invoice in seconds, not spreadsheets
               </h2>
-              <p className="mt-5 text-[17px] leading-relaxed text-[#8a8f98]">
+              <p className="mt-5 text-[17px] leading-relaxed text-[var(--mkt-ink-subtle)]">
                 Pick a client, add line items, and watch totals, VAT, and the
                 live PDF preview update as you type. Auto-numbered, brand-ready,
                 and correct every time.
@@ -229,10 +249,10 @@ export default function Landing() {
                 ].map(item => (
                   <li
                     key={item}
-                    className="flex items-center gap-3 text-[15px] text-[#d0d6e0]"
+                    className="flex items-center gap-3 text-[15px] text-[var(--mkt-ink-muted)]"
                   >
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5e6ad2]/15">
-                      <Check className="h-3 w-3 text-[#828fff]" />
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--mkt-primary)]/15">
+                      <Check className="h-3 w-3 text-[var(--mkt-primary-hover)]" />
                     </span>
                     {item}
                   </li>
@@ -259,30 +279,30 @@ export default function Landing() {
             </div>
             <div className="order-1 lg:order-2">
               <Eyebrow>Automate</Eyebrow>
-              <h2 className="mkt-display mt-4 text-[clamp(28px,4vw,42px)] text-[#f7f8f8]">
+              <h2 className="mkt-display mt-4 text-[clamp(28px,4vw,42px)] text-[var(--mkt-ink)]">
                 Reminders that chase payments so you don't have to
               </h2>
-              <p className="mt-5 text-[17px] leading-relaxed text-[#8a8f98]">
+              <p className="mt-5 text-[17px] leading-relaxed text-[var(--mkt-ink-subtle)]">
                 Set a schedule once and InvoiceFlow handles the rest — gentle
                 nudges before the due date, firm reminders after, and an instant
                 status flip the moment a payment lands.
               </p>
               <div className="mt-8 grid grid-cols-2 gap-4">
                 <div className="mkt-panel rounded-lg p-4">
-                  <Zap className="h-5 w-5 text-[#828fff]" />
-                  <div className="mt-3 text-[15px] font-medium text-[#f7f8f8]">
+                  <Zap className="h-5 w-5 text-[var(--mkt-primary-hover)]" />
+                  <div className="mt-3 text-[15px] font-medium text-[var(--mkt-ink)]">
                     Smart schedules
                   </div>
-                  <div className="mt-1 text-[13px] text-[#8a8f98]">
+                  <div className="mt-1 text-[13px] text-[var(--mkt-ink-subtle)]">
                     Trigger reminders by due date or status.
                   </div>
                 </div>
                 <div className="mkt-panel rounded-lg p-4">
-                  <Globe className="h-5 w-5 text-[#828fff]" />
-                  <div className="mt-3 text-[15px] font-medium text-[#f7f8f8]">
+                  <Globe className="h-5 w-5 text-[var(--mkt-primary-hover)]" />
+                  <div className="mt-3 text-[15px] font-medium text-[var(--mkt-ink)]">
                     Hosted pay pages
                   </div>
-                  <div className="mt-1 text-[13px] text-[#8a8f98]">
+                  <div className="mt-1 text-[13px] text-[var(--mkt-ink-subtle)]">
                     Clients pay in two taps, anywhere.
                   </div>
                 </div>
@@ -293,15 +313,15 @@ export default function Landing() {
       </section>
 
       {/* ===== Stats band ===== */}
-      <section className="border-y border-[#1c1d20] py-16">
+      <section className="border-y border-[var(--mkt-hairline-soft)] py-16">
         <Container>
           <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
             {stats.map(s => (
               <div key={s.label} className="text-center">
-                <div className="mkt-display text-[clamp(32px,5vw,48px)] text-[#f7f8f8]">
+                <div className="mkt-display text-[clamp(32px,5vw,48px)] text-[var(--mkt-ink)]">
                   {s.value}
                 </div>
-                <div className="mt-2 text-[14px] text-[#8a8f98]">{s.label}</div>
+                <div className="mt-2 text-[14px] text-[var(--mkt-ink-subtle)]">{s.label}</div>
               </div>
             ))}
           </div>
@@ -321,23 +341,23 @@ export default function Landing() {
                 key={t.name}
                 className="mkt-panel flex flex-col rounded-xl p-7"
               >
-                <div className="flex gap-0.5 text-[#828fff]">
+                <div className="flex gap-0.5 text-[var(--mkt-primary-hover)]">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star key={i} className="h-4 w-4 fill-current" />
                   ))}
                 </div>
-                <blockquote className="mt-4 flex-1 text-[16px] leading-relaxed text-[#d0d6e0]">
+                <blockquote className="mt-4 flex-1 text-[16px] leading-relaxed text-[var(--mkt-ink-muted)]">
                   "{t.quote}"
                 </blockquote>
                 <figcaption className="mt-6 flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#5e6ad2] to-[#828fff] text-[13px] font-semibold text-white">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[var(--mkt-primary)] to-[var(--mkt-primary-hover)] text-[13px] font-semibold text-white">
                     {t.name.charAt(0)}
                   </div>
                   <div>
-                    <div className="text-[14px] font-medium text-[#f7f8f8]">
+                    <div className="text-[14px] font-medium text-[var(--mkt-ink)]">
                       {t.name}
                     </div>
-                    <div className="text-[12px] text-[#62666d]">{t.role}</div>
+                    <div className="text-[12px] text-[var(--mkt-ink-tertiary)]">{t.role}</div>
                   </div>
                 </figcaption>
               </figure>
@@ -349,7 +369,7 @@ export default function Landing() {
       {/* ===== CTA banner ===== */}
       <section className="pb-28">
         <Container>
-          <div className="relative overflow-hidden rounded-2xl border border-[#23252a] bg-[#0f1011] px-8 py-16 text-center sm:px-16">
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] px-8 py-16 text-center sm:px-16">
             <div
               className="pointer-events-none absolute inset-0 opacity-40"
               style={{
@@ -358,10 +378,10 @@ export default function Landing() {
               }}
             />
             <div className="relative">
-              <h2 className="mkt-display mx-auto max-w-[18ch] text-[clamp(28px,4.5vw,46px)] text-[#f7f8f8]">
+              <h2 className="mkt-display mx-auto max-w-[18ch] text-[clamp(28px,4.5vw,46px)] text-[var(--mkt-ink)]">
                 Start getting paid faster today
               </h2>
-              <p className="mx-auto mt-4 max-w-[52ch] text-[17px] text-[#8a8f98]">
+              <p className="mx-auto mt-4 max-w-[52ch] text-[17px] text-[var(--mkt-ink-subtle)]">
                 Join thousands of teams running their billing on InvoiceFlow.
                 Free to start — no credit card, no setup calls.
               </p>
@@ -374,11 +394,11 @@ export default function Landing() {
                   Talk to sales
                 </MButton>
               </div>
-              <p className="mt-6 text-[13px] text-[#62666d]">
+              <p className="mt-6 text-[13px] text-[var(--mkt-ink-tertiary)]">
                 Already have an account?{" "}
                 <Link
                   href="/dashboard"
-                  className="text-[#828fff] hover:underline"
+                  className="text-[var(--mkt-primary-hover)] hover:underline"
                 >
                   Go to dashboard
                 </Link>

@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Link } from "wouter";
+import { motion, useReducedMotion } from "motion/react";
 import type { ComponentProps, ReactNode } from "react";
 
 /**
@@ -25,21 +26,22 @@ export function Container({
 }
 
 export function Eyebrow({ children }: { children: ReactNode }) {
-  return <span className="mkt-eyebrow text-[#828fff]">{children}</span>;
+  return <span className="mkt-eyebrow text-[var(--mkt-primary-hover)]">{children}</span>;
 }
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "inverse";
 type ButtonSize = "sm" | "md" | "lg";
 
 const buttonBase =
-  "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-150 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5e69d1]/60 disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-150 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--mkt-primary-focus)]/60 disabled:opacity-50";
 
 const buttonVariants: Record<ButtonVariant, string> = {
   primary:
-    "bg-[#5e6ad2] text-white hover:bg-[#828fff] shadow-[0_1px_2px_rgba(0,0,0,0.4)]",
+    "bg-[var(--mkt-primary)] text-white hover:bg-[var(--mkt-primary-hover)] shadow-[0_1px_2px_rgba(0,0,0,0.4)]",
   secondary:
-    "bg-[#0f1011] text-[#f7f8f8] border border-[#34343a] hover:border-[#4a4a52] hover:bg-[#141516]",
-  ghost: "text-[#d0d6e0] hover:text-white hover:bg-white/5",
+    "bg-[var(--mkt-surface-1)] text-[var(--mkt-ink)] border border-[var(--mkt-hairline-strong)] hover:border-[var(--mkt-mock-faint)] hover:bg-[var(--mkt-surface-2)]",
+  ghost:
+    "text-[var(--mkt-ink-muted)] hover:text-[var(--mkt-ink)] hover:bg-[var(--mkt-surface-3)]",
   inverse: "bg-white text-black hover:bg-[#f5f6f6]",
 };
 
@@ -103,7 +105,7 @@ export function Pill({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border border-[#23252a] bg-[#141516] px-3 py-1 text-[12px] font-medium text-[#d0d6e0]",
+        "inline-flex items-center gap-1.5 rounded-full border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-2)] px-3 py-1 text-[12px] font-medium text-[var(--mkt-ink-muted)]",
         className
       )}
     >
@@ -125,8 +127,13 @@ export function SectionHeading({
   align?: "center" | "left";
   className?: string;
 }) {
+  const reduce = useReducedMotion();
   return (
-    <div
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 14 }}
+      whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
         "flex flex-col gap-4",
         align === "center"
@@ -136,25 +143,25 @@ export function SectionHeading({
       )}
     >
       {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
-      <h2 className="mkt-display text-[clamp(28px,4vw,44px)] text-[#f7f8f8] max-w-[20ch]">
+      <h2 className="mkt-display text-[clamp(28px,4vw,44px)] text-[var(--mkt-ink)] max-w-[20ch]">
         {title}
       </h2>
       {description ? (
         <p
           className={cn(
-            "text-[17px] leading-relaxed text-[#8a8f98]",
+            "text-[17px] leading-relaxed text-[var(--mkt-ink-subtle)]",
             align === "center" ? "max-w-[58ch]" : "max-w-[52ch]"
           )}
         >
           {description}
         </p>
       ) : null}
-    </div>
+    </motion.div>
   );
 }
 
 export function GlowDivider() {
   return (
-    <div className="mx-auto h-px max-w-[1180px] bg-gradient-to-r from-transparent via-[#34343a] to-transparent" />
+    <div className="mx-auto h-px max-w-[1180px] bg-gradient-to-r from-transparent via-[var(--mkt-hairline-strong)] to-transparent" />
   );
 }

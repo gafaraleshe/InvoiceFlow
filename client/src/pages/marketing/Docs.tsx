@@ -23,7 +23,7 @@ import type { ReactNode } from "react";
 
 function Code({ children }: { children: ReactNode }) {
   return (
-    <code className="rounded-[5px] border border-[#23252a] bg-[#141516] px-1.5 py-0.5 font-mono text-[13px] text-[#aab2f5]">
+    <code className="rounded-[5px] border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-2)] px-1.5 py-0.5 font-mono text-[13px] text-[var(--mkt-primary-soft)]">
       {children}
     </code>
   );
@@ -31,7 +31,7 @@ function Code({ children }: { children: ReactNode }) {
 
 function Pre({ children }: { children: ReactNode }) {
   return (
-    <pre className="my-4 overflow-x-auto rounded-xl border border-[#23252a] bg-[#0c0c0e] p-4 font-mono text-[12.5px] leading-relaxed text-[#d0d6e0]">
+    <pre className="my-4 overflow-x-auto rounded-xl border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-0)] p-4 font-mono text-[12.5px] leading-relaxed text-[var(--mkt-ink-muted)]">
       {children}
     </pre>
   );
@@ -39,7 +39,7 @@ function Pre({ children }: { children: ReactNode }) {
 
 function Note({ children }: { children: ReactNode }) {
   return (
-    <div className="my-4 rounded-lg border-l-2 border-[#5e6ad2] bg-[#5e6ad2]/[0.06] py-3 pl-4 pr-4 text-[14px] leading-relaxed text-[#d0d6e0]">
+    <div className="my-4 rounded-lg border-l-2 border-[var(--mkt-primary)] bg-[var(--mkt-primary)]/[0.06] py-3 pl-4 pr-4 text-[14px] leading-relaxed text-[var(--mkt-ink-muted)]">
       {children}
     </div>
   );
@@ -47,7 +47,7 @@ function Note({ children }: { children: ReactNode }) {
 
 function P({ children }: { children: ReactNode }) {
   return (
-    <p className="mb-4 text-[15px] leading-relaxed text-[#c2c6cf]">
+    <p className="mb-4 text-[15px] leading-relaxed text-[var(--mkt-mock-ink)]">
       {children}
     </p>
   );
@@ -57,7 +57,7 @@ function H({ id, children }: { id: string; children: ReactNode }) {
   return (
     <h2
       id={id}
-      className="mkt-display scroll-mt-24 text-[26px] text-[#f7f8f8] [&:not(:first-child)]:mt-2"
+      className="mkt-display scroll-mt-24 text-[26px] text-[var(--mkt-ink)] [&:not(:first-child)]:mt-2"
     >
       {children}
     </h2>
@@ -66,7 +66,7 @@ function H({ id, children }: { id: string; children: ReactNode }) {
 
 function H3({ children }: { children: ReactNode }) {
   return (
-    <h3 className="mb-2 mt-7 text-[16px] font-semibold tracking-tight text-[#f7f8f8]">
+    <h3 className="mb-2 mt-7 text-[16px] font-semibold tracking-tight text-[var(--mkt-ink)]">
       {children}
     </h3>
   );
@@ -84,9 +84,9 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section className="scroll-mt-24 border-b border-[#161719] py-10 first:pt-0 last:border-0">
+    <section className="scroll-mt-24 border-b border-[var(--mkt-line-soft)] py-10 first:pt-0 last:border-0">
       <div className="mb-4 flex items-center gap-2.5">
-        <span className="flex h-7 w-7 items-center justify-center rounded-md border border-[#23252a] bg-[#141516] text-[#828fff]">
+        <span className="flex h-7 w-7 items-center justify-center rounded-md border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-2)] text-[var(--mkt-primary-hover)]">
           <Icon className="h-4 w-4" />
         </span>
         <H id={id}>{title}</H>
@@ -100,9 +100,9 @@ function FeatureList({ rows }: { rows: [string, string][] }) {
   return (
     <ul className="my-4 space-y-2.5">
       {rows.map(([term, desc]) => (
-        <li key={term} className="text-[15px] leading-relaxed text-[#c2c6cf]">
-          <span className="font-medium text-[#f7f8f8]">{term}</span>
-          <span className="text-[#8a8f98]"> — {desc}</span>
+        <li key={term} className="text-[15px] leading-relaxed text-[var(--mkt-mock-ink)]">
+          <span className="font-medium text-[var(--mkt-ink)]">{term}</span>
+          <span className="text-[var(--mkt-ink-subtle)]"> — {desc}</span>
         </li>
       ))}
     </ul>
@@ -193,14 +193,14 @@ export default function Docs() {
   return (
     <Container className="py-12 sm:py-16">
       {/* header */}
-      <div className="mb-10 border-b border-[#1c1d20] pb-8">
-        <div className="flex items-center gap-2 text-[13px] text-[#62666d]">
+      <div className="mb-10 border-b border-[var(--mkt-hairline-soft)] pb-8">
+        <div className="flex items-center gap-2 text-[13px] text-[var(--mkt-ink-tertiary)]">
           <BookOpen className="h-3.5 w-3.5" /> Documentation
         </div>
-        <h1 className="mkt-display mt-3 text-[clamp(32px,5vw,48px)] text-[#f7f8f8]">
+        <h1 className="mkt-display mt-3 text-[clamp(32px,5vw,48px)] text-[var(--mkt-ink)]">
           InvoiceFlow docs
         </h1>
-        <p className="mt-3 max-w-[64ch] text-[17px] leading-relaxed text-[#8a8f98]">
+        <p className="mt-3 max-w-[64ch] text-[17px] leading-relaxed text-[var(--mkt-ink-subtle)]">
           Everything you need to use InvoiceFlow — core concepts, plans, the
           REST API, and how the platform is built and deployed.
         </p>
@@ -212,10 +212,10 @@ export default function Docs() {
           <nav className="space-y-6">
             {nav.map(group => (
               <div key={group.group}>
-                <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[#62666d]">
+                <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--mkt-ink-tertiary)]">
                   {group.group}
                 </div>
-                <ul className="space-y-0.5 border-l border-[#1c1d20]">
+                <ul className="space-y-0.5 border-l border-[var(--mkt-hairline-soft)]">
                   {group.items.map(item => (
                     <li key={item.id}>
                       <a
@@ -223,8 +223,8 @@ export default function Docs() {
                         className={cn(
                           "-ml-px block border-l py-1.5 pl-3 text-[14px] transition-colors",
                           active === item.id
-                            ? "border-[#5e6ad2] text-[#f7f8f8]"
-                            : "border-transparent text-[#8a8f98] hover:text-[#d0d6e0]"
+                            ? "border-[var(--mkt-primary)] text-[var(--mkt-ink)]"
+                            : "border-transparent text-[var(--mkt-ink-subtle)] hover:text-[var(--mkt-ink-muted)]"
                         )}
                       >
                         {item.label}
@@ -250,7 +250,7 @@ export default function Docs() {
               These docs cover how the product works day to day, what each plan
               includes, the public REST API for integrations, and how the
               platform is built and deployed. New to InvoiceFlow? Start with the{" "}
-              <a href="#quickstart" className="text-[#828fff] hover:underline">
+              <a href="#quickstart" className="text-[var(--mkt-primary-hover)] hover:underline">
                 Quickstart
               </a>
               .
@@ -259,7 +259,7 @@ export default function Docs() {
 
           <Section id="quickstart" icon={Rocket} title="Quickstart">
             <P>Get your first invoice out the door in under two minutes.</P>
-            <ol className="my-4 space-y-3 text-[15px] leading-relaxed text-[#c2c6cf]">
+            <ol className="my-4 space-y-3 text-[15px] leading-relaxed text-[var(--mkt-mock-ink)]">
               {[
                 [
                   "Create your account",
@@ -279,11 +279,11 @@ export default function Docs() {
                 ],
               ].map(([t, d], i) => (
                 <li key={t} className="flex gap-3">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#5e6ad2]/15 text-[12px] font-semibold text-[#828fff]">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--mkt-primary)]/15 text-[12px] font-semibold text-[var(--mkt-primary-hover)]">
                     {i + 1}
                   </span>
                   <span>
-                    <span className="font-medium text-[#f7f8f8]">{t}</span> —{" "}
+                    <span className="font-medium text-[var(--mkt-ink)]">{t}</span> —{" "}
                     {d}
                   </span>
                 </li>
@@ -409,7 +409,7 @@ export default function Docs() {
             <P>
               InvoiceFlow is free to start. Upgrade for automation, the API, and
               team seats. See the{" "}
-              <Link href="/pricing" className="text-[#828fff] hover:underline">
+              <Link href="/pricing" className="text-[var(--mkt-primary-hover)] hover:underline">
                 pricing page
               </Link>{" "}
               for current prices.
@@ -437,7 +437,7 @@ export default function Docs() {
             <P>
               Subscriptions and tax are handled by Polar.sh; manage or cancel
               your plan anytime from billing settings. Enterprise is a custom
-              annual contract — <Link href="/contact" className="text-[#828fff] hover:underline">talk to sales</Link>.
+              annual contract — <Link href="/contact" className="text-[var(--mkt-primary-hover)] hover:underline">talk to sales</Link>.
             </P>
           </Section>
 
@@ -469,7 +469,7 @@ export default function Docs() {
     ]
   }'`}</Pre>
             <H3>Endpoints</H3>
-            <div className="my-4 overflow-hidden rounded-xl border border-[#23252a]">
+            <div className="my-4 overflow-hidden rounded-xl border border-[var(--mkt-hairline)]">
               {[
                 ["GET", "/v1/clients", "List clients"],
                 ["POST", "/v1/clients", "Create a client"],
@@ -487,16 +487,16 @@ export default function Docs() {
                   key={path as string}
                   className={cn(
                     "grid grid-cols-[56px_minmax(0,1fr)] items-center gap-3 px-4 py-2.5 text-[13px] sm:grid-cols-[56px_240px_minmax(0,1fr)]",
-                    i > 0 && "border-t border-[#161719]"
+                    i > 0 && "border-t border-[var(--mkt-line-soft)]"
                   )}
                 >
-                  <span className="font-mono text-[11px] font-semibold text-[#7fe0a0]">
+                  <span className="font-mono text-[11px] font-semibold text-[var(--mkt-success-ink)]">
                     {m}
                   </span>
-                  <span className="truncate font-mono text-[#aab2f5]">
+                  <span className="truncate font-mono text-[var(--mkt-primary-soft)]">
                     {path}
                   </span>
-                  <span className="hidden text-[#8a8f98] sm:block">{desc}</span>
+                  <span className="hidden text-[var(--mkt-ink-subtle)] sm:block">{desc}</span>
                 </div>
               ))}
             </div>
@@ -569,7 +569,7 @@ pnpm dev               # http://localhost:3000`}</Pre>
             <H3>Where do I get help?</H3>
             <P>
               Reach the team from the{" "}
-              <Link href="/contact" className="text-[#828fff] hover:underline">
+              <Link href="/contact" className="text-[var(--mkt-primary-hover)] hover:underline">
                 contact page
               </Link>{" "}
               — we reply within one business day.
@@ -577,11 +577,11 @@ pnpm dev               # http://localhost:3000`}</Pre>
           </Section>
 
           {/* footer CTA */}
-          <div className="mt-12 rounded-2xl border border-[#23252a] bg-[#0f1011] p-8 text-center">
-            <h3 className="mkt-display text-[24px] text-[#f7f8f8]">
+          <div className="mt-12 rounded-2xl border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] p-8 text-center">
+            <h3 className="mkt-display text-[24px] text-[var(--mkt-ink)]">
               Ready to send your first invoice?
             </h3>
-            <p className="mx-auto mt-3 max-w-[44ch] text-[15px] text-[#8a8f98]">
+            <p className="mx-auto mt-3 max-w-[44ch] text-[15px] text-[var(--mkt-ink-subtle)]">
               Create an account free — no card required.
             </p>
             <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">

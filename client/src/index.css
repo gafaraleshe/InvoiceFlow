@@ -142,20 +142,39 @@
  * light-themed authenticated dashboard. Tokens mirror DESIGN.md front matter.
  */
 .mkt {
+  /* Light theme is the base; dark values are overridden under `.dark .mkt`
+     (the ThemeProvider toggles `.dark` on <html>). Every marketing component
+     references these tokens, so both themes stay in sync from one place. */
   --mkt-primary: #5e6ad2;
-  --mkt-primary-hover: #828fff;
+  --mkt-primary-hover: #4954c9;
   --mkt-primary-focus: #5e69d1;
-  --mkt-ink: #f7f8f8;
-  --mkt-ink-muted: #d0d6e0;
-  --mkt-ink-subtle: #8a8f98;
-  --mkt-ink-tertiary: #62666d;
-  --mkt-canvas: #010102;
-  --mkt-surface-1: #0f1011;
-  --mkt-surface-2: #141516;
-  --mkt-surface-3: #18191a;
-  --mkt-hairline: #23252a;
-  --mkt-hairline-strong: #34343a;
-  --mkt-success: #27a644;
+  --mkt-primary-soft: #4954c9;
+  --mkt-ink: #0c0d10;
+  --mkt-ink-muted: #3a3d44;
+  --mkt-ink-subtle: #5a5f68;
+  --mkt-ink-tertiary: #868b93;
+  --mkt-canvas: #ffffff;
+  --mkt-surface-0: #f0f1f3;
+  --mkt-surface-1: #f7f8f9;
+  --mkt-surface-2: #ffffff;
+  --mkt-surface-3: #eef0f2;
+  --mkt-hairline: #e4e6ea;
+  --mkt-hairline-strong: #d2d5db;
+  --mkt-hairline-soft: #ececef;
+  --mkt-line-soft: #eef0f2;
+  --mkt-success: #1a8f3c;
+  --mkt-success-ink: #15803d;
+  --mkt-mock-1: #ffffff;
+  --mkt-mock-2: #f3f4f6;
+  --mkt-mock-border: #e4e6ea;
+  --mkt-mock-ink: #3a3d44;
+  --mkt-mock-ink-2: #5a5f68;
+  --mkt-mock-ink-3: #868b93;
+  --mkt-mock-faint: #b3b7be;
+  --mkt-mock-faint-2: #c7cad0;
+  --mkt-grid-line: rgba(0, 0, 0, 0.045);
+  --mkt-panel-top: rgba(255, 255, 255, 0.9);
+  --mkt-selection-ink: #ffffff;
 
   background-color: var(--mkt-canvas);
   color: var(--mkt-ink);
@@ -163,9 +182,41 @@
   -webkit-font-smoothing: antialiased;
 }
 
+.dark .mkt {
+  --mkt-primary: #5e6ad2;
+  --mkt-primary-hover: #828fff;
+  --mkt-primary-focus: #5e69d1;
+  --mkt-primary-soft: #aab2f5;
+  --mkt-ink: #f7f8f8;
+  --mkt-ink-muted: #d0d6e0;
+  --mkt-ink-subtle: #8a8f98;
+  --mkt-ink-tertiary: #62666d;
+  --mkt-canvas: #010102;
+  --mkt-surface-0: #0b0b0c;
+  --mkt-surface-1: #0f1011;
+  --mkt-surface-2: #141516;
+  --mkt-surface-3: #18191a;
+  --mkt-hairline: #23252a;
+  --mkt-hairline-strong: #34343a;
+  --mkt-hairline-soft: #1c1d20;
+  --mkt-line-soft: #161719;
+  --mkt-success: #27a644;
+  --mkt-success-ink: #7fe0a0;
+  --mkt-mock-1: #1a1b1e;
+  --mkt-mock-2: #1d1e21;
+  --mkt-mock-border: #2a2b2f;
+  --mkt-mock-ink: #c2c6cf;
+  --mkt-mock-ink-2: #9aa0a8;
+  --mkt-mock-ink-3: #5b5f66;
+  --mkt-mock-faint: #4a4a52;
+  --mkt-mock-faint-2: #3e3e44;
+  --mkt-grid-line: rgba(255, 255, 255, 0.025);
+  --mkt-panel-top: rgba(255, 255, 255, 0.04);
+}
+
 .mkt ::selection {
   background-color: color-mix(in oklab, var(--mkt-primary) 35%, transparent);
-  color: #ffffff;
+  color: var(--mkt-selection-ink);
 }
 
 /* Aggressive negative tracking for display type, per DESIGN.md. */
@@ -186,13 +237,13 @@
 .mkt-panel {
   background-color: var(--mkt-surface-1);
   border: 1px solid var(--mkt-hairline);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 0 var(--mkt-panel-top);
 }
 
 .mkt-grid-bg {
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    linear-gradient(to right, var(--mkt-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--mkt-grid-line) 1px, transparent 1px);
   background-size: 56px 56px;
 }
 

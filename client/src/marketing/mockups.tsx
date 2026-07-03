@@ -34,19 +34,19 @@ export function WindowFrame({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-xl border border-[#23252a] bg-[#0b0b0c] shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)]",
+        "overflow-hidden rounded-xl border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-0)] shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)]",
         "ring-1 ring-white/5",
         className
       )}
     >
-      <div className="flex items-center gap-3 border-b border-[#1c1d20] bg-[#0f1011] px-4 py-2.5">
+      <div className="flex items-center gap-3 border-b border-[var(--mkt-hairline-soft)] bg-[var(--mkt-surface-1)] px-4 py-2.5">
         <div className="flex gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#2a2b2f]" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#2a2b2f]" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#2a2b2f]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[var(--mkt-mock-border)]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[var(--mkt-mock-border)]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[var(--mkt-mock-border)]" />
         </div>
-        <div className="mx-auto flex h-6 w-full max-w-[280px] items-center justify-center gap-1.5 rounded-md bg-[#08080a] text-[11px] text-[#62666d]">
-          <span className="h-2.5 w-2.5 rounded-full border border-[#34343a]" />
+        <div className="mx-auto flex h-6 w-full max-w-[280px] items-center justify-center gap-1.5 rounded-md bg-[var(--mkt-surface-0)] text-[11px] text-[var(--mkt-ink-tertiary)]">
+          <span className="h-2.5 w-2.5 rounded-full border border-[var(--mkt-hairline-strong)]" />
           {url}
         </div>
         <div className="h-2.5 w-8" />
@@ -68,10 +68,10 @@ const stats = [
     label: "Total Revenue",
     value: "£248,910",
     delta: "+18.2%",
-    accent: "#27a644",
+    accent: "var(--mkt-success)",
   },
   { label: "Outstanding", value: "£32,540", delta: "+4.1%", accent: "#d8a200" },
-  { label: "Invoices", value: "1,284", delta: "+96", accent: "#5e6ad2" },
+  { label: "Invoices", value: "1,284", delta: "+96", accent: "var(--mkt-primary)" },
   { label: "Overdue", value: "7", delta: "−3", accent: "#c75d5d" },
 ];
 
@@ -125,10 +125,10 @@ const statusStyles: Record<
   Row["status"],
   { dot: string; text: string; bg: string }
 > = {
-  Paid: { dot: "#27a644", text: "#7fe0a0", bg: "rgba(39,166,68,0.12)" },
-  Sent: { dot: "#5e6ad2", text: "#aab2f5", bg: "rgba(94,106,210,0.14)" },
+  Paid: { dot: "var(--mkt-success)", text: "var(--mkt-success-ink)", bg: "rgba(39,166,68,0.12)" },
+  Sent: { dot: "var(--mkt-primary)", text: "var(--mkt-primary-soft)", bg: "rgba(94,106,210,0.14)" },
   Overdue: { dot: "#c75d5d", text: "#f0a0a0", bg: "rgba(199,93,93,0.12)" },
-  Draft: { dot: "#62666d", text: "#9aa0a8", bg: "rgba(255,255,255,0.05)" },
+  Draft: { dot: "var(--mkt-ink-tertiary)", text: "var(--mkt-mock-ink-2)", bg: "rgba(255,255,255,0.05)" },
 };
 
 const StatusBadge = ({ status }: { status: Row["status"] }) => {
@@ -160,7 +160,7 @@ function MiniChart() {
               height: `${h}%`,
               background:
                 i === bars.length - 1
-                  ? "#5e6ad2"
+                  ? "var(--mkt-primary)"
                   : "linear-gradient(180deg, rgba(94,106,210,0.55), rgba(94,106,210,0.12))",
             }}
           />
@@ -176,14 +176,14 @@ function MiniChart() {
 export function ProductDashboardMock({ className }: { className?: string }) {
   return (
     <WindowFrame className={className}>
-      <div className="flex min-h-[460px] bg-[#0a0a0b] text-left">
+      <div className="flex min-h-[460px] bg-[var(--mkt-surface-0)] text-left">
         {/* Sidebar */}
-        <aside className="hidden w-[200px] shrink-0 flex-col border-r border-[#1a1b1e] bg-[#0c0c0e] p-3 sm:flex">
+        <aside className="hidden w-[200px] shrink-0 flex-col border-r border-[var(--mkt-mock-1)] bg-[var(--mkt-surface-0)] p-3 sm:flex">
           <div className="flex items-center gap-2 px-2 py-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[#5e6ad2] text-[13px] font-bold text-white">
+            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--mkt-primary)] text-[13px] font-bold text-white">
               I
             </div>
-            <span className="text-[14px] font-semibold tracking-tight text-[#f7f8f8]">
+            <span className="text-[14px] font-semibold tracking-tight text-[var(--mkt-ink)]">
               InvoiceFlow
             </span>
           </div>
@@ -194,27 +194,27 @@ export function ProductDashboardMock({ className }: { className?: string }) {
                 className={cn(
                   "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px]",
                   item.active
-                    ? "bg-[#5e6ad2]/12 text-[#f7f8f8]"
-                    : "text-[#8a8f98]"
+                    ? "bg-[var(--mkt-primary)]/12 text-[var(--mkt-ink)]"
+                    : "text-[var(--mkt-ink-subtle)]"
                 )}
               >
                 <item.icon
                   className="h-3.5 w-3.5"
-                  style={{ color: item.active ? "#828fff" : undefined }}
+                  style={{ color: item.active ? "var(--mkt-primary-hover)" : undefined }}
                 />
                 {item.label}
               </div>
             ))}
           </nav>
           <div className="mt-auto flex items-center gap-2 rounded-md px-2 py-2">
-            <div className="h-7 w-7 rounded-full bg-gradient-to-br from-[#5e6ad2] to-[#828fff] text-center text-[12px] font-semibold leading-7 text-white">
+            <div className="h-7 w-7 rounded-full bg-gradient-to-br from-[var(--mkt-primary)] to-[var(--mkt-primary-hover)] text-center text-[12px] font-semibold leading-7 text-white">
               A
             </div>
             <div className="min-w-0">
-              <div className="truncate text-[12px] font-medium text-[#d0d6e0]">
+              <div className="truncate text-[12px] font-medium text-[var(--mkt-ink-muted)]">
                 Avery Klein
               </div>
-              <div className="truncate text-[10px] text-[#62666d]">Admin</div>
+              <div className="truncate text-[10px] text-[var(--mkt-ink-tertiary)]">Admin</div>
             </div>
           </div>
         </aside>
@@ -222,24 +222,24 @@ export function ProductDashboardMock({ className }: { className?: string }) {
         {/* Main */}
         <div className="flex min-w-0 flex-1 flex-col">
           {/* Topbar */}
-          <div className="flex items-center justify-between border-b border-[#1a1b1e] px-4 py-3 sm:px-5">
+          <div className="flex items-center justify-between border-b border-[var(--mkt-mock-1)] px-4 py-3 sm:px-5">
             <div>
-              <div className="text-[15px] font-semibold tracking-tight text-[#f7f8f8]">
+              <div className="text-[15px] font-semibold tracking-tight text-[var(--mkt-ink)]">
                 Dashboard
               </div>
-              <div className="text-[11px] text-[#62666d]">
+              <div className="text-[11px] text-[var(--mkt-ink-tertiary)]">
                 Overview of your invoicing activity
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="hidden items-center gap-1.5 rounded-md border border-[#23252a] bg-[#0f1011] px-2.5 py-1.5 text-[11px] text-[#62666d] md:flex">
+              <div className="hidden items-center gap-1.5 rounded-md border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] px-2.5 py-1.5 text-[11px] text-[var(--mkt-ink-tertiary)] md:flex">
                 <Search className="h-3 w-3" />
                 Search…
               </div>
-              <div className="flex h-7 w-7 items-center justify-center rounded-md border border-[#23252a] bg-[#0f1011]">
-                <Bell className="h-3.5 w-3.5 text-[#8a8f98]" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-md border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)]">
+                <Bell className="h-3.5 w-3.5 text-[var(--mkt-ink-subtle)]" />
               </div>
-              <div className="flex items-center gap-1.5 rounded-md bg-[#5e6ad2] px-2.5 py-1.5 text-[11px] font-medium text-white">
+              <div className="flex items-center gap-1.5 rounded-md bg-[var(--mkt-primary)] px-2.5 py-1.5 text-[11px] font-medium text-white">
                 <Plus className="h-3 w-3" />
                 New Invoice
               </div>
@@ -253,10 +253,10 @@ export function ProductDashboardMock({ className }: { className?: string }) {
               {stats.map(s => (
                 <div
                   key={s.label}
-                  className="rounded-lg border border-[#1d1e21] bg-[#0f1011] p-3"
+                  className="rounded-lg border border-[var(--mkt-mock-2)] bg-[var(--mkt-surface-1)] p-3"
                 >
-                  <div className="text-[11px] text-[#62666d]">{s.label}</div>
-                  <div className="mt-1.5 text-[18px] font-semibold tracking-tight text-[#f7f8f8]">
+                  <div className="text-[11px] text-[var(--mkt-ink-tertiary)]">{s.label}</div>
+                  <div className="mt-1.5 text-[18px] font-semibold tracking-tight text-[var(--mkt-ink)]">
                     {s.value}
                   </div>
                   <div
@@ -272,40 +272,40 @@ export function ProductDashboardMock({ className }: { className?: string }) {
 
             {/* Chart + table */}
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-5">
-              <div className="rounded-lg border border-[#1d1e21] bg-[#0f1011] p-4 lg:col-span-2">
+              <div className="rounded-lg border border-[var(--mkt-mock-2)] bg-[var(--mkt-surface-1)] p-4 lg:col-span-2">
                 <div className="flex items-center justify-between">
-                  <div className="text-[12px] font-medium text-[#d0d6e0]">
+                  <div className="text-[12px] font-medium text-[var(--mkt-ink-muted)]">
                     Revenue
                   </div>
-                  <span className="text-[10px] text-[#62666d]">Last 12 mo</span>
+                  <span className="text-[10px] text-[var(--mkt-ink-tertiary)]">Last 12 mo</span>
                 </div>
                 <div className="mt-4">
                   <MiniChart />
                 </div>
               </div>
 
-              <div className="rounded-lg border border-[#1d1e21] bg-[#0f1011] lg:col-span-3">
-                <div className="flex items-center justify-between border-b border-[#1a1b1e] px-4 py-2.5">
-                  <span className="text-[12px] font-medium text-[#d0d6e0]">
+              <div className="rounded-lg border border-[var(--mkt-mock-2)] bg-[var(--mkt-surface-1)] lg:col-span-3">
+                <div className="flex items-center justify-between border-b border-[var(--mkt-mock-1)] px-4 py-2.5">
+                  <span className="text-[12px] font-medium text-[var(--mkt-ink-muted)]">
                     Recent Invoices
                   </span>
-                  <span className="inline-flex items-center gap-1 text-[10px] text-[#828fff]">
+                  <span className="inline-flex items-center gap-1 text-[10px] text-[var(--mkt-primary-hover)]">
                     View all <ArrowUpRight className="h-2.5 w-2.5" />
                   </span>
                 </div>
-                <div className="divide-y divide-[#161719]">
+                <div className="divide-y divide-[var(--mkt-line-soft)]">
                   {rows.map(r => (
                     <div
                       key={r.number}
                       className="grid grid-cols-[1.1fr_1.2fr_0.9fr_0.8fr] items-center gap-2 px-4 py-2.5 text-[11px]"
                     >
-                      <span className="font-mono text-[#aab2f5]">
+                      <span className="font-mono text-[var(--mkt-primary-soft)]">
                         {r.number}
                       </span>
-                      <span className="truncate text-[#d0d6e0]">
+                      <span className="truncate text-[var(--mkt-ink-muted)]">
                         {r.client}
                       </span>
-                      <span className="text-right font-mono font-medium text-[#f7f8f8]">
+                      <span className="text-right font-mono font-medium text-[var(--mkt-ink)]">
                         {r.total}
                       </span>
                       <span className="flex justify-end">
@@ -332,61 +332,61 @@ export function InvoiceComposerMock({ className }: { className?: string }) {
   ];
   return (
     <WindowFrame className={className} url="app.invoiceflow.com/invoices/new">
-      <div className="grid min-h-[420px] grid-cols-1 bg-[#0a0a0b] lg:grid-cols-[1.1fr_1fr]">
+      <div className="grid min-h-[420px] grid-cols-1 bg-[var(--mkt-surface-0)] lg:grid-cols-[1.1fr_1fr]">
         {/* Form side */}
-        <div className="border-b border-[#1a1b1e] p-5 lg:border-b-0 lg:border-r">
+        <div className="border-b border-[var(--mkt-mock-1)] p-5 lg:border-b-0 lg:border-r">
           <div className="flex items-center justify-between">
-            <span className="text-[13px] font-semibold tracking-tight text-[#f7f8f8]">
+            <span className="text-[13px] font-semibold tracking-tight text-[var(--mkt-ink)]">
               New Invoice
             </span>
-            <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] font-medium text-[#9aa0a8]">
+            <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] font-medium text-[var(--mkt-mock-ink-2)]">
               Draft
             </span>
           </div>
 
           <div className="mt-4 space-y-3">
             <div>
-              <div className="mb-1 text-[10px] uppercase tracking-wide text-[#62666d]">
+              <div className="mb-1 text-[10px] uppercase tracking-wide text-[var(--mkt-ink-tertiary)]">
                 Bill to
               </div>
-              <div className="flex items-center justify-between rounded-md border border-[#23252a] bg-[#0f1011] px-3 py-2 text-[12px] text-[#d0d6e0]">
+              <div className="flex items-center justify-between rounded-md border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] px-3 py-2 text-[12px] text-[var(--mkt-ink-muted)]">
                 Northwind Studio
-                <span className="text-[#62666d]">▾</span>
+                <span className="text-[var(--mkt-ink-tertiary)]">▾</span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <div className="mb-1 text-[10px] uppercase tracking-wide text-[#62666d]">
+                <div className="mb-1 text-[10px] uppercase tracking-wide text-[var(--mkt-ink-tertiary)]">
                   Issue date
                 </div>
-                <div className="rounded-md border border-[#23252a] bg-[#0f1011] px-3 py-2 text-[12px] text-[#d0d6e0]">
+                <div className="rounded-md border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] px-3 py-2 text-[12px] text-[var(--mkt-ink-muted)]">
                   23 Jun 2026
                 </div>
               </div>
               <div>
-                <div className="mb-1 text-[10px] uppercase tracking-wide text-[#62666d]">
+                <div className="mb-1 text-[10px] uppercase tracking-wide text-[var(--mkt-ink-tertiary)]">
                   Due
                 </div>
-                <div className="rounded-md border border-[#23252a] bg-[#0f1011] px-3 py-2 text-[12px] text-[#d0d6e0]">
+                <div className="rounded-md border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] px-3 py-2 text-[12px] text-[var(--mkt-ink-muted)]">
                   Net 30
                 </div>
               </div>
             </div>
 
-            <div className="rounded-md border border-[#23252a] bg-[#0f1011]">
+            <div className="rounded-md border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)]">
               {lines.map((l, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between border-b border-[#161719] px-3 py-2 text-[11px] last:border-0"
+                  className="flex items-center justify-between border-b border-[var(--mkt-line-soft)] px-3 py-2 text-[11px] last:border-0"
                 >
-                  <span className="truncate text-[#d0d6e0]">{l.desc}</span>
-                  <span className="ml-3 shrink-0 font-mono text-[#f7f8f8]">
+                  <span className="truncate text-[var(--mkt-ink-muted)]">{l.desc}</span>
+                  <span className="ml-3 shrink-0 font-mono text-[var(--mkt-ink)]">
                     {l.price}
                   </span>
                 </div>
               ))}
-              <div className="flex items-center gap-1.5 px-3 py-2 text-[11px] text-[#828fff]">
+              <div className="flex items-center gap-1.5 px-3 py-2 text-[11px] text-[var(--mkt-primary-hover)]">
                 <Plus className="h-3 w-3" /> Add line item
               </div>
             </div>
@@ -394,11 +394,11 @@ export function InvoiceComposerMock({ className }: { className?: string }) {
         </div>
 
         {/* Preview side */}
-        <div className="bg-[#08080a] p-5">
+        <div className="bg-[var(--mkt-surface-0)] p-5">
           <div className="rounded-lg bg-white p-5 text-black shadow-[0_20px_60px_-30px_rgba(0,0,0,0.8)]">
             <div className="flex items-start justify-between">
               <div>
-                <div className="text-[15px] font-bold tracking-tight text-[#5e6ad2]">
+                <div className="text-[15px] font-bold tracking-tight text-[var(--mkt-primary)]">
                   InvoiceFlow
                 </div>
                 <div className="mt-0.5 text-[10px] text-neutral-500">
@@ -443,10 +443,10 @@ export function InvoiceComposerMock({ className }: { className?: string }) {
             </div>
           </div>
           <div className="mt-3 flex gap-2">
-            <div className="flex flex-1 items-center justify-center gap-1.5 rounded-md bg-[#5e6ad2] py-2 text-[11px] font-medium text-white">
+            <div className="flex flex-1 items-center justify-center gap-1.5 rounded-md bg-[var(--mkt-primary)] py-2 text-[11px] font-medium text-white">
               <Send className="h-3 w-3" /> Send invoice
             </div>
-            <div className="flex items-center justify-center rounded-md border border-[#23252a] bg-[#0f1011] px-3 py-2 text-[11px] text-[#d0d6e0]">
+            <div className="flex items-center justify-center rounded-md border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] px-3 py-2 text-[11px] text-[var(--mkt-ink-muted)]">
               Preview PDF
             </div>
           </div>
@@ -467,31 +467,31 @@ export function AutomationMock({ className }: { className?: string }) {
   return (
     <div className={cn("mkt-panel rounded-xl p-5", className)}>
       <div className="flex items-center justify-between">
-        <span className="text-[13px] font-medium text-[#d0d6e0]">
+        <span className="text-[13px] font-medium text-[var(--mkt-ink-muted)]">
           Payment workflow
         </span>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-[rgba(39,166,68,0.12)] px-2 py-0.5 text-[11px] font-medium text-[#7fe0a0]">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#27a644]" /> Active
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[rgba(39,166,68,0.12)] px-2 py-0.5 text-[11px] font-medium text-[var(--mkt-success-ink)]">
+          <span className="h-1.5 w-1.5 rounded-full bg-[var(--mkt-success)]" /> Active
         </span>
       </div>
       <div className="mt-4 space-y-2.5">
         {steps.map((s, i) => (
           <div
             key={i}
-            className="flex items-center gap-3 rounded-lg border border-[#1d1e21] bg-[#0c0c0e] px-3 py-2.5"
+            className="flex items-center gap-3 rounded-lg border border-[var(--mkt-mock-2)] bg-[var(--mkt-surface-0)] px-3 py-2.5"
           >
             <div
               className={cn(
                 "flex h-7 w-7 items-center justify-center rounded-md",
                 s.done
-                  ? "bg-[#5e6ad2]/15 text-[#828fff]"
-                  : "bg-white/5 text-[#62666d]"
+                  ? "bg-[var(--mkt-primary)]/15 text-[var(--mkt-primary-hover)]"
+                  : "bg-white/5 text-[var(--mkt-ink-tertiary)]"
               )}
             >
               <s.icon className="h-3.5 w-3.5" />
             </div>
-            <span className="flex-1 text-[12px] text-[#d0d6e0]">{s.label}</span>
-            <span className="font-mono text-[11px] text-[#62666d]">
+            <span className="flex-1 text-[12px] text-[var(--mkt-ink-muted)]">{s.label}</span>
+            <span className="font-mono text-[11px] text-[var(--mkt-ink-tertiary)]">
               {s.time}
             </span>
           </div>
