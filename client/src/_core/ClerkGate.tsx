@@ -1,6 +1,7 @@
 import { ClerkProvider } from "@clerk/clerk-react";
 import { Link } from "wouter";
 import { clerkConfigured, clerkPublishableKey } from "@/lib/auth";
+import { useTheme } from "@/contexts/ThemeContext";
 
 /**
  * Wraps the authenticated app (and the /login page) with Clerk. Marketing pages
@@ -8,6 +9,9 @@ import { clerkConfigured, clerkPublishableKey } from "@/lib/auth";
  * aren't set. When unconfigured we show a friendly notice instead of throwing.
  */
 export function ClerkGate({ children }: { children: React.ReactNode }) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   if (!clerkConfigured) {
     return (
       <div className="mkt flex min-h-screen items-center justify-center px-5 py-12 text-center">
@@ -37,14 +41,16 @@ export function ClerkGate({ children }: { children: React.ReactNode }) {
       publishableKey={clerkPublishableKey!}
       afterSignOutUrl="/"
       appearance={{
+        // NOTE: Clerk parses these into color scales, so they must be real
+        // color values — CSS var() references break the widget.
         variables: {
-          colorPrimary: "var(--mkt-primary)",
-          colorBackground: "var(--mkt-surface-1)",
-          colorInputBackground: "var(--mkt-surface-1)",
-          colorText: "var(--mkt-ink)",
-          colorTextSecondary: "var(--mkt-ink-subtle)",
-          colorInputText: "var(--mkt-ink)",
-          colorNeutral: "var(--mkt-ink)",
+          colorPrimary: "#5e6ad2",
+          colorBackground: isDark ? "#0f1011" : "#ffffff",
+          colorInputBackground: isDark ? "#0f1011" : "#ffffff",
+          colorText: isDark ? "#f7f8f8" : "#0c0d10",
+          colorTextSecondary: isDark ? "#8a8f98" : "#5a5f68",
+          colorInputText: isDark ? "#f7f8f8" : "#0c0d10",
+          colorNeutral: isDark ? "#f7f8f8" : "#0c0d10",
           borderRadius: "0.625rem",
         },
         elements: {
