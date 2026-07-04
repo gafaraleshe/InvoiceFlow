@@ -34,10 +34,16 @@ if (!dbConfigured) {
 
 // Non-connecting placeholder when unconfigured — postgres-js only dials on the
 // first query, so construction is always safe.
+//
+// connect_timeout is deliberately short (5s): serverless functions have a tight
+// budget (Vercel Hobby kills at 10s), so if the database is unreachable we want
+// the query to fail fast and be turned into a clean JSON error, rather than
+// hanging until the whole function is killed and returns an unparseable
+// "A server error has occurred" page.
 const client = postgres(
   connectionString ||
     "postgres://placeholder:placeholder@127.0.0.1:5432/placeholder",
-  { prepare: false, max: 1, connect_timeout: 10 }
+  { prepare: false, max: 1, connect_timeout: 5, idle_timeout: 20 }
 );
 
 export const db = drizzle(client, { schema });
