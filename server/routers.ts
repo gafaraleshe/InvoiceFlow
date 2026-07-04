@@ -313,6 +313,14 @@ export const appRouter = router({
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(({ ctx }) => {
+      // Valid Clerk session but the workspace couldn't be loaded — report the
+      // real reason so the client can show it instead of spinning forever.
+      if (ctx.user && !ctx.active && ctx.authError) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Couldn't load your workspace: ${ctx.authError}`,
+        });
+      }
       if (!ctx.user || !ctx.active) return null;
       return {
         id: ctx.user.id,

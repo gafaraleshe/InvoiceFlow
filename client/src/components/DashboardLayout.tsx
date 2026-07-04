@@ -28,6 +28,8 @@ import {
   Plug,
   LogOut,
   PanelLeft,
+  AlertTriangle,
+  RefreshCw,
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -59,15 +61,32 @@ export default function DashboardLayout({
     const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY);
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
-  // Redirects to /login (Supabase) when there's no session.
-  const { loading, user } = useAuth({ redirectOnUnauthenticated: true });
+  // Redirects to /login when there's no Clerk session.
+  const { loading, user, session, error, refresh, logout } = useAuth({
+    redirectOnUnauthenticated: true,
+  });
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
   }, [sidebarWidth]);
 
-  if (loading || !user) {
+  if (loading) {
     return <DashboardLayoutSkeleton />;
+  }
+
+  // Signed in with Clerk, but the API couldn't load the workspace (auth.me
+  // returned nothing). Surface it instead of spinning forever — this is almost
+  // always a server-side config issue (CLERK_SECRET_KEY, DATABASE_URL, or the
+  // database schema not applied for Clerk user ids).
+  if (!user) {
+    if (!session) return <DashboardLayoutSkeleton />; // redirect in flight
+    return (
+      <WorkspaceLoadError
+        message={error?.message}
+        onRetry={() => refresh()}
+        onSignOut={() => logout()}
+      />
+    );
   }
 
   return (
@@ -82,6 +101,47 @@ export default function DashboardLayout({
         {children}
       </DashboardLayoutContent>
     </SidebarProvider>
+  );
+}
+
+function WorkspaceLoadError({
+  message,
+  onRetry,
+  onSignOut,
+}: {
+  message?: string;
+  onRetry: () => void;
+  onSignOut: () => void;
+}) {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-5 bg-background px-6 text-center">
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl border bg-muted text-amber-500">
+        <AlertTriangle className="h-6 w-6" />
+      </div>
+      <div className="max-w-[440px] space-y-2">
+        <h1 className="text-xl font-semibold tracking-tight">
+          We couldn&apos;t load your workspace
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          You&apos;re signed in, but the app couldn&apos;t reach your account
+          data. This is usually a temporary hiccup — try again in a moment.
+        </p>
+        {message ? (
+          <p className="mt-1 rounded-md border bg-muted/50 px-3 py-2 font-mono text-[12px] text-muted-foreground">
+            {message}
+          </p>
+        ) : null}
+      </div>
+      <div className="flex items-center gap-3">
+        <Button onClick={onRetry} size="sm">
+          <RefreshCw className="mr-1.5 h-4 w-4" />
+          Try again
+        </Button>
+        <Button onClick={onSignOut} size="sm" variant="outline">
+          Sign out
+        </Button>
+      </div>
+    </div>
   );
 }
 
