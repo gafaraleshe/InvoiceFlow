@@ -12,6 +12,12 @@ export type TrpcContext = {
   user: AuthUser | null;
   /** The caller's active organization + role, or null if unauthenticated. */
   active: ActiveContext | null;
+  /**
+   * Set when the Clerk token was valid but we couldn't load/provision the
+   * workspace (e.g. the database is unreachable or the schema isn't applied).
+   * Lets `auth.me` report the real reason instead of looking unauthenticated.
+   */
+  authError?: string;
 };
 
 const ORG_HEADER = "x-organization-id";
@@ -21,12 +27,22 @@ export async function createContext(
 ): Promise<TrpcContext> {
   let user: AuthUser | null = null;
   let active: ActiveContext | null = null;
+  let authError: string | undefined;
 
+  // A missing/invalid token just means "not signed in" — never block the
+  // request, so public procedures keep working.
   try {
     const token = bearerFromHeader(opts.req.headers.authorization);
     user = await verifyClerkToken(token);
+  } catch (error) {
+    console.error("[context] token verification failed:", error);
+    user = null;
+  }
 
-    if (user) {
+  // The token is valid but resolving the org can fail for real, actionable
+  // reasons (DB down, schema not migrated). Capture that separately.
+  if (user) {
+    try {
       const requestedOrg = opts.req.headers[ORG_HEADER];
       const orgId = Array.isArray(requestedOrg)
         ? requestedOrg[0]
@@ -35,13 +51,12 @@ export async function createContext(
         { id: user.id, email: user.email ?? "", fullName: user.fullName },
         orgId ?? null
       );
+    } catch (error) {
+      console.error("[context] workspace resolution failed:", error);
+      authError =
+        error instanceof Error ? error.message : "Failed to load workspace";
     }
-  } catch (error) {
-    // Auth is optional for public procedures; never block context creation.
-    console.error("[context] auth resolution failed:", error);
-    user = null;
-    active = null;
   }
 
-  return { req: opts.req, res: opts.res, user, active };
+  return { req: opts.req, res: opts.res, user, active, authError };
 }
