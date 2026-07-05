@@ -30,8 +30,9 @@ export function createApp() {
     try {
       await db.execute(sql`select 1`);
       dbConnect = "ok";
+      // NB: filter by schema — Supabase also has auth.users (always uuid).
       const rows = await db.execute(
-        sql`select data_type from information_schema.columns where table_name = 'users' and column_name = 'id'`
+        sql`select data_type from information_schema.columns where table_schema = 'public' and table_name = 'users' and column_name = 'id'`
       );
       usersIdType =
         (rows as unknown as { data_type: string }[])[0]?.data_type ??
