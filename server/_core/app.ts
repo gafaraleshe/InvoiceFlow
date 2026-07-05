@@ -5,7 +5,8 @@ import { sql } from "drizzle-orm";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
-import { db } from "../db/client";
+import { db, client } from "../db/client";
+import { BOOTSTRAP_SQL } from "../db/bootstrap-sql";
 
 export function createApp() {
   const app = express();
@@ -61,6 +62,41 @@ export function createApp() {
       publicTables,
       error,
     });
+  });
+
+  // One-shot schema bootstrap: applies the full schema + RLS to the database
+  // the app is actually connected to. Refuses to run if the public schema
+  // already has tables (unless ?secret=CRON_SECRET is provided), so it can't
+  // clobber an existing database. Safe to remove once the DB is set up.
+  app.get("/api/bootstrap-db", async (req, res) => {
+    const secretOk =
+      Boolean(process.env.CRON_SECRET) &&
+      req.query.secret === process.env.CRON_SECRET;
+    try {
+      const existing = (await db.execute(
+        sql`select table_name from information_schema.tables where table_schema = 'public'`
+      )) as unknown as { table_name: string }[];
+
+      if (existing.length > 0 && !secretOk) {
+        return res.status(409).json({
+          applied: false,
+          reason:
+            "public schema already has tables; pass ?secret=<CRON_SECRET> to force",
+          tables: existing.map(t => t.table_name),
+        });
+      }
+
+      await client.unsafe(BOOTSTRAP_SQL);
+
+      const after = (await db.execute(
+        sql`select table_name from information_schema.tables where table_schema = 'public' order by table_name`
+      )) as unknown as { table_name: string }[];
+      res.json({ applied: true, tables: after.map(t => t.table_name) });
+    } catch (e) {
+      res
+        .status(500)
+        .json({ applied: false, error: e instanceof Error ? e.message : String(e) });
+    }
   });
 
   registerOAuthRoutes(app);
