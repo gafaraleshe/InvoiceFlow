@@ -25,18 +25,27 @@ export function createApp() {
     );
 
     let dbConnect = "unknown";
+    let currentDatabase: string | null = null;
     let usersIdType: string | null = null;
+    let publicTables: string[] = [];
     let error: string | undefined;
     try {
-      await db.execute(sql`select 1`);
+      const meta = (await db.execute(
+        sql`select current_database() as db`
+      )) as unknown as { db: string }[];
+      currentDatabase = meta[0]?.db ?? null;
       dbConnect = "ok";
+
+      const tbls = (await db.execute(
+        sql`select table_name from information_schema.tables where table_schema = 'public' order by table_name`
+      )) as unknown as { table_name: string }[];
+      publicTables = tbls.map(t => t.table_name);
+
       // NB: filter by schema — Supabase also has auth.users (always uuid).
-      const rows = await db.execute(
+      const rows = (await db.execute(
         sql`select data_type from information_schema.columns where table_schema = 'public' and table_name = 'users' and column_name = 'id'`
-      );
-      usersIdType =
-        (rows as unknown as { data_type: string }[])[0]?.data_type ??
-        "table-missing";
+      )) as unknown as { data_type: string }[];
+      usersIdType = rows[0]?.data_type ?? "table-missing";
     } catch (e) {
       dbConnect = "error";
       error = e instanceof Error ? e.message : String(e);
@@ -47,7 +56,9 @@ export function createApp() {
       clerkSecret,
       databaseUrl,
       dbConnect,
+      currentDatabase,
       usersIdType, // expect "character varying"; "uuid" => migration not applied
+      publicTables,
       error,
     });
   });
