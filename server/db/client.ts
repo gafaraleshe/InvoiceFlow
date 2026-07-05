@@ -47,4 +47,4 @@ const client = postgres(
 );
 
 export const db = drizzle(client, { schema });
-export { schema };
+export { schema, client };
