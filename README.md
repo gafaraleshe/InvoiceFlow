@@ -210,6 +210,59 @@ All API procedures are exposed via tRPC under `/api/trpc`. The application uses 
 
 ---
 
+## Public REST API (`/api/v1`)
+
+A key-authenticated REST API sits **on top of the same tRPC procedures**, so the
+business logic (VAT, invoice numbering, validation, tenancy) is never duplicated.
+See [`docs/API.md`](docs/API.md) and the machine-readable spec at
+`GET /api/v1/openapi.json` (source: [`openapi.yaml`](openapi.yaml)).
+
+**Auth:** send an API key as a bearer token. Keys are minted per organization in
+the dashboard (**Settings → Integrations → API keys**) — the plaintext key is
+shown once; only a SHA-256 hash + prefix are stored.
+
+```
+Authorization: Bearer ifk_live_xxxxxxxxxxxxxxxx
+```
+
+| Method & path | Description |
+|---|---|
+| `GET /api/v1/clients` | List clients (`?page=&limit=&search=`) |
+| `POST /api/v1/clients` | Create a client |
+| `GET /api/v1/clients/{id}` | Retrieve a client |
+| `PATCH /api/v1/clients/{id}` | Update a client |
+| `DELETE /api/v1/clients/{id}` | Delete a client (409 if it has invoices) |
+| `GET /api/v1/invoices` | List invoices (`?page=&limit=&status=&client_id=`) |
+| `POST /api/v1/invoices` | Create an invoice (totals/VAT computed) |
+| `GET /api/v1/invoices/{id}` | Retrieve an invoice |
+| `PATCH /api/v1/invoices/{id}` | Update / change status |
+| `DELETE /api/v1/invoices/{id}` | Delete a draft invoice |
+| `POST /api/v1/invoices/{id}/send` | Email the invoice to the client |
+| `POST /api/v1/invoices/{id}/pdf` | Generate the invoice PDF |
+| `GET /api/v1/dashboard/stats` | Revenue / outstanding / counts |
+| `GET /api/v1/me` | The organization this key belongs to |
+| `GET /api/v1/openapi.json` | OpenAPI 3.0 document (no key required) |
+
+- **Pagination:** `?page=` (1-based) + `?limit=` (max 100). Responses:
+  `{ data, page, limit, total, total_pages }`.
+- **Errors:** `{ "error": { "code", "message", "details"? } }` with a matching
+  HTTP status (`unauthorized`, `not_found`, `validation_error`, `conflict`, …).
+
+Key management is exposed to the web app via tRPC (`apiKeys.create/list/revoke`,
+owner/admin only) — a separate path from the API keys themselves.
+
+## MCP server
+
+An MCP server in [`mcp/`](mcp/) wraps this REST API so assistants (Claude Code,
+Claude Desktop) can manage invoicing conversationally. It ships as its own
+package (`node mcp/dist/index.js`) and is configured with two env vars —
+`INVOICEFLOW_API_URL` and `INVOICEFLOW_API_KEY`. Tools include `list_clients`,
+`create_invoice`, `send_invoice_email`, `get_dashboard_stats`, and more. See
+[`mcp/README.md`](mcp/README.md) for the exact `.mcp.json` /
+`claude_desktop_config.json` snippet.
+
+---
+
 ## Getting Started
 
 ### Prerequisites
