@@ -8,9 +8,11 @@
  * Money is stored as Postgres numeric (strings); we convert to Number only for
  * arithmetic to avoid float drift.
  */
-import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
+import { createHash, randomBytes } from "node:crypto";
 import { db } from "./db/client";
 import {
+  apiKeys,
   clients,
   invoices,
   lineItems,
@@ -514,6 +516,130 @@ export async function getDashboardStats(orgId: string) {
     paidCount: Number(rev?.paidCount ?? 0),
     clientCount: Number(cl?.count ?? 0),
     invoiceCount: Number(rev?.invoiceCount ?? 0),
+  };
+}
+
+/* ── API keys (public REST auth) ────────────────────────────────────────── */
+
+const API_KEY_BYTES = 24;
+
+/** SHA-256 of the raw key — only the hash is ever stored. */
+function hashApiKey(raw: string): string {
+  return createHash("sha256").update(raw).digest("hex");
+}
+
+export type ApiKeyContext = {
+  user: { id: string; email: string | null; fullName: string | null };
+  active: ActiveContext;
+};
+
+/**
+ * Mint a new API key for an organization. Returns the one-time plaintext key
+ * (shown to the caller once) plus the stored row (hash + prefix only).
+ */
+export async function createApiKey(
+  organizationId: string,
+  name: string,
+  opts?: { test?: boolean }
+) {
+  const secret = randomBytes(API_KEY_BYTES).toString("base64url");
+  const key = `ifk_${opts?.test ? "test" : "live"}_${secret}`;
+  const [row] = await db
+    .insert(apiKeys)
+    .values({
+      organizationId,
+      name,
+      prefix: key.slice(0, 12), // ifk_live_XXX — safe to display
+      hashedKey: hashApiKey(key),
+    })
+    .returning({
+      id: apiKeys.id,
+      name: apiKeys.name,
+      prefix: apiKeys.prefix,
+      createdAt: apiKeys.createdAt,
+    });
+  return { key, apiKey: row };
+}
+
+/** List an org's keys (metadata only — never the secret). */
+export async function listApiKeys(organizationId: string) {
+  return db
+    .select({
+      id: apiKeys.id,
+      name: apiKeys.name,
+      prefix: apiKeys.prefix,
+      lastUsedAt: apiKeys.lastUsedAt,
+      revokedAt: apiKeys.revokedAt,
+      createdAt: apiKeys.createdAt,
+    })
+    .from(apiKeys)
+    .where(eq(apiKeys.organizationId, organizationId))
+    .orderBy(desc(apiKeys.createdAt));
+}
+
+/** Revoke a key. Returns the id, or null if not found / already revoked. */
+export async function revokeApiKey(organizationId: string, id: string) {
+  const [row] = await db
+    .update(apiKeys)
+    .set({ revokedAt: new Date() })
+    .where(
+      and(
+        eq(apiKeys.id, id),
+        eq(apiKeys.organizationId, organizationId),
+        isNull(apiKeys.revokedAt)
+      )
+    )
+    .returning({ id: apiKeys.id });
+  return row ?? null;
+}
+
+/**
+ * Resolve a raw API key into the same context shape a protected tRPC procedure
+ * expects (user + active org), or null if the key is missing/invalid/revoked.
+ * The acting user is the org owner, so createCaller-backed logic behaves as if
+ * an owner made the call.
+ */
+export async function resolveApiKeyContext(
+  raw: string
+): Promise<ApiKeyContext | null> {
+  if (!raw.startsWith("ifk_")) return null;
+
+  const [key] = await db
+    .select()
+    .from(apiKeys)
+    .where(and(eq(apiKeys.hashedKey, hashApiKey(raw)), isNull(apiKeys.revokedAt)))
+    .limit(1);
+  if (!key) return null;
+
+  const [org] = await db
+    .select({ id: organizations.id, name: organizations.name })
+    .from(organizations)
+    .where(eq(organizations.id, key.organizationId))
+    .limit(1);
+  if (!org) return null;
+
+  const [owner] = await db
+    .select({ userId: memberships.userId, role: memberships.role })
+    .from(memberships)
+    .where(eq(memberships.organizationId, org.id))
+    .orderBy(sql`case when ${memberships.role} = 'owner' then 0 else 1 end`)
+    .limit(1);
+
+  // Best-effort usage stamp — don't await/block the request on it.
+  void db
+    .update(apiKeys)
+    .set({ lastUsedAt: new Date() })
+    .where(eq(apiKeys.id, key.id));
+
+  const userId = owner?.userId ?? `apikey:${key.id}`;
+  return {
+    user: { id: userId, email: null, fullName: `API key: ${key.name}` },
+    active: {
+      userId,
+      organizationId: org.id,
+      organizationName: org.name,
+      role: owner?.role ?? "admin",
+    },
   };
 }
 

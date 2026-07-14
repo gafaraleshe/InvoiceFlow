@@ -7,6 +7,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { db, client } from "../db/client";
 import { BOOTSTRAP_SQL } from "../db/bootstrap-sql";
+import { createRestApi } from "../rest";
 
 export function createApp() {
   const app = express();
@@ -100,6 +101,9 @@ export function createApp() {
   });
 
   registerOAuthRoutes(app);
+
+  // Public REST API (API-key auth) — separate from the web session's tRPC path.
+  app.use("/api/v1", createRestApi());
 
   app.use(
     "/api/trpc",

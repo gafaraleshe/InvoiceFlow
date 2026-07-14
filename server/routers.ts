@@ -10,9 +10,16 @@ import {
   invoiceListQuerySchema,
   sendInvoiceEmailSchema,
   createOrganizationSchema,
+  createApiKeySchema,
+  apiKeyIdSchema,
 } from "@shared/validation";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import {
+  publicProcedure,
+  protectedProcedure,
+  adminProcedure,
+  router,
+} from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
 
@@ -307,6 +314,32 @@ const orgRouter = router({
     }),
 });
 
+// ─── API Keys Router ──────────────────────────────────────────────────────────
+// Managed via the web session (owner/admin), NOT via an API key — this is the
+// chicken-and-egg path that mints the keys the public REST API accepts.
+
+const apiKeysRouter = router({
+  list: adminProcedure.query(async ({ ctx }) => {
+    return db.listApiKeys(ctx.active.organizationId);
+  }),
+  create: adminProcedure
+    .input(createApiKeySchema)
+    .mutation(async ({ ctx, input }) => {
+      // Returns the plaintext key exactly once — the client must store it.
+      return db.createApiKey(ctx.active.organizationId, input.name, {
+        test: input.test,
+      });
+    }),
+  revoke: adminProcedure
+    .input(apiKeyIdSchema)
+    .mutation(async ({ ctx, input }) => {
+      const row = await db.revokeApiKey(ctx.active.organizationId, input.id);
+      if (!row)
+        throw new TRPCError({ code: "NOT_FOUND", message: "API key not found" });
+      return { success: true } as const;
+    }),
+});
+
 // ─── App Router ─────────────────────────────────────────────────────────────
 
 export const appRouter = router({
@@ -341,6 +374,7 @@ export const appRouter = router({
   clients: clientRouter,
   invoice: invoiceRouter,
   dashboard: dashboardRouter,
+  apiKeys: apiKeysRouter,
 });
 
 export type AppRouter = typeof appRouter;
