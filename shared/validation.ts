@@ -93,3 +93,14 @@ export const createOrganizationSchema = z.object({
 export const switchOrganizationSchema = z.object({
   organizationId: z.string().uuid(),
 });
+
+// ─── API Key Schemas ────────────────────────────────────────────────────────
+
+export const createApiKeySchema = z.object({
+  name: z.string().min(1, "Name is required").max(120),
+  test: z.boolean().optional(),
+});
+
+export const apiKeyIdSchema = z.object({
+  id: z.string().uuid(),
+});
