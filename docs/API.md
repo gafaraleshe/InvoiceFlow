@@ -7,10 +7,12 @@ programmatically.
 - **Base URL:** `https://api.invoiceflow.app/v1` (or `https://YOURDOMAIN/api/v1`)
 - **Format:** JSON. UTF-8. Money as integer-minor-units optional; default decimal strings.
 - **Versioning:** path-based (`/v1`). Breaking changes ship under `/v2`.
-- **Spec:** an **OpenAPI 3.1** document is published at `/api/v1/openapi.json` and
-  rendered as interactive docs at `/docs/api`.
+- **Spec:** an **OpenAPI 3.0** document is published at `/api/v1/openapi.json`
+  (source of truth: `server/rest/openapi.ts`, mirrored to `openapi.yaml`).
 
-> Status: **design** (built in Phase 4). This documents the contract we implement.
+> Status: **implemented** — clients, invoices, and dashboard endpoints are live.
+> Payments, pay-links, idempotency, and rate-limit headers remain design (later
+> phases) and are marked below.
 
 ---
 
@@ -33,7 +35,7 @@ Authorization: Bearer ifk_live_xxxxxxxxxxxxxxxxxxxxxxxx
 
 | Topic | Rule |
 |---|---|
-| Pagination | `?limit=` (max 100, default 25) + `?cursor=`; responses include `next_cursor`. |
+| Pagination | `?page=` (1-based) + `?limit=` (max 100, default 25); responses include `{ data, page, limit, total, total_pages }`. |
 | Filtering | e.g. `GET /invoices?status=overdue&client_id=...&from=2026-01-01`. |
 | Idempotency | Send `Idempotency-Key: <uuid>` on POST; we dedupe for 24h. |
 | Errors | HTTP status + `{ "error": { "code", "message", "details" } }`. |
@@ -60,27 +62,32 @@ DELETE /v1/clients/{id}            Delete a client (409 if it has invoices)
 
 ### Invoices
 ```
-GET    /v1/invoices                List (?status=&client_id=&from=&to=)
+GET    /v1/invoices                List (?status=&client_id=&page=&limit=)
 POST   /v1/invoices                Create (with line items; totals auto-computed)
 GET    /v1/invoices/{id}           Retrieve (includes line items + totals)
-PATCH  /v1/invoices/{id}           Update (draft only)
+PATCH  /v1/invoices/{id}           Update / change status (paid invoices are locked)
 DELETE /v1/invoices/{id}           Delete (draft only)
-POST   /v1/invoices/{id}/send      Email to the client (optionally attach pay link)
-POST   /v1/invoices/{id}/pay-link  Create a Stripe payment link, returns URL
-POST   /v1/invoices/{id}/mark-paid Manually mark paid (records a payment)
-GET    /v1/invoices/{id}/pdf       Download the rendered PDF
+POST   /v1/invoices/{id}/send      Email to the client
+POST   /v1/invoices/{id}/pdf       Generate the rendered PDF (returns its path)
 ```
 
-### Payments
-```
-GET    /v1/payments                List payments (?invoice_id=)
-GET    /v1/payments/{id}           Retrieve a payment
-```
+> Request bodies accept snake_case (`client_id`, `due_date`, `tax_rate`,
+> `line_items[].unit_price`) with ISO dates; responses use the app's camelCase
+> field names. `PATCH` applies field updates and, if `status` is present,
+> transitions the invoice.
 
 ### Meta
 ```
-GET    /v1/me                      The org + plan + limits for this key
-GET    /v1/openapi.json            Machine-readable spec
+GET    /v1/me                      The org this key belongs to
+GET    /v1/openapi.json            Machine-readable spec (no key required)
+```
+
+### Not yet implemented (design — later phases)
+```
+POST   /v1/invoices/{id}/pay-link  Create a Stripe payment link
+POST   /v1/invoices/{id}/mark-paid Manually mark paid (records a payment)
+GET    /v1/payments                List payments
+GET    /v1/payments/{id}           Retrieve a payment
 ```
 
 ---
@@ -126,9 +133,50 @@ curl -X POST https://YOURDOMAIN/api/v1/invoices/in_456/send \
 
 ---
 
-## Implementation notes (for the build)
-- REST routes live in `api/v1/*` (or a Hono/Express sub-app) and call the **same**
-  service functions as the tRPC routers — no duplicated business logic.
-- The OpenAPI document is generated from Zod schemas (single source of truth) so the
-  docs never drift from the code.
-- Plan limits are enforced centrally; over-limit calls return `plan_limit_reached` (402/403).
+## Implementation notes
+- REST routes live in [`server/rest/`](../server/rest) as an Express sub-app
+  mounted at `/api/v1`, and call the **same** tRPC procedures via
+  `appRouter.createCaller(ctx)` — no duplicated business logic.
+- API keys are **organization-scoped** (`server/db/schema.ts` → `api_keys`),
+  SHA-256 hashed with a lookup `prefix`. `resolveApiKeyContext` turns a key into
+  the same `{ user, active }` context a `protectedProcedure` expects.
+- The OpenAPI object in `server/rest/openapi.ts` is the single source of truth;
+  `pnpm gen:openapi` writes `openapi.yaml`, and it is served at
+  `/api/v1/openapi.json`.
+- Plan limits / idempotency / rate-limit headers are future work.
+
+---
+
+## MCP server
+
+The [`mcp/`](../mcp) package wraps this REST API as a Model Context Protocol
+server, so assistants (Claude Code, Claude Desktop) can manage clients and
+invoices. It talks to the API over HTTP using:
+
+| Variable | Example |
+|----------|---------|
+| `INVOICEFLOW_API_URL` | `https://invoice-flow-teal.vercel.app` |
+| `INVOICEFLOW_API_KEY` | `ifk_live_…` |
+
+Configure it in `.mcp.json` (Claude Code) or `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "invoiceflow": {
+      "command": "node",
+      "args": ["/absolute/path/to/InvoiceFlow/mcp/dist/index.js"],
+      "env": {
+        "INVOICEFLOW_API_URL": "https://invoice-flow-teal.vercel.app",
+        "INVOICEFLOW_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
+      }
+    }
+  }
+}
+```
+
+Tools: `list_clients`, `get_client`, `create_client`, `update_client`,
+`delete_client`, `list_invoices`, `get_invoice`, `create_invoice`,
+`update_invoice`, `update_invoice_status`, `delete_invoice`,
+`send_invoice_email`, `generate_invoice_pdf`, `get_dashboard_stats`.
+See [`mcp/README.md`](../mcp/README.md) for full setup.
