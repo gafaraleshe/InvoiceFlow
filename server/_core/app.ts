@@ -146,9 +146,25 @@ export function createApp() {
 
       res.json({ ok: true, invoice });
     } catch (e) {
+      // postgres-js/drizzle wraps the real Postgres error in `.cause` — unwrap
+      // the chain so the actual constraint/type error (not just "Failed
+      // query") is visible.
+      const chain: string[] = [];
+      let cur: unknown = e;
+      for (let i = 0; i < 5 && cur; i++) {
+        if (cur instanceof Error) {
+          chain.push(cur.message);
+          cur = (cur as { cause?: unknown }).cause;
+        } else {
+          chain.push(String(cur));
+          break;
+        }
+      }
       res.status(500).json({
         ok: false,
         error: e instanceof Error ? e.message : String(e),
+        causeChain: chain,
+        pgCode: (e as { cause?: { code?: string } })?.cause?.code,
         stack: e instanceof Error ? e.stack : undefined,
       });
     } finally {
