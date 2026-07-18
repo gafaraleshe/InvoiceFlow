@@ -8,6 +8,9 @@ import { createContext } from "./context";
 import { db, client } from "../db/client";
 import { BOOTSTRAP_SQL } from "../db/bootstrap-sql";
 import { createRestApi } from "../rest";
+import * as dbLayer from "../db";
+import { organizations, clients, invoices, users } from "../db/schema";
+import { eq } from "drizzle-orm";
 
 export function createApp() {
   const app = express();
@@ -97,6 +100,74 @@ export function createApp() {
       res
         .status(500)
         .json({ applied: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  // One-shot diagnostic: exercises the exact create-invoice code path
+  // (createOrganization -> createClient -> createInvoice) against a throwaway
+  // org, so we can see the *real* DB error instead of guessing. Cleans up
+  // after itself. Safe to remove once invoice creation is confirmed working.
+  app.get("/api/debug/invoice-flow", async (_req, res) => {
+    let orgId: string | undefined;
+    const debugUserId = "debug-user-invoice-flow";
+    try {
+      // Satisfy memberships.user_id's FK to users.id (createOrganization
+      // requires an existing user row — this is exactly what
+      // resolveActiveContext's syncUser call does for a real Clerk login).
+      await db
+        .insert(users)
+        .values({ id: debugUserId, email: "debug@example.com" })
+        .onConflictDoNothing();
+
+      const org = await dbLayer.createOrganization(
+        "Debug Org (safe to delete)",
+        debugUserId
+      );
+      orgId = org.id;
+
+      const testClient = await dbLayer.createClient(org.id, {
+        name: "Debug Client",
+        email: "debug@example.com",
+        paymentTerms: 30,
+      });
+
+      const now = Date.now();
+      const invoice = await dbLayer.createInvoice(
+        org.id,
+        {
+          clientId: testClient.id,
+          issueDate: new Date(now).toISOString().slice(0, 10),
+          dueDate: new Date(now + 30 * 86_400_000).toISOString().slice(0, 10),
+          vatRate: 20,
+          notes: null,
+        },
+        [{ description: "Test line item", quantity: 1, unitPrice: 100 }]
+      );
+
+      res.json({ ok: true, invoice });
+    } catch (e) {
+      res.status(500).json({
+        ok: false,
+        error: e instanceof Error ? e.message : String(e),
+        stack: e instanceof Error ? e.stack : undefined,
+      });
+    } finally {
+      // Best-effort cleanup regardless of outcome.
+      if (orgId) {
+        try {
+          await db.delete(invoices).where(eq(invoices.organizationId, orgId));
+          await db.delete(clients).where(eq(clients.organizationId, orgId));
+          await db.delete(organizations).where(eq(organizations.id, orgId));
+        } catch {
+          // ignore cleanup errors
+        }
+      }
+      try {
+        await db.delete(users).where(eq(users.id, debugUserId));
+      } catch {
+        // ignore cleanup errors (membership cascade already removed the row's
+        // dependents; this just removes the seed user itself)
+      }
     }
   });
 
