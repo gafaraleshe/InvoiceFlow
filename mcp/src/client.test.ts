@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { ApiError, InvoiceFlowClient } from "./client.js";
+import { ApiError, SigmaClient } from "./client.js";
 
 function mockFetch(response: {
   ok: boolean;
@@ -14,10 +14,10 @@ function mockFetch(response: {
   })) as unknown as typeof fetch;
 }
 
-describe("InvoiceFlowClient", () => {
+describe("SigmaClient", () => {
   it("appends /api/v1 to a bare origin and sends the bearer key", async () => {
     const fetchImpl = mockFetch({ ok: true, status: 200, body: { data: [] } });
-    const client = new InvoiceFlowClient({
+    const client = new SigmaClient({
       baseUrl: "https://example.com/",
       apiKey: "ifk_test_123",
       fetchImpl,
@@ -34,7 +34,7 @@ describe("InvoiceFlowClient", () => {
 
   it("does not double-append /api/v1 if already present", async () => {
     const fetchImpl = mockFetch({ ok: true, status: 200, body: {} });
-    const client = new InvoiceFlowClient({
+    const client = new SigmaClient({
       baseUrl: "https://example.com/api/v1",
       apiKey: "k",
       fetchImpl,
@@ -51,7 +51,7 @@ describe("InvoiceFlowClient", () => {
       status: 404,
       body: { error: { code: "not_found", message: "Client not found" } },
     });
-    const client = new InvoiceFlowClient({
+    const client = new SigmaClient({
       baseUrl: "https://example.com",
       apiKey: "k",
       fetchImpl,

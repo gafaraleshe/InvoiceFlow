@@ -1,4 +1,4 @@
-# InvoiceFlow Public API (v1)
+# Sigma Public API (v1)
 
 A versioned, key-authenticated REST API over the same domain services that power the
 app. Designed for customers and integrations to manage clients, invoices, and payments
@@ -165,7 +165,7 @@ Configure it in `.mcp.json` (Claude Code) or `claude_desktop_config.json`:
   "mcpServers": {
     "invoiceflow": {
       "command": "node",
-      "args": ["/absolute/path/to/InvoiceFlow/mcp/dist/index.js"],
+      "args": ["/absolute/path/to/Sigma/mcp/dist/index.js"],
       "env": {
         "INVOICEFLOW_API_URL": "https://invoice-flow-teal.vercel.app",
         "INVOICEFLOW_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"

@@ -69,7 +69,7 @@ function Wordmark() {
       <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--mkt-primary)] text-[13px] font-bold text-white">
         I
       </span>
-      InvoiceFlow
+      Sigma
     </Link>
   );
 }
@@ -214,7 +214,7 @@ function Footer() {
         </div>
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-[var(--mkt-hairline-soft)] pt-6 sm:flex-row">
           <span className="text-[12px] text-[var(--mkt-ink-tertiary)]">
-            © {new Date().getFullYear()} InvoiceFlow, Inc. All rights reserved.
+            © {new Date().getFullYear()} Sigma, Inc. All rights reserved.
           </span>
           <span className="text-[12px] text-[var(--mkt-ink-tertiary)]">
             Made for teams that get paid on time.

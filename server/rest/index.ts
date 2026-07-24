@@ -112,6 +112,32 @@ export function toUpdateInvoice(body: Body) {
   return out;
 }
 
+/** Map a REST booking body (snake_case) → createBookingSchema shape. */
+export function toCreateBooking(body: Body) {
+  return {
+    name: body.name,
+    email: body.email,
+    phone: body.phone ?? null,
+    serviceType: body.service_type ?? body.serviceType ?? null,
+    packageName: body.package_name ?? body.packageName ?? body.package ?? null,
+    eventDate: body.event_date ?? body.eventDate ?? body.date ?? null,
+    location: body.location ?? null,
+    message: body.message ?? body.notes ?? null,
+    amount:
+      body.amount != null && body.amount !== ""
+        ? Number(body.amount)
+        : undefined,
+    currency: typeof body.currency === "string" ? body.currency : undefined,
+    source: typeof body.source === "string" ? body.source : undefined,
+    metadata:
+      body.metadata && typeof body.metadata === "object"
+        ? (body.metadata as Record<string, unknown>)
+        : undefined,
+    autoInvoice: Boolean(body.auto_invoice ?? body.autoInvoice),
+    autoSend: Boolean(body.auto_send ?? body.autoSend),
+  };
+}
+
 export function createRestApi(auth: RequestHandler = requireApiKey): Router {
   const api = Router();
 
@@ -125,12 +151,16 @@ export function createRestApi(auth: RequestHandler = requireApiKey): Router {
     "/me",
     asyncHandler(async (req, res) => {
       const { active } = (req as RestRequest).apiCtx!;
+      const scopes = (req as RestRequest).apiCtx!.scopes ?? [];
       res.json({
         organization: {
           id: active.organizationId,
           name: active.organizationName,
         },
         role: active.role,
+        scopes,
+        // "Special" owner access: an owner-scoped key unlocks everything.
+        owner: scopes.includes("owner") || active.role === "owner",
       });
     })
   );
@@ -272,6 +302,87 @@ export function createRestApi(auth: RequestHandler = requireApiKey): Router {
       res.json(
         await callerFor(req, res).invoice.generatePdf({ id: req.params.id })
       );
+    })
+  );
+
+  // ── Bookings (CRM) ─────────────────────────────────────────────────────────
+  api.get(
+    "/bookings/stats",
+    asyncHandler(async (req, res) => {
+      res.json(await callerFor(req, res).booking.stats());
+    })
+  );
+
+  api.get(
+    "/bookings",
+    asyncHandler(async (req, res) => {
+      const { page, limit, offset } = pagination(req.query);
+      const status = (req.query.status as string) || "all";
+      const result = await callerFor(req, res).booking.list({
+        status: status as never,
+        search: req.query.search ? String(req.query.search) : undefined,
+        limit,
+        offset,
+      });
+      res.json(pageResult(result, page, limit));
+    })
+  );
+
+  api.post(
+    "/bookings",
+    asyncHandler(async (req, res) => {
+      const created = await callerFor(req, res).booking.create(
+        toCreateBooking((req.body ?? {}) as Body) as never
+      );
+      res.status(201).json(created);
+    })
+  );
+
+  api.get(
+    "/bookings/:id",
+    asyncHandler(async (req, res) => {
+      res.json(await callerFor(req, res).booking.getById({ id: req.params.id }));
+    })
+  );
+
+  api.patch(
+    "/bookings/:id",
+    asyncHandler(async (req, res) => {
+      const body = (req.body ?? {}) as Body;
+      const caller = callerFor(req, res);
+      const result =
+        typeof body.status === "string"
+          ? await caller.booking.updateStatus({
+              id: req.params.id,
+              status: body.status as never,
+            })
+          : await caller.booking.getById({ id: req.params.id });
+      res.json(result);
+    })
+  );
+
+  api.post(
+    "/bookings/:id/convert",
+    asyncHandler(async (req, res) => {
+      const body = (req.body ?? {}) as Body;
+      res.json(
+        await callerFor(req, res).booking.convertToInvoice({
+          id: req.params.id,
+          amount:
+            body.amount != null && body.amount !== ""
+              ? Number(body.amount)
+              : undefined,
+          send: Boolean(body.send),
+        })
+      );
+    })
+  );
+
+  api.delete(
+    "/bookings/:id",
+    asyncHandler(async (req, res) => {
+      await callerFor(req, res).booking.delete({ id: req.params.id });
+      res.json({ deleted: true });
     })
   );
 

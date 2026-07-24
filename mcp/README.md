@@ -1,10 +1,10 @@
-# invoiceflow-mcp
+# @gaffystudios/sigma-mcp
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server that exposes
-the **InvoiceFlow REST API** as tools, so assistants like Claude can manage your
+the **Sigma REST API** as tools, so assistants like Claude can manage your
 clients and invoices in natural language.
 
-It talks to the deployed InvoiceFlow API over HTTP with an API key — it does not
+It talks to the deployed Sigma API over HTTP with an API key — it does not
 need database access or the app source.
 
 ## Tools
@@ -32,8 +32,8 @@ Two environment variables:
 
 | Variable | Example | Notes |
 |----------|---------|-------|
-| `INVOICEFLOW_API_URL` | `https://invoice-flow-teal.vercel.app` | Your site origin. `/api/v1` is appended automatically. |
-| `INVOICEFLOW_API_KEY` | `ifk_live_…` | Create one in the dashboard → **Settings → Integrations → API keys**. |
+| `SIGMA_API_URL` | `https://invoice-flow-teal.vercel.app` | Your site origin. `/api/v1` is appended automatically. |
+| `SIGMA_API_KEY` | `ifk_live_…` | Create one in the dashboard → **Settings → Integrations → API keys**. |
 
 ## Install & build
 
@@ -46,8 +46,8 @@ pnpm build      # -> dist/index.js
 Run it standalone (for a quick check — it speaks MCP over stdio):
 
 ```bash
-INVOICEFLOW_API_URL=https://invoice-flow-teal.vercel.app \
-INVOICEFLOW_API_KEY=ifk_live_xxx \
+SIGMA_API_URL=https://invoice-flow-teal.vercel.app \
+SIGMA_API_KEY=ifk_live_xxx \
 node dist/index.js
 ```
 
@@ -58,12 +58,12 @@ Add to `.mcp.json` in your project root (or `~/.claude.json`):
 ```json
 {
   "mcpServers": {
-    "invoiceflow": {
+    "sigma": {
       "command": "node",
-      "args": ["/absolute/path/to/InvoiceFlow/mcp/dist/index.js"],
+      "args": ["/absolute/path/to/Sigma/mcp/dist/index.js"],
       "env": {
-        "INVOICEFLOW_API_URL": "https://invoice-flow-teal.vercel.app",
-        "INVOICEFLOW_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
+        "SIGMA_API_URL": "https://invoice-flow-teal.vercel.app",
+        "SIGMA_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
       }
     }
   }
@@ -78,12 +78,12 @@ Add to `.mcp.json` in your project root (or `~/.claude.json`):
 ```json
 {
   "mcpServers": {
-    "invoiceflow": {
+    "sigma": {
       "command": "node",
-      "args": ["/absolute/path/to/InvoiceFlow/mcp/dist/index.js"],
+      "args": ["/absolute/path/to/Sigma/mcp/dist/index.js"],
       "env": {
-        "INVOICEFLOW_API_URL": "https://invoice-flow-teal.vercel.app",
-        "INVOICEFLOW_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
+        "SIGMA_API_URL": "https://invoice-flow-teal.vercel.app",
+        "SIGMA_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
       }
     }
   }
@@ -91,7 +91,7 @@ Add to `.mcp.json` in your project root (or `~/.claude.json`):
 ```
 
 Restart Claude Desktop after editing. If you publish the package, you can use
-`"command": "npx", "args": ["-y", "invoiceflow-mcp"]` instead of an absolute path.
+`"command": "npx", "args": ["-y", "@gaffystudios/sigma-mcp"]` instead of an absolute path.
 
 ## Develop
 

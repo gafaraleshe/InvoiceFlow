@@ -8,6 +8,7 @@ import DashboardLayout from "./components/DashboardLayout";
 import { ClerkGate } from "./_core/ClerkGate";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import BookingsPage from "./pages/Bookings";
 import InvoicesPage from "./pages/Invoices";
 import InvoiceDetailPage from "./pages/InvoiceDetail";
 import CreateInvoicePage from "./pages/CreateInvoice";
@@ -67,6 +68,7 @@ function AppArea() {
     <DashboardLayout>
       <Switch>
         <Route path="/dashboard" component={Home} />
+        <Route path="/bookings" component={BookingsPage} />
         <Route path="/invoices" component={InvoicesPage} />
         <Route path="/invoices/new" component={CreateInvoicePage} />
         <Route path="/invoices/:id/edit" component={EditInvoicePage} />

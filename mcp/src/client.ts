@@ -1,5 +1,5 @@
 /**
- * Thin HTTP client for the InvoiceFlow public REST API (`/api/v1`).
+ * Thin HTTP client for the Sigma public REST API (`/api/v1`).
  * The MCP tools talk to the deployed API over HTTP with an API key — they do
  * not import server code, so this package stays independently deployable.
  */
@@ -20,7 +20,7 @@ export class ApiError extends Error {
   }
 }
 
-export class InvoiceFlowClient {
+export class SigmaClient {
   private readonly base: string;
   private readonly apiKey: string;
   private readonly doFetch: typeof fetch;
@@ -117,6 +117,26 @@ export class InvoiceFlowClient {
   }
   generateInvoicePdf(id: string) {
     return this.request("POST", `/invoices/${id}/pdf`);
+  }
+
+  // ── Bookings (CRM) ──
+  listBookings(q: { page?: number; limit?: number; status?: string; search?: string }) {
+    return this.request("GET", "/bookings", undefined, q);
+  }
+  getBooking(id: string) {
+    return this.request("GET", `/bookings/${id}`);
+  }
+  createBooking(body: unknown) {
+    return this.request("POST", "/bookings", body);
+  }
+  updateBookingStatus(id: string, status: string) {
+    return this.request("PATCH", `/bookings/${id}`, { status });
+  }
+  convertBooking(id: string, body: { amount?: number; send?: boolean }) {
+    return this.request("POST", `/bookings/${id}/convert`, body);
+  }
+  getBookingStats() {
+    return this.request("GET", "/bookings/stats");
   }
 
   // ── Dashboard ──
