@@ -1,6 +1,17 @@
 {
-  "name": "hermitelabs",
+  "name": "hermite-labs",
   "version": "1.0.0",
+  "private": true,
+  "description": "Hermite Labs — the parent site (hermitelabs.com) and HermiteFlow (flow.hermitelabs.com), served from one deployment.",
+  "homepage": "https://hermitelabs.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gafaraleshe/hermite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gafaraleshe/hermite/issues"
+  },
+  "author": "Gafar Aleshe (Hermite Labs) <hello@hermitelabs.com>",
   "type": "module",
   "license": "MIT",
   "scripts": {
@@ -10,12 +21,14 @@
     "start": "NODE_ENV=production node dist/index.js",
     "check": "tsc --noEmit",
     "gen:openapi": "tsx scripts/gen-openapi.ts",
+    "gen:assets": "python3 scripts/gen-brand-assets.py",
+    "gen:bootstrap": "node scripts/gen-bootstrap-sql.mjs",
     "connect": "node scripts/connect.mjs",
     "seed:owner": "tsx scripts/seed-owner.ts",
     "format": "prettier --write .",
     "test": "vitest run",
     "db:push": "drizzle-kit generate && drizzle-kit migrate",
-    "db:pg:generate": "drizzle-kit generate --config drizzle.config.pg.ts",
+    "db:pg:generate": "drizzle-kit generate --config drizzle.config.pg.ts && node scripts/gen-bootstrap-sql.mjs",
     "db:pg:migrate": "drizzle-kit migrate --config drizzle.config.pg.ts"
   },
   "dependencies": {

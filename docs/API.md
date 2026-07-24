@@ -1,10 +1,10 @@
-# Hermite Flow Public API (v1)
+# HermiteFlow Public API (v1)
 
 A versioned, key-authenticated REST API over the same domain services that power the
 app. Designed for customers and integrations to manage clients, invoices, and payments
 programmatically.
 
-- **Base URL:** `https://api.invoiceflow.app/v1` (or `https://YOURDOMAIN/api/v1`)
+- **Base URL:** `https://flow.hermitelabs.com/api/v1` (or `https://YOURDOMAIN/api/v1`)
 - **Format:** JSON. UTF-8. Money as integer-minor-units optional; default decimal strings.
 - **Versioning:** path-based (`/v1`). Breaking changes ship under `/v2`.
 - **Spec:** an **OpenAPI 3.0** document is published at `/api/v1/openapi.json`
@@ -155,20 +155,20 @@ invoices. It talks to the API over HTTP using:
 
 | Variable | Example |
 |----------|---------|
-| `INVOICEFLOW_API_URL` | `https://flow.hermitelabs.com` |
-| `INVOICEFLOW_API_KEY` | `ifk_live_…` |
+| `HERMITE_FLOW_API_URL` | `https://flow.hermitelabs.com` |
+| `HERMITE_FLOW_API_KEY` | `ifk_live_…` |
 
 Configure it in `.mcp.json` (Claude Code) or `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "invoiceflow": {
+    "hermiteflow": {
       "command": "node",
-      "args": ["/absolute/path/to/Hermite Flow/mcp/dist/index.js"],
+      "args": ["/absolute/path/to/HermiteFlow/mcp/dist/index.js"],
       "env": {
-        "INVOICEFLOW_API_URL": "https://flow.hermitelabs.com",
-        "INVOICEFLOW_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
+        "HERMITE_FLOW_API_URL": "https://flow.hermitelabs.com",
+        "HERMITE_FLOW_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
       }
     }
   }

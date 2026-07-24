@@ -1,7 +1,7 @@
 # Domains & deployment — Hermite Labs
 
 **One repo, one Vercel project, one deployment.** Hermite Labs (the parent
-site) and Hermite Flow (the product) are the same codebase; a host check in the
+site) and HermiteFlow (the product) are the same codebase; a host check in the
 client (`client/src/lib/host.ts`) decides which site renders. There is no
 separate "Flow" project.
 
@@ -21,13 +21,13 @@ Remaining one-time steps (dashboard-only):
   General → rename the project to `hermite`. One project serves both
   hermitelabs.com and flow.hermitelabs.com.
 - The photography site (`shotbygafar`) stays its own repo/project — it's a
-  separate website that *talks to* Hermite Flow over the API.
+  separate website that *talks to* HermiteFlow over the API.
 
 | Host | Serves |
 |---|---|
 | `hermitelabs.com`, `www.hermitelabs.com` | **Hermite Labs** parent site (`HermiteLabs.tsx`) |
-| `flow.hermitelabs.com` | **Hermite Flow** — marketing at `/`, app at `/dashboard`, API at `/api/v1` |
-| any other host (previews, `localhost`) | Hermite Flow (append `/labs` or `?labs=1` to preview the parent site) |
+| `flow.hermitelabs.com` | **HermiteFlow** — marketing at `/`, app at `/dashboard`, API at `/api/v1` |
+| any other host (previews, `localhost`) | HermiteFlow (append `/labs` or `?labs=1` to preview the parent site) |
 
 ## Vercel setup
 

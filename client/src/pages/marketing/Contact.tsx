@@ -19,13 +19,13 @@ const channels = [
     icon: Mail,
     title: "Email us",
     body: "We reply to every message within one business day.",
-    value: "hello@invoiceflow.com",
+    value: "hello@hermitelabs.com",
   },
   {
     icon: MessageSquare,
     title: "Sales",
     body: "Talk through plans, migrations, and volume pricing.",
-    value: "sales@invoiceflow.com",
+    value: "sales@hermitelabs.com",
   },
   {
     icon: Building2,

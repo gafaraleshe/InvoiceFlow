@@ -198,10 +198,10 @@ export default function Docs() {
           <BookOpen className="h-3.5 w-3.5" /> Documentation
         </div>
         <h1 className="mkt-display mt-3 text-[clamp(32px,5vw,48px)] text-[var(--mkt-ink)]">
-          Hermite Flow docs
+          HermiteFlow docs
         </h1>
         <p className="mt-3 max-w-[64ch] text-[17px] leading-relaxed text-[var(--mkt-ink-subtle)]">
-          Everything you need to use Hermite Flow — core concepts, plans, the
+          Everything you need to use HermiteFlow — core concepts, plans, the
           REST API, and how the platform is built and deployed.
         </p>
       </div>
@@ -241,7 +241,7 @@ export default function Docs() {
         <article className="min-w-0 max-w-[760px]">
           <Section id="introduction" icon={BookOpen} title="Introduction">
             <P>
-              Hermite Flow is a fast, focused invoicing platform for freelancers,
+              HermiteFlow is a fast, focused invoicing platform for freelancers,
               agencies, and small finance teams. You create branded invoices,
               send them with a built-in payment link, and get paid faster — from
               one clean dashboard.
@@ -249,7 +249,7 @@ export default function Docs() {
             <P>
               These docs cover how the product works day to day, what each plan
               includes, the public REST API for integrations, and how the
-              platform is built and deployed. New to Hermite Flow? Start with the{" "}
+              platform is built and deployed. New to HermiteFlow? Start with the{" "}
               <a href="#quickstart" className="text-[var(--mkt-primary-hover)] hover:underline">
                 Quickstart
               </a>
@@ -377,14 +377,14 @@ export default function Docs() {
               to <Code>paid</Code> automatically and a receipt is emailed.
             </P>
             <Note>
-              Online payments are powered by Stripe. Hermite Flow never takes a
+              Online payments are powered by Stripe. HermiteFlow never takes a
               percentage of the payments you collect.
             </Note>
           </Section>
 
           <Section id="automation" icon={Bell} title="Automation">
             <P>
-              Stop chasing invoices. Hermite Flow runs scheduled jobs that send
+              Stop chasing invoices. HermiteFlow runs scheduled jobs that send
               reminders and keep statuses accurate without any manual work.
             </P>
             <FeatureList
@@ -407,7 +407,7 @@ export default function Docs() {
 
           <Section id="plans" icon={Gem} title="Plans & billing">
             <P>
-              Hermite Flow is free to start. Upgrade for automation, the API, and
+              HermiteFlow is free to start. Upgrade for automation, the API, and
               team seats. See the{" "}
               <Link href="/pricing" className="text-[var(--mkt-primary-hover)] hover:underline">
                 pricing page
@@ -521,12 +521,12 @@ export default function Docs() {
 
           <Section id="setup" icon={Server} title="Setup & deploy">
             <P>
-              Hermite Flow is built in TypeScript end to end: React + Vite on the
+              HermiteFlow is built in TypeScript end to end: React + Vite on the
               front end, a tRPC + REST API, Clerk for authentication, Supabase
               Postgres for data, and it deploys to Vercel. Run it locally with:
             </P>
-            <Pre>{`git clone https://github.com/gafaraleshe/Hermite Flow.git
-cd Hermite Flow
+            <Pre>{`git clone https://github.com/gafaraleshe/HermiteFlow.git
+cd HermiteFlow
 pnpm install
 cp .env.example .env   # fill in your keys
 pnpm dev               # http://localhost:3000`}</Pre>
@@ -543,7 +543,7 @@ pnpm dev               # http://localhost:3000`}</Pre>
                   "Resend",
                   "transactional email — invoices, receipts, reminders",
                 ],
-                ["Polar.sh", "subscription billing for Hermite Flow plans"],
+                ["Polar.sh", "subscription billing for HermiteFlow plans"],
                 ["Stripe", "online payment of your customers' invoices"],
                 ["Vercel", "serverless hosting and scheduled jobs (Cron)"],
               ]}
