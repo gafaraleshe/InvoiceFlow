@@ -45,7 +45,7 @@
 :root {
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --primary: #0007cd; /* Hermite Flow electric-blue accent */
+  --primary: #0007cd; /* HermiteFlow electric-blue accent */
   --primary-foreground: oklch(0.98 0 0);
   --sidebar-primary: oklch(0.5 0.2 260);
   --sidebar-primary-foreground: oklch(0.98 0 0);
@@ -81,7 +81,7 @@
 }
 
 .dark {
-  --primary: #1a26ff; /* Hermite Flow electric-blue accent (dark) */
+  --primary: #1a26ff; /* HermiteFlow electric-blue accent (dark) */
   --primary-foreground: var(--color-blue-50);
   --sidebar-primary: var(--color-blue-500);
   --sidebar-primary-foreground: var(--color-blue-50);

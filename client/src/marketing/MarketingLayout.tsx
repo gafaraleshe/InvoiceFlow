@@ -69,7 +69,7 @@ function Wordmark() {
       <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--mkt-primary)] text-[13px] font-bold text-white">
         H
       </span>
-      Hermite Flow
+      HermiteFlow
     </Link>
   );
 }

@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 /**
- * Hermite Flow MCP server (stdio). Exposes the Hermite Flow REST API as MCP tools
+ * HermiteFlow MCP server (stdio). Exposes the HermiteFlow REST API as MCP tools
  * so an assistant can manage clients and invoices.
  *
  * Configure with two environment variables:
- *   INVOICEFLOW_API_URL  – your site origin, e.g. https://flow.hermitelabs.com
- *   INVOICEFLOW_API_KEY  – an API key (ifk_live_… / ifk_test_…) from the dashboard
+ *   HERMITE_FLOW_API_URL  – your site origin, e.g. https://flow.hermitelabs.com
+ *   HERMITE_FLOW_API_KEY  – an API key (ifk_live_… / ifk_test_…) from the dashboard
+ *
+ * The legacy INVOICEFLOW_* names still work as a fallback during the env
+ * cutover; see main() below.
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -14,7 +17,7 @@ import { tools } from "./tools.js";
 import { ApiError } from "./client.js";
 
 export function createServer(client: HermiteFlowClient): McpServer {
-  const server = new McpServer({ name: "invoiceflow-mcp", version: "1.0.0" });
+  const server = new McpServer({ name: "hermiteflow-mcp", version: "1.0.0" });
 
   for (const tool of tools) {
     server.tool(tool.name, tool.description, tool.shape, async args => {
@@ -26,7 +29,7 @@ export function createServer(client: HermiteFlowClient): McpServer {
       } catch (err) {
         const message =
           err instanceof ApiError
-            ? `Hermite Flow API error (${err.status} ${err.code}): ${err.message}`
+            ? `HermiteFlow API error (${err.status} ${err.code}): ${err.message}`
             : err instanceof Error
               ? err.message
               : String(err);
@@ -39,8 +42,11 @@ export function createServer(client: HermiteFlowClient): McpServer {
 }
 
 async function main() {
-  // Prefer SIGMA_* env vars; fall back to the legacy INVOICEFLOW_* names.
+  // Prefer the HERMITE_* names; fall back to the legacy INVOICEFLOW_* ones so
+  // existing MCP client configs keep working across the env cutover.
+  // TODO(hermite): remove after env cutover
   const baseUrl = process.env.HERMITE_FLOW_API_URL ?? process.env.INVOICEFLOW_API_URL;
+  // TODO(hermite): remove after env cutover
   const apiKey = process.env.HERMITE_FLOW_API_KEY ?? process.env.INVOICEFLOW_API_KEY;
   if (!baseUrl || !apiKey) {
     console.error(

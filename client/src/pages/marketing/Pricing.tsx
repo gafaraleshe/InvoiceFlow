@@ -170,7 +170,7 @@ const faqs = [
   },
   {
     q: "What payment methods do you support?",
-    a: "Your clients can pay by card or bank transfer through hosted payment links. You can pay for Hermite Flow with any major card.",
+    a: "Your clients can pay by card or bank transfer through hosted payment links. You can pay for HermiteFlow with any major card.",
   },
   {
     q: "Do you charge per invoice?",

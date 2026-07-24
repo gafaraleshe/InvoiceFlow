@@ -1,4 +1,4 @@
-// Generates docs/InvoiceFlow-Product-Guide.pdf from a structured content model.
+// Generates docs/HermiteFlow-Product-Guide.pdf from a structured content model.
 // Pure JS (pdfkit) — no browser or native deps. Run: node scripts/generate-guide-pdf.mjs
 import PDFDocument from "pdfkit";
 import fs from "node:fs";
@@ -6,7 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const OUT = path.join(__dirname, "..", "docs", "InvoiceFlow-Product-Guide.pdf");
+const OUT = path.join(__dirname, "..", "docs", "HermiteFlow-Product-Guide.pdf");
 
 // ── palette ──────────────────────────────────────────────────────────────────
 const INK = "#1c1d22";
@@ -118,7 +118,7 @@ function table(headers, rows, props) {
 // ── COVER ──────────────────────────────────────────────────────────────────
 doc.save().roundedRect(M, M + 30, 40, 40, 8).fill(ACCENT).restore();
 doc.font(FB).fontSize(22).fillColor("#ffffff").text("I", M + 13, M + 40);
-doc.font(FB).fontSize(34).fillColor(DARK).text("InvoiceFlow", M, M + 90);
+doc.font(FB).fontSize(34).fillColor(DARK).text("HermiteFlow", M, M + 90);
 doc
   .font(F)
   .fontSize(14)
@@ -133,8 +133,8 @@ doc
 const metaY = M + 220;
 doc.roundedRect(M, metaY, CONTENT_W, 150, 8).lineWidth(1).strokeColor(RULE).stroke();
 const meta = [
-  ["Prepared for", "InvoiceFlow stakeholders & clients"],
-  ["Product", "InvoiceFlow — online invoicing SaaS"],
+  ["Prepared for", "HermiteFlow stakeholders & clients"],
+  ["Product", "HermiteFlow — online invoicing SaaS"],
   ["Stage", "Marketing site live; building the product"],
   ["Stack", "TypeScript · React · Supabase · Polar.sh · Stripe · Resend · Vercel"],
   ["Date", "June 2026"],
@@ -160,7 +160,7 @@ doc
 doc.addPage();
 h2("1. Executive summary");
 para(
-  "InvoiceFlow is a fast, focused online invoicing platform for freelancers, agencies, and small finance teams. Users create polished, branded invoices, send them by email with a built-in payment link, and get paid faster through automated reminders — all from a clean, Linear-grade dashboard.",
+  "HermiteFlow is a fast, focused online invoicing platform for freelancers, agencies, and small finance teams. Users create polished, branded invoices, send them by email with a built-in payment link, and get paid faster through automated reminders — all from a clean, Linear-grade dashboard.",
 );
 para(
   "The public marketing website is already built and deployable. This guide covers building the actual product: a secure, multi-tenant SaaS with accounts, subscription billing, online payments, automation, and a public API — engineered with modern, scalable best practices in TypeScript.",
@@ -308,7 +308,7 @@ doc
   .fontSize(8.5)
   .fillColor("#8a8d98")
   .text(
-    "InvoiceFlow — Product & Launch Guide. Generated from the project repository. Full technical detail in PRODUCT_PLAN.md, SETUP_GUIDE.md, and API.md.",
+    "HermiteFlow — Product & Launch Guide. Generated from the project repository. Full technical detail in PRODUCT_PLAN.md, SETUP_GUIDE.md, and API.md.",
     M,
     doc.y,
     { width: CONTENT_W },
