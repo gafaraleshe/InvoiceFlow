@@ -37,7 +37,7 @@ function buildEmailHtml(params: SendInvoiceEmailParams): string {
   <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
     <div style="background: white; border-radius: 12px; padding: 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
       <div style="text-align: center; margin-bottom: 32px;">
-        <h1 style="font-size: 24px; font-weight: 700; color: #1e40af; margin: 0;">Hermite Flow</h1>
+        <h1 style="font-size: 24px; font-weight: 700; color: #1e40af; margin: 0;">HermiteFlow</h1>
       </div>
 
       <h2 style="font-size: 20px; font-weight: 600; color: #111827; margin: 0 0 16px;">
@@ -80,7 +80,7 @@ function buildEmailHtml(params: SendInvoiceEmailParams): string {
       </div>
 
       <p style="font-size: 13px; color: #9ca3af; text-align: center; margin: 0;">
-        This invoice was sent via Hermite Flow. If you have any questions, please reply to this email.
+        This invoice was sent via HermiteFlow. If you have any questions, please reply to this email.
       </p>
     </div>
   </div>
@@ -98,7 +98,7 @@ export async function sendInvoiceEmail(
       "[Email] RESEND_API_KEY not configured. Email will be simulated."
     );
     console.log(`[Email] Simulated email to ${params.to}:`, {
-      subject: `Invoice ${params.invoiceNumber} from Hermite Flow`,
+      subject: `Invoice ${params.invoiceNumber} from HermiteFlow`,
       invoiceUrl: params.pdfUrl,
     });
     return;
@@ -114,7 +114,7 @@ export async function sendInvoiceEmail(
     },
     body: JSON.stringify({
       from:
-        process.env.RESEND_FROM_EMAIL || "Hermite Flow <invoices@resend.dev>",
+        process.env.RESEND_FROM_EMAIL || "HermiteFlow <invoices@resend.dev>",
       to: [params.to],
       subject: `Invoice ${params.invoiceNumber} — ${formatCurrency(params.total)} due ${formatDate(params.dueDate)}`,
       html,

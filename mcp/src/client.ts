@@ -1,5 +1,5 @@
 /**
- * Thin HTTP client for the Hermite Flow public REST API (`/api/v1`).
+ * Thin HTTP client for the HermiteFlow public REST API (`/api/v1`).
  * The MCP tools talk to the deployed API over HTTP with an API key — they do
  * not import server code, so this package stays independently deployable.
  */

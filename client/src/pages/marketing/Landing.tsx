@@ -83,7 +83,7 @@ const stats = [
   {
     n: 2.4,
     fmt: (v: number) => `£${v.toFixed(1)}B+`,
-    label: "Invoiced through Hermite Flow",
+    label: "Invoiced through HermiteFlow",
   },
   {
     n: 11,
@@ -105,7 +105,7 @@ const stats = [
 const testimonials = [
   {
     quote:
-      "We replaced three tools and a spreadsheet with Hermite Flow. Our DSO dropped by two weeks in the first month.",
+      "We replaced three tools and a spreadsheet with HermiteFlow. Our DSO dropped by two weeks in the first month.",
     name: "Sofia Marchetti",
     role: "Finance Lead, Atlas Logistics",
   },
@@ -162,7 +162,7 @@ export default function Landing() {
               Invoicing for creatives
             </h1>
             <p className="mt-6 max-w-[56ch] text-[clamp(17px,2vw,20px)] leading-relaxed text-[var(--mkt-ink-subtle)]">
-              Hermite Flow turns bookings into paid invoices for photographers,
+              HermiteFlow turns bookings into paid invoices for photographers,
               filmmakers, designers and studios. Connect your booking site and
               every enquiry becomes a client, a branded invoice, and an email —
               on its own. By Gaffy Studios.
@@ -231,7 +231,7 @@ export default function Landing() {
           <SectionHeading
             eyebrow="Everything you need"
             title="A complete billing workflow, end to end"
-            description="From the first draft to the final payment, Hermite Flow handles the entire lifecycle so you can stop chasing and start collecting."
+            description="From the first draft to the final payment, HermiteFlow handles the entire lifecycle so you can stop chasing and start collecting."
           />
           <Stagger className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {features.map(f => (
@@ -312,7 +312,7 @@ export default function Landing() {
                 Reminders that chase payments so you don't have to
               </h2>
               <p className="mt-5 text-[17px] leading-relaxed text-[var(--mkt-ink-subtle)]">
-                Set a schedule once and Hermite Flow handles the rest — gentle
+                Set a schedule once and HermiteFlow handles the rest — gentle
                 nudges before the due date, firm reminders after, and an instant
                 status flip the moment a payment lands.
               </p>
@@ -426,7 +426,7 @@ export default function Landing() {
                 Start getting paid faster today
               </h2>
               <p className="mx-auto mt-4 max-w-[52ch] text-[17px] text-[var(--mkt-ink-subtle)]">
-                Join thousands of teams running their billing on Hermite Flow.
+                Join thousands of teams running their billing on HermiteFlow.
                 Free to start — no credit card, no setup calls.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -474,7 +474,7 @@ const LABS = {
 const HERMITE_PRODUCTS = [
   {
     icon: FileText,
-    name: "Hermite Flow",
+    name: "HermiteFlow",
     category: "CRM + Invoicing",
     domain: "flow.hermitelabs.com",
     blurb: "Bookings to paid invoices, on autopilot. The one you're looking at.",
@@ -552,7 +552,7 @@ function HermiteLabsSection() {
               className="mx-auto mt-4 max-w-[56ch] text-[16px] leading-relaxed"
               style={{ color: LABS.body }}
             >
-              Hermite Flow is the first of a growing suite by Gaffy Studios.
+              HermiteFlow is the first of a growing suite by Gaffy Studios.
               One account, one design language, everything that runs a studio.
             </p>
           </div>

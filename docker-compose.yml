@@ -4,37 +4,37 @@ services:
   # ─── PostgreSQL Database ─────────────────────────────────────────────────
   db:
     image: postgres:16-alpine
-    container_name: invoiceflow-db
+    container_name: hermiteflow-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: invoiceflow
-      POSTGRES_PASSWORD: invoiceflow_secret
-      POSTGRES_DB: invoiceflow
+      POSTGRES_USER: hermiteflow
+      POSTGRES_PASSWORD: hermiteflow_secret
+      POSTGRES_DB: hermiteflow
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U invoiceflow"]
+      test: ["CMD-SHELL", "pg_isready -U hermiteflow"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # ─── InvoiceFlow API ────────────────────────────────────────────────────
+  # ─── HermiteFlow API ────────────────────────────────────────────────────
   api:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: invoiceflow-api
+    container_name: hermiteflow-api
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       NODE_ENV: production
-      DATABASE_URL: mysql://invoiceflow:invoiceflow_secret@db:3306/invoiceflow
+      DATABASE_URL: mysql://hermiteflow:hermiteflow_secret@db:3306/hermiteflow
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
-      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-InvoiceFlow <invoices@resend.dev>}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-HermiteFlow <invoices@resend.dev>}
     depends_on:
       db:
         condition: service_healthy

@@ -3,7 +3,7 @@
  *
  * This provisions a "special access" tenant (default: SHOTBYGAFAR) on the
  * Business plan and mints an owner-scoped API key that unlocks every
- * capability. Use it to connect your own booking site to Hermite Flow.
+ * capability. Use it to connect your own booking site to HermiteFlow.
  *
  *   DATABASE_URL=... pnpm seed:owner
  *

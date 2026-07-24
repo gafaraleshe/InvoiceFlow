@@ -3,7 +3,7 @@
   <p align="center">
     Software for creative businesses, by Gaffy Studios. This repo is the Hermite Labs platform —
     one deployment serving <a href="https://hermitelabs.com">hermitelabs.com</a> (the parent site)
-    and <a href="https://flow.hermitelabs.com">flow.hermitelabs.com</a> (<b>Hermite Flow</b>, the
+    and <a href="https://flow.hermitelabs.com">flow.hermitelabs.com</a> (<b>HermiteFlow</b>, the
     CRM + invoicing product) via host-based routing. Built with TypeScript, React, Express, and tRPC.
   </p>
   <p align="center">
@@ -19,7 +19,7 @@
 
 ## 📐 Building the product (roadmap & docs)
 
-We're evolving Hermite Flow from an app into a **shippable, multi-tenant invoicing SaaS**
+We're evolving HermiteFlow from an app into a **shippable, multi-tenant invoicing SaaS**
 (Supabase Auth + Postgres, Polar.sh subscriptions, Stripe invoice payments, Resend email,
 a public REST API, all on Vercel). Start here:
 
@@ -29,7 +29,7 @@ a public REST API, all on Vercel). Start here:
 | [`docs/SETUP_GUIDE.md`](docs/SETUP_GUIDE.md) | Click-by-click setup for Supabase, Resend, Polar.sh, Stripe, and Vercel (+ env vars) |
 | [`docs/API.md`](docs/API.md) | Public REST API (`/api/v1`) design — auth, resources, pagination, OpenAPI |
 | [`.env.example`](.env.example) | Every environment variable the product needs |
-| [`docs/InvoiceFlow-Product-Guide.pdf`](docs/InvoiceFlow-Product-Guide.pdf) | One-page-per-topic PDF for you **and your clients** — summary, setup, costs, timeline |
+| [`docs/HermiteFlow-Product-Guide.pdf`](docs/HermiteFlow-Product-Guide.pdf) | One-page-per-topic PDF for you **and your clients** — summary, setup, costs, timeline |
 
 > Regenerate the PDF after editing the guide: `node scripts/generate-guide-pdf.mjs`.
 
@@ -37,7 +37,7 @@ a public REST API, all on Vercel). Start here:
 
 ## Overview
 
-**Hermite Flow** is a full-stack invoice management application designed for freelancers and small businesses operating in the UK. It handles the complete invoicing lifecycle — from creating clients and drafting invoices with itemised line items, through automatic UK VAT (20%) calculation, to generating professional invoice documents and emailing them directly to clients via the Resend API.
+**HermiteFlow** is a full-stack invoice management application designed for freelancers and small businesses operating in the UK. It handles the complete invoicing lifecycle — from creating clients and drafting invoices with itemised line items, through automatic UK VAT (20%) calculation, to generating professional invoice documents and emailing them directly to clients via the Resend API.
 
 The system features a clean, responsive dashboard UI with real-time statistics, a type-safe API layer powered by tRPC, OAuth 2.0 authentication with role-based access control, and a comprehensive test suite with 34 passing tests. It ships with Docker Compose for containerised deployment and a GitHub Actions CI/CD pipeline that runs linting, type checking, tests, and Docker builds on every push.
 
@@ -83,7 +83,7 @@ The system features a clean, responsive dashboard UI with real-time statistics, 
 ## Project Structure
 
 ```
-invoice-flow/
+hermite-flow/
 ├── client/                     # React frontend
 │   ├── src/
 │   │   ├── components/         # Reusable UI components (shadcn/ui)
@@ -107,7 +107,7 @@ invoice-flow/
 │   ├── pdfGenerator.ts         # Invoice document generation
 │   ├── emailService.ts         # Resend email integration
 │   ├── storage.ts              # S3 file storage helpers
-│   ├── invoiceflow.test.ts     # Comprehensive test suite (33 tests)
+│   ├── hermiteflow.test.ts     # Comprehensive test suite (33 tests)
 │   └── auth.logout.test.ts     # Auth logout test (1 test)
 ├── drizzle/
 │   ├── schema.ts               # Database tables (users, clients, invoices, line_items)
@@ -259,7 +259,7 @@ owner/admin only) — a separate path from the API keys themselves.
 An MCP server in [`mcp/`](mcp/) wraps this REST API so assistants (Claude Code,
 Claude Desktop) can manage invoicing conversationally. It ships as its own
 package (`node mcp/dist/index.js`) and is configured with two env vars —
-`INVOICEFLOW_API_URL` and `INVOICEFLOW_API_KEY`. Tools include `list_clients`,
+`HERMITE_FLOW_API_URL` and `HERMITE_FLOW_API_KEY`. Tools include `list_clients`,
 `create_invoice`, `send_invoice_email`, `get_dashboard_stats`, and more. See
 [`mcp/README.md`](mcp/README.md) for the exact `.mcp.json` /
 `claude_desktop_config.json` snippet.
@@ -279,7 +279,7 @@ package (`node mcp/dist/index.js`) and is configured with two env vars —
 ```bash
 # Clone the repository
 git clone https://github.com/gafaraleshe/hermite.git
-cd Hermite Flow
+cd hermite
 
 # Install dependencies
 pnpm install
@@ -320,7 +320,7 @@ docker compose up -d
 | `VITE_APP_ID` | Yes | OAuth application ID |
 | `VITE_OAUTH_PORTAL_URL` | Yes | OAuth login portal URL |
 | `RESEND_API_KEY` | No | Resend API key for email delivery (simulated if absent) |
-| `RESEND_FROM_EMAIL` | No | Sender email address (defaults to `Hermite Flow <invoices@resend.dev>`) |
+| `RESEND_FROM_EMAIL` | No | Sender email address (defaults to `HermiteFlow <invoices@resend.dev>`) |
 
 ---
 
@@ -335,12 +335,14 @@ docker compose up -d
 | `pnpm format` | Format code with Prettier |
 | `pnpm test` | Run the Vitest test suite |
 | `pnpm db:push` | Generate and apply database migrations |
+| `pnpm gen:openapi` | Regenerate `openapi.yaml` from `server/rest/openapi.ts` |
+| `pnpm gen:assets` | Regenerate the placeholder brand assets (see below) |
 
 ---
 
 ## Testing
 
-The test suite contains **34 tests** across two test files, all executed with Vitest using tRPC's `createCaller` for direct procedure testing without HTTP overhead.
+The test suite contains **51 tests** across three test files (`server/hermiteflow.test.ts`, `server/rest.test.ts`, `server/auth.logout.test.ts`), all executed with Vitest using tRPC's `createCaller` for direct procedure testing without HTTP overhead.
 
 ```bash
 # Run all tests
@@ -362,18 +364,50 @@ pnpm test
 
 ## CI/CD Pipeline
 
-The GitHub Actions workflow (`.github/workflows/ci.yml`) runs on every push and pull request to `main` with four sequential stages:
+> **Not set up yet.** This repository has no `.github/workflows/` directory — an
+> earlier version of this README described a pipeline that was never committed.
+> Until it exists, run the checks locally before pushing:
+>
+> ```bash
+> pnpm check && pnpm test && pnpm build
+> ```
+>
+> The intended pipeline (to be added during cutover) is: type check → tests →
+> build → Docker image on pushes to `main`.
 
-1. **Lint & Type Check** — Runs `pnpm check` for TypeScript validation and `pnpm format --check` for code style
-2. **Tests** — Executes the full Vitest suite with `NODE_ENV=test`
-3. **Build** — Compiles the frontend and backend for production
-4. **Docker Build** — Builds the Docker image on pushes to `main` (uses GitHub Actions cache for layer reuse)
+---
+
+## Brand assets
+
+The files in `client/public/` are **placeholders**, generated programmatically
+from the Hermite Labs monogram by `pnpm gen:assets`
+(`scripts/gen-brand-assets.py`). They are correctly sized and wired up, but they
+are drawn with DejaVu Sans rather than Inter and are not final artwork.
+
+**Replace these with real exports before launch:**
+
+| File | Size / format | Used by |
+|---|---|---|
+| `favicon.ico` | 16/32/48/64 multi-size ICO | Legacy browser tabs |
+| `favicon.svg` | SVG, monochrome | Modern browser tabs (Hermite Labs) |
+| `favicon-flow.svg` | SVG, `#3ADCC8` crossbar | Modern browser tabs (HermiteFlow) |
+| `favicon-16x16.png`, `favicon-32x32.png` | PNG | Fallback tab icons |
+| `apple-touch-icon.png` | 180×180 PNG, no alpha | iOS home screen |
+| `icon-192.png`, `icon-512.png` | PNG | PWA / `site.webmanifest` |
+| `icon-512-maskable.png` | 512×512 PNG, 28% safe inset | Android maskable icon |
+| `og-image.png` | 1200×630 PNG | Hermite Labs OG/Twitter card |
+| `og-image-flow.png` | 1200×630 PNG | HermiteFlow OG/Twitter card |
+
+Still outstanding (Phase 5 — brand system): light/dark **wordmark exports**, and
+per-product OG images for HermiteCut and HermiteMind. The monogram geometry and
+the accent tokens live in `scripts/gen-brand-assets.py`; keep them in sync with
+the brand system.
 
 ---
 
 ## VAT Calculation Logic
 
-Hermite Flow computes UK VAT automatically on every invoice. The calculation follows this formula:
+HermiteFlow computes UK VAT automatically on every invoice. The calculation follows this formula:
 
 ```
 Line Item Amount = Quantity × Unit Price

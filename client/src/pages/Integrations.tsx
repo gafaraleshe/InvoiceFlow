@@ -28,7 +28,7 @@ import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 
 /*
- * Integrations — the "connection tool" for Hermite Flow.
+ * Integrations — the "connection tool" for HermiteFlow.
  *
  * The connect panel is styled after the Composio design reference
  * (composio/DESIGN.md): a dark, technical surface with an electric-blue
@@ -160,7 +160,7 @@ export default function IntegrationsPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Integrations</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Connect your booking site to Hermite Flow — enquiries become clients
+            Connect your booking site to HermiteFlow — enquiries become clients
             and invoices automatically.
           </p>
         </div>
@@ -208,7 +208,7 @@ export default function IntegrationsPage() {
             One command to connect a booking site
           </h2>
           <p className="mt-2 max-w-xl text-sm" style={{ color: CX.body }}>
-            Create an API key, then point your site at Hermite Flow. Every booking
+            Create an API key, then point your site at HermiteFlow. Every booking
             posts to <code style={{ color: CX.cyan }}>/api/v1/bookings</code> and,
             with <code style={{ color: CX.cyan }}>auto_send</code>, an invoice is
             emailed via Resend on the spot.
@@ -217,14 +217,14 @@ export default function IntegrationsPage() {
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
             <TerminalPanel
               title="connect.sh"
-              copyText={`npx @invoiceflow/connect --url ${origin} --key ifk_live_xxx`}
+              copyText={`npx @hermite/connect --url ${origin} --key ifk_live_xxx`}
               lines={[
                 { text: "Verify a key and print your ready-to-paste config:", tone: "comment" },
-                { text: `npx @invoiceflow/connect \\`, tone: "cmd" },
+                { text: `npx @hermite/connect \\`, tone: "cmd" },
                 { text: `    --url ${origin} \\`, tone: "cmd" },
                 { text: "    --key ifk_live_xxx", tone: "cmd" },
                 { text: "✓ authenticated as your workspace (owner)", tone: "out" },
-                { text: "✓ wrote .env.invoiceflow", tone: "out" },
+                { text: "✓ wrote .env.hermiteflow", tone: "out" },
               ]}
             />
             <TerminalPanel

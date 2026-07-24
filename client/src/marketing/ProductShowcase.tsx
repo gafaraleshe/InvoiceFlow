@@ -31,7 +31,7 @@ const steps = [
     icon: Bell,
     label: "Automate",
     title: "Reminders chase for you",
-    body: "Set a schedule once. Hermite Flow nudges clients, escalates overdue notices, and flips to paid on its own.",
+    body: "Set a schedule once. HermiteFlow nudges clients, escalates overdue notices, and flips to paid on its own.",
     render: () => (
       <div className="flex h-full items-center justify-center">
         <div className="w-full max-w-[420px]">
@@ -70,7 +70,7 @@ export function ProductShowcase() {
           </h2>
           <p className="mt-4 max-w-[56ch] text-[17px] leading-relaxed text-[var(--mkt-ink-subtle)]">
             Watch a payment move from draft to paid — create, send, automate,
-            and track without ever leaving Hermite Flow.
+            and track without ever leaving HermiteFlow.
           </p>
         </Reveal>
 

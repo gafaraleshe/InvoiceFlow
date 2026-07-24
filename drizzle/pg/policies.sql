@@ -1,4 +1,4 @@
--- Row-Level Security policies for InvoiceFlow (Supabase Postgres).
+-- Row-Level Security policies for HermiteFlow (Supabase Postgres).
 --
 -- The API connects as the `postgres` role, which BYPASSES RLS, and enforces
 -- tenant scoping in the application layer. These policies are defense-in-depth:
@@ -8,7 +8,8 @@
 --
 -- Apply AFTER the generated schema migration (0000_*.sql).
 
--- Is the current Supabase user a member of the given organization?
+-- Is the current PostgREST user a member of the given organization?
+-- NB: user ids are Clerk strings (varchar), auth.uid() is a uuid — hence ::text.
 create or replace function public.is_org_member(org uuid)
 returns boolean
 language sql
@@ -19,7 +20,7 @@ as $$
   select exists (
     select 1 from public.memberships m
     where m.organization_id = org
-      and m.user_id = auth.uid()
+      and m.user_id = auth.uid()::text
   );
 $$;
 
@@ -36,7 +37,7 @@ alter table public.bookings       enable row level security;
 
 -- A user can see/update only their own profile row.
 create policy users_self on public.users
-  for all using (id = auth.uid()) with check (id = auth.uid());
+  for all using (id = auth.uid()::text) with check (id = auth.uid()::text);
 
 -- Members can read their organizations and memberships.
 create policy orgs_member_read on public.organizations
