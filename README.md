@@ -7,7 +7,7 @@
     CRM + invoicing product) via host-based routing. Built with TypeScript, React, Express, and tRPC.
   </p>
   <p align="center">
-    <a href="https://github.com/gafaraleshe/hermitelabs/actions"><img src="https://github.com/gafaraleshe/hermitelabs/actions/workflows/ci.yml/badge.svg" alt="CI/CD"></a>
+    <a href="https://github.com/gafaraleshe/hermite/actions"><img src="https://github.com/gafaraleshe/hermite/actions/workflows/ci.yml/badge.svg" alt="CI/CD"></a>
     <img src="https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript" alt="TypeScript">
     <img src="https://img.shields.io/badge/Node.js-22-green?logo=node.js" alt="Node.js">
     <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" alt="React">
@@ -278,7 +278,7 @@ package (`node mcp/dist/index.js`) and is configured with two env vars —
 
 ```bash
 # Clone the repository
-git clone https://github.com/gafaraleshe/hermitelabs.git
+git clone https://github.com/gafaraleshe/hermite.git
 cd Hermite Flow
 
 # Install dependencies

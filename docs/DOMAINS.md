@@ -5,13 +5,21 @@ site) and Hermite Flow (the product) are the same codebase; a host check in the
 client (`client/src/lib/host.ts`) decides which site renders. There is no
 separate "Flow" project.
 
-## One-time renames (align everything to "hermitelabs")
+## Home repo: `gafaraleshe/hermite`
 
-- **GitHub**: repo Settings → rename `gafaraleshe/InvoiceFlow` →
-  `gafaraleshe/hermitelabs`. GitHub redirects all old URLs/clones automatically.
-- **Vercel**: project `gafitenisons-projects/invoice-flow` → Settings →
-  General → rename to `hermitelabs`. The Git connection follows the repo
-  rename automatically; deployments are unaffected.
+The platform was transferred here from `gafaraleshe/InvoiceFlow` — the full
+history lives on the **`main`** branch of `gafaraleshe/hermite`. (The Hermite
+Resolve-plugin work is unaffected on its own branch,
+`claude/hermite-resolve-plugin-cf4zzx`.)
+
+Remaining one-time steps (dashboard-only):
+
+- **GitHub**: repo `hermite` → Settings → Default branch → `main`, and archive
+  `gafaraleshe/InvoiceFlow` (its history is fully contained here).
+- **Vercel**: project `gafitenisons-projects/invoice-flow` → Settings → Git →
+  connect `gafaraleshe/hermite` (production branch `main`), and Settings →
+  General → rename the project to `hermite`. One project serves both
+  hermitelabs.com and flow.hermitelabs.com.
 - The photography site (`shotbygafar`) stays its own repo/project — it's a
   separate website that *talks to* Hermite Flow over the API.
 
