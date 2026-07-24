@@ -1,4 +1,4 @@
--- Row-Level Security policies for InvoiceFlow (Supabase Postgres).
+-- Row-Level Security policies for HermiteFlow (Supabase Postgres).
 --
 -- The API connects as the `postgres` role, which BYPASSES RLS, and enforces
 -- tenant scoping in the application layer. These policies are defense-in-depth:

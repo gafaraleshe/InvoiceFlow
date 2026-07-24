@@ -1,4 +1,4 @@
-# InvoiceFlow - Project TODO
+# HermiteFlow - Project TODO
 
 ## Database & Schema
 - [x] Define clients table (name, email, company, address, payment terms)

@@ -1,10 +1,10 @@
 # @hermitelabs/flow-mcp
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server that exposes
-the **Hermite Flow REST API** as tools, so assistants like Claude can manage your
+the **HermiteFlow REST API** as tools, so assistants like Claude can manage your
 clients and invoices in natural language.
 
-It talks to the deployed Hermite Flow API over HTTP with an API key — it does not
+It talks to the deployed HermiteFlow API over HTTP with an API key — it does not
 need database access or the app source.
 
 ## Tools
@@ -60,7 +60,7 @@ Add to `.mcp.json` in your project root (or `~/.claude.json`):
   "mcpServers": {
     "hermite-flow": {
       "command": "node",
-      "args": ["/absolute/path/to/Hermite Flow/mcp/dist/index.js"],
+      "args": ["/absolute/path/to/HermiteFlow/mcp/dist/index.js"],
       "env": {
         "HERMITE_FLOW_API_URL": "https://flow.hermitelabs.com",
         "HERMITE_FLOW_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
@@ -80,7 +80,7 @@ Add to `.mcp.json` in your project root (or `~/.claude.json`):
   "mcpServers": {
     "hermite-flow": {
       "command": "node",
-      "args": ["/absolute/path/to/Hermite Flow/mcp/dist/index.js"],
+      "args": ["/absolute/path/to/HermiteFlow/mcp/dist/index.js"],
       "env": {
         "HERMITE_FLOW_API_URL": "https://flow.hermitelabs.com",
         "HERMITE_FLOW_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"

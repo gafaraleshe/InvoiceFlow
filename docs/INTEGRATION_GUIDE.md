@@ -1,10 +1,10 @@
-# Hermite Flow — Integration Guide
+# HermiteFlow — Integration Guide
 
-_Connect any booking site to Hermite Flow in a few minutes. Every booking becomes a
+_Connect any booking site to HermiteFlow in a few minutes. Every booking becomes a
 client and an invoice, and (optionally) an email goes out via Resend — no manual
 data entry._
 
-Hermite Flow is invoicing for creatives, by **Gaffy Studios**. This guide shows the
+HermiteFlow is invoicing for creatives, by **Gaffy Studios**. This guide shows the
 fastest path from "someone booked a shoot" to "invoice in their inbox".
 
 ---
@@ -29,7 +29,7 @@ Verify the key and write a ready-to-paste env file:
 node scripts/connect.mjs --url https://flow.hermitelabs.com --key ifk_live_xxx
 # ✓ authenticated as SHOTBYGAFAR
 # ✓ access: owner (full)
-# ✓ wrote .env.invoiceflow
+# ✓ wrote .env.hermiteflow
 ```
 
 This writes:
@@ -146,6 +146,6 @@ bookings — as tools, so you can run your CRM from Claude in natural language.
 ## Notes
 
 - `HERMITE_FLOW_API_URL` / `HERMITE_FLOW_API_KEY` are the current env names; the legacy
-  `INVOICEFLOW_API_URL` / `INVOICEFLOW_API_KEY` still work as a fallback.
+  `HERMITE_FLOW_API_URL` / `HERMITE_FLOW_API_KEY` still work as a fallback.
 - Delivery is best-effort: if Resend isn't configured, the booking and invoice
   still persist and `emailed` is `false` — nothing is lost.

@@ -1,5 +1,5 @@
 /**
- * Hermite Flow — multi-tenant Postgres schema (Supabase).
+ * HermiteFlow — multi-tenant Postgres schema (Supabase).
  *
  * This is the Phase 1 data model from docs/PRODUCT_PLAN.md. Every tenant row is
  * owned by an `organization`; access is scoped by membership and backstopped by

@@ -1,4 +1,4 @@
-# Hermite Flow — Setup & Connections Guide
+# HermiteFlow — Setup & Connections Guide
 
 Everything **you** need to create and connect so I can build and ship the product.
 Work top to bottom — that's the order I need them. Copy each value into `.env`
@@ -12,7 +12,7 @@ Environment Variables. Never commit real keys.
 
 ## 1. Supabase (database + auth + storage) — **do this first**
 
-1. Go to <https://supabase.com> → **New project**. Name it `invoiceflow`. Pick a strong
+1. Go to <https://supabase.com> → **New project**. Name it `hermiteflow`. Pick a strong
    DB password and the region closest to your users. Wait for it to provision.
 2. **Project Settings → API**, copy:
    - `Project URL` → `SUPABASE_URL` and `VITE_SUPABASE_URL`
@@ -84,7 +84,7 @@ I handle the schema, migrations, and RLS policies in code.
 ---
 
 ## 6. Domain & DNS
-- Buy/own a domain (e.g. `invoiceflow.app`). Point it at Vercel (step 5.3).
+- Buy/own a domain (e.g. `hermitelabs.com`). Point it at Vercel (step 5.3).
 - Add Resend's email DNS records (step 2.2).
 - Set `APP_URL=https://yourdomain` and `VITE_APP_URL=https://yourdomain`.
 

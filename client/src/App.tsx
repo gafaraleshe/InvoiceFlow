@@ -51,7 +51,7 @@ function ScrollToTop() {
 
 function MarketingArea() {
   // hermitelabs.com (apex) serves the Hermite Labs parent site; flow.hermitelabs.com
-  // (and everything else) serves the Hermite Flow product. `/labs` forces the
+  // (and everything else) serves the HermiteFlow product. `/labs` forces the
   // parent site on any host.
   const [location] = useLocation();
   if (isLabsHost() || location === "/labs") {

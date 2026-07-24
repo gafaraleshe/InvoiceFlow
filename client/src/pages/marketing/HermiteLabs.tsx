@@ -1,7 +1,7 @@
 /*
  * Hermite Labs — the parent site (hermitelabs.com).
  *
- * The umbrella brand over Hermite Flow and the wider suite. Styled after the
+ * The umbrella brand over HermiteFlow and the wider suite. Styled after the
  * Composio design reference (composio/DESIGN.md): electric-blue voltage, a
  * central spotlight, terminal-adjacent panels. Theme-aware via the `.mkt`
  * token scope, so light and dark both work; the accent stays electric blue.
@@ -37,7 +37,7 @@ type Product = {
 const PRODUCTS: Product[] = [
   {
     icon: FileText,
-    name: "Hermite Flow",
+    name: "HermiteFlow",
     category: "CRM + Invoicing",
     domain: "flow.hermitelabs.com",
     href: FLOW_URL,
@@ -136,11 +136,11 @@ export default function HermiteLabs() {
           <p className="mx-auto mt-6 max-w-[58ch] text-[clamp(17px,2vw,20px)] leading-relaxed text-[var(--mkt-ink-subtle)]">
             Hermite Labs builds the tools that run a modern studio — billing,
             AI, auth, cloud, finance, and analytics — under one account and one
-            design language. It starts with Hermite Flow.
+            design language. It starts with HermiteFlow.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <MButton size="lg" href={FLOW_URL}>
-              Start with Hermite Flow
+              Start with HermiteFlow
               <ArrowRight className="h-4 w-4" />
             </MButton>
             <MButton variant="secondary" size="lg" href="#products">

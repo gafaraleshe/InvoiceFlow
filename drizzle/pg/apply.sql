@@ -1,4 +1,4 @@
--- InvoiceFlow — full schema + RLS for Supabase.
+-- HermiteFlow — full schema + RLS for Supabase.
 -- Paste this whole file into Supabase → SQL Editor → Run.
 -- Generated from server/db/schema.ts (drizzle) + drizzle/pg/policies.sql.
 
@@ -162,7 +162,7 @@ CREATE INDEX "payments_invoice_idx" ON "payments" USING btree ("invoice_id");
 CREATE UNIQUE INDEX "subscriptions_org_idx" ON "subscriptions" USING btree ("organization_id");
 CREATE UNIQUE INDEX "webhook_events_provider_event_idx" ON "webhook_events" USING btree ("provider","event_id");
 -- ============ 2) ROW-LEVEL SECURITY ============
--- Row-Level Security policies for InvoiceFlow (Supabase Postgres).
+-- Row-Level Security policies for HermiteFlow (Supabase Postgres).
 --
 -- Authentication runs through Clerk; the API connects as the `postgres` role,
 -- which BYPASSES RLS, and enforces tenant scoping in the application layer.
