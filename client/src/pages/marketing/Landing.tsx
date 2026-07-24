@@ -3,7 +3,6 @@ import {
   Container,
   Eyebrow,
   MButton,
-  Pill,
   SectionHeading,
 } from "@/marketing/primitives";
 import {
@@ -19,7 +18,6 @@ import {
   BarChart3,
   Users,
   ShieldCheck,
-  Sparkles,
   Star,
   Check,
   Zap,
@@ -32,6 +30,7 @@ import {
 import { Link } from "wouter";
 import { motion, useReducedMotion } from "motion/react";
 import { ProductShowcase } from "@/marketing/ProductShowcase";
+import { Badge, GridOverlay } from "@/brand/primitives";
 import { CountUp, Reveal, Stagger, StaggerItem } from "@/marketing/motion";
 import BorderGlow from "@/marketing/BorderGlow";
 
@@ -141,43 +140,38 @@ export default function Landing() {
     <>
       {/* ===== Hero ===== */}
       <section className="relative overflow-hidden">
-        <div className="mkt-grid-bg pointer-events-none absolute inset-0 opacity-60" />
-        <div
-          className="pointer-events-none absolute -top-40 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full opacity-30 blur-[120px]"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(94,106,210,0.55), transparent 70%)",
-          }}
-        />
-        <Container className="relative pt-20 pb-16 sm:pt-28">
-          <motion.div
-            className="flex flex-col items-center text-center"
-            {...rise(0)}
-          >
-            <Pill className="mb-6">
-              <Sparkles className="h-3.5 w-3.5 text-[var(--mkt-primary-hover)]" />
-              From booking to paid — automatically
-            </Pill>
-            <h1 className="mkt-display max-w-[16ch] text-[clamp(40px,7vw,80px)] text-[var(--mkt-ink)]">
-              Invoicing for creatives
+        <GridOverlay />
+        <Container className="relative pb-[clamp(48px,7vw,90px)] pt-[clamp(64px,11vw,150px)]">
+          <motion.div className="flex flex-col items-start" {...rise(0)}>
+            {/* Status pill — status only, never an action. The dot carries the
+                one permitted glow in the system. */}
+            <Badge live className="mb-6">
+              v1 API — live
+            </Badge>
+            <h1 className="mkt-display max-w-[16ch] text-[clamp(34px,6.4vw,70px)] text-[var(--mkt-ink)]">
+              You decide who gets billed.{" "}
+              <em className="not-italic text-[var(--accent)]">
+                We handle the rest.
+              </em>
             </h1>
-            <p className="mt-6 max-w-[56ch] text-[clamp(17px,2vw,20px)] leading-relaxed text-[var(--mkt-ink-subtle)]">
+            <p className="mt-5 max-w-[62ch] text-[14px] leading-[1.5] text-[var(--mkt-ink-subtle)]">
               HermiteFlow turns bookings into paid invoices for photographers,
               filmmakers, designers and studios. Connect your booking site and
               every enquiry becomes a client, a branded invoice, and an email —
               on its own. By Gaffy Studios.
             </p>
-            <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
+            <div className="mt-[26px] flex flex-wrap gap-[10px]">
+              {/* The single accent CTA. One per page — this is the ~5%. */}
               <MButton size="lg" href={getLoginUrl()}>
                 Start for free
                 <ArrowRight className="h-4 w-4" />
               </MButton>
               <MButton variant="secondary" size="lg" href="/pricing">
-                View pricing
+                Read the docs
               </MButton>
             </div>
-            <div className="mt-5 flex items-center gap-2 text-[13px] text-[var(--mkt-ink-tertiary)]">
-              <Check className="h-3.5 w-3.5 text-[var(--mkt-success)]" />
+            <div className="mt-5 flex items-center gap-2 text-[12.5px] text-[var(--mkt-ink-tertiary)]">
+              <Check className="h-3.5 w-3.5" />
               No credit card required
               <span className="mx-1 h-1 w-1 rounded-full bg-[var(--mkt-hairline-strong)]" />
               Free 14-day Pro trial
@@ -189,13 +183,8 @@ export default function Landing() {
             className="relative mx-auto mt-16 max-w-[1080px]"
             {...rise(0.15)}
           >
-            <div
-              className="pointer-events-none absolute -inset-x-10 -top-10 bottom-0 -z-10 rounded-[32px] opacity-40 blur-[100px]"
-              style={{
-                background:
-                  "radial-gradient(60% 60% at 50% 0%, rgba(94,106,210,0.4), transparent 70%)",
-              }}
-            />
+            {/* No glow behind the mock: depth is hairlines and a background
+                step, never a blur. */}
             <ProductDashboardMock />
           </motion.div>
         </Container>

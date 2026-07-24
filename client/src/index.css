@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./brand/tokens.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -142,78 +143,68 @@
  * light-themed authenticated dashboard. Tokens mirror DESIGN.md front matter.
  */
 .mkt {
-  /* Light theme is the base; dark values are overridden under `.dark .mkt`
-     (the ThemeProvider toggles `.dark` on <html>). Every marketing component
-     references these tokens, so both themes stay in sync from one place. */
-  /* Composio-inspired electric-blue voltage (see composio/DESIGN.md). */
-  --mkt-primary: #0007cd;
-  --mkt-primary-hover: #0005a3;
-  --mkt-primary-focus: #1a26ff;
-  --mkt-primary-soft: #1a26ff;
-  --mkt-ink: #0c0d10;
-  --mkt-ink-muted: #3a3d44;
-  --mkt-ink-subtle: #5a5f68;
-  --mkt-ink-tertiary: #868b93;
-  --mkt-canvas: #ffffff;
-  --mkt-surface-0: #f0f1f3;
-  --mkt-surface-1: #f7f8f9;
-  --mkt-surface-2: #ffffff;
-  --mkt-surface-3: #eef0f2;
-  --mkt-hairline: #e4e6ea;
-  --mkt-hairline-strong: #d2d5db;
-  --mkt-hairline-soft: #ececef;
-  --mkt-line-soft: #eef0f2;
-  --mkt-success: #1a8f3c;
-  --mkt-success-ink: #15803d;
-  --mkt-mock-1: #ffffff;
-  --mkt-mock-2: #f3f4f6;
-  --mkt-mock-border: #e4e6ea;
-  --mkt-mock-ink: #3a3d44;
-  --mkt-mock-ink-2: #5a5f68;
-  --mkt-mock-ink-3: #868b93;
-  --mkt-mock-faint: #b3b7be;
-  --mkt-mock-faint-2: #c7cad0;
-  --mkt-grid-line: rgba(0, 0, 0, 0.045);
-  --mkt-panel-top: rgba(255, 255, 255, 0.9);
-  --mkt-selection-ink: #ffffff;
+  /* Marketing surfaces are remapped onto the Hermite ink ramp (brand/tokens.css).
+     Dark is the base: the brand system is dark-first. `.light-surface` inverts
+     the ramp for the light theme, applied under `:root:not(.dark) .mkt` below. */
+  --mkt-primary: var(--accent);
+  --mkt-primary-hover: var(--accent);
+  --mkt-primary-focus: var(--accent);
+  --mkt-primary-soft: var(--accent);
+  --mkt-ink: var(--ink-900);
+  --mkt-ink-muted: var(--ink-800);
+  --mkt-ink-subtle: var(--ink-700);
+  --mkt-ink-tertiary: var(--ink-600);
+  --mkt-canvas: var(--ink-050);
+  --mkt-surface-0: var(--ink-100);
+  --mkt-surface-1: var(--ink-100);
+  --mkt-surface-2: var(--ink-200);
+  --mkt-surface-3: var(--ink-200);
+  --mkt-hairline: var(--border);
+  --mkt-hairline-strong: var(--border-strong);
+  --mkt-hairline-soft: var(--border);
+  --mkt-line-soft: var(--border);
+  --mkt-success: var(--success);
+  --mkt-success-ink: var(--success);
+  --mkt-mock-1: var(--ink-100);
+  --mkt-mock-2: var(--ink-200);
+  --mkt-mock-border: var(--border);
+  --mkt-mock-ink: var(--ink-800);
+  --mkt-mock-ink-2: var(--ink-700);
+  --mkt-mock-ink-3: var(--ink-600);
+  --mkt-mock-faint: var(--ink-500);
+  --mkt-mock-faint-2: var(--ink-400);
+  --mkt-grid-line: var(--border);
+  --mkt-panel-top: rgba(255, 255, 255, 0.04);
+  --mkt-selection-ink: var(--ink-050);
 
   background-color: var(--mkt-canvas);
   color: var(--mkt-ink);
-  font-family: var(--font-sans);
+  font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
 }
 
-.dark .mkt {
-  /* Brighter electric-blue glow for the dark canvas. */
-  --mkt-primary: #1a26ff;
-  --mkt-primary-hover: #4b57ff;
-  --mkt-primary-focus: #1a26ff;
-  --mkt-primary-soft: #7b83ff;
-  --mkt-ink: #f7f8f8;
-  --mkt-ink-muted: #d0d6e0;
-  --mkt-ink-subtle: #8a8f98;
-  --mkt-ink-tertiary: #62666d;
-  --mkt-canvas: #010102;
-  --mkt-surface-0: #0b0b0c;
-  --mkt-surface-1: #0f1011;
-  --mkt-surface-2: #141516;
-  --mkt-surface-3: #18191a;
-  --mkt-hairline: #23252a;
-  --mkt-hairline-strong: #34343a;
-  --mkt-hairline-soft: #1c1d20;
-  --mkt-line-soft: #161719;
-  --mkt-success: #27a644;
-  --mkt-success-ink: #7fe0a0;
-  --mkt-mock-1: #1a1b1e;
-  --mkt-mock-2: #1d1e21;
-  --mkt-mock-border: #2a2b2f;
-  --mkt-mock-ink: #c2c6cf;
-  --mkt-mock-ink-2: #9aa0a8;
-  --mkt-mock-ink-3: #5b5f66;
-  --mkt-mock-faint: #4a4a52;
-  --mkt-mock-faint-2: #3e3e44;
-  --mkt-grid-line: rgba(255, 255, 255, 0.025);
-  --mkt-panel-top: rgba(255, 255, 255, 0.04);
+:root:not(.dark) .mkt {
+  /* Light theme inverts the ramp; accents hold, dropping to 88% lightness for
+     CTA fills so text on them stays legible. See tokens.css .light-surface. */
+  --ink-050: #fafafa;
+  --ink-100: #f2f3f4;
+  --ink-200: #e8eaeb;
+  --ink-300: #dcdfe1;
+  --ink-400: #c9cfd3;
+  --ink-500: #9aa1a6;
+  --ink-600: #6b7378;
+  --ink-700: #4a5155;
+  --ink-800: #2c3134;
+  --ink-900: #16191b;
+  --paper: #08090a;
+  --border: rgba(0, 0, 0, 0.09);
+  --border-strong: rgba(0, 0, 0, 0.16);
+  --mkt-selection-ink: var(--paper);
+}
+
+:root:not(.dark) .mkt[data-product="flow"] {
+  --accent: #2bbfad;
+  --accent-ink: #ffffff;
 }
 
 .mkt ::selection {
@@ -223,15 +214,19 @@
 
 /* Aggressive negative tracking for display type, per DESIGN.md. */
 .mkt-display {
+  /* Inter 600 with negative tracking. Never weight 700+. */
   font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  letter-spacing: -0.04em;
+  line-height: 1.03;
 }
 
 .mkt-eyebrow {
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  /* The signature micro-label: mono, uppercase, 10.5px, 0.16em. */
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  line-height: 1;
   text-transform: uppercase;
 }
 

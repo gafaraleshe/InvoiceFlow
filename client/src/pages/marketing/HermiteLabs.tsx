@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Container, MButton } from "@/marketing/primitives";
+import { HermiteMark } from "@/brand/HermiteMark";
+import { GridOverlay, Label } from "@/brand/primitives";
 import { FLOW_URL } from "@/lib/host";
 
 const toggleMkt =
@@ -32,6 +34,13 @@ type Product = {
   href?: string;
   blurb: string;
   live?: boolean;
+  /**
+   * The product's allocated accent, shown only as a 2px identifying rule.
+   * Set this ONLY for accents allocated in the brand system — currently
+   * flow (#3ADCC8), cut (#FF7A45) and mind (#9B8AFB). Products without an
+   * allocation stay monochrome; do not invent a colour for them.
+   */
+  tint?: string;
 };
 
 const PRODUCTS: Product[] = [
@@ -44,6 +53,7 @@ const PRODUCTS: Product[] = [
     blurb:
       "Turn bookings into paid invoices automatically. A CRM and billing engine built for creative studios.",
     live: true,
+    tint: "var(--flow)",
   },
   {
     icon: Bot,
@@ -86,12 +96,11 @@ function Wordmark() {
   return (
     <a
       href="/"
-      className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-[var(--mkt-ink)]"
+      className="flex items-center gap-[11px] text-[19px] font-semibold tracking-[-0.035em] text-[var(--mkt-ink)]"
     >
-      <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--mkt-primary)] text-[13px] font-bold text-white">
-        H
-      </span>
-      Hermite Labs
+      {/* Parent brand: monochrome. The mark takes no accent here. */}
+      <HermiteMark size={22} />
+      Hermite<span className="font-medium text-[var(--mkt-ink-tertiary)]"> Labs</span>
     </a>
   );
 }
@@ -117,29 +126,28 @@ export default function HermiteLabs() {
         </Container>
       </header>
 
-      {/* Hero */}
+      {/* Hero — the parent is silent: no accent, no glow, structure only. */}
       <section className="relative overflow-hidden">
-        <div
-          className="pointer-events-none absolute -top-40 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full opacity-30 blur-[130px]"
-          style={{
-            background:
-              "radial-gradient(circle, var(--mkt-primary-soft), transparent 70%)",
-          }}
-        />
-        <Container className="relative pt-24 pb-16 text-center sm:pt-32">
-          <span className="inline-block rounded-full border border-[var(--mkt-hairline)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--mkt-primary-hover)]">
-            By Gaffy Studios
-          </span>
-          <h1 className="mkt-display mx-auto mt-6 max-w-[18ch] text-[clamp(40px,7vw,80px)] text-[var(--mkt-ink)]">
-            Software for creative businesses
+        <GridOverlay />
+        <Container className="relative pb-[clamp(48px,7vw,90px)] pt-[clamp(64px,11vw,150px)]">
+          <Label>Hermite Labs — by Gaffy Studios</Label>
+          <h1 className="mkt-display mt-[26px] max-w-[16ch] text-[clamp(34px,6.4vw,70px)] text-[var(--mkt-ink)]">
+            The parent is silent.{" "}
+            <em className="not-italic text-[var(--mkt-ink-tertiary)]">
+              The products speak in color.
+            </em>
           </h1>
-          <p className="mx-auto mt-6 max-w-[58ch] text-[clamp(17px,2vw,20px)] leading-relaxed text-[var(--mkt-ink-subtle)]">
+          <p className="mt-5 max-w-[62ch] text-[14px] leading-[1.5] text-[var(--mkt-ink-subtle)]">
             Hermite Labs builds the tools that run a modern studio — billing,
             AI, auth, cloud, finance, and analytics — under one account and one
-            design language. It starts with HermiteFlow.
+            design language. Every product inherits the same grid, type, and
+            spacing, and is distinguished by exactly one accent. It starts with
+            HermiteFlow.
           </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <MButton size="lg" href={FLOW_URL}>
+          <div className="mt-[26px] flex flex-wrap gap-[10px]">
+            {/* Parent surfaces use the inverse (paper) CTA — accent is a
+                product-level privilege and never appears on hermitelabs.com. */}
+            <MButton variant="inverse" size="lg" href={FLOW_URL}>
               Start with HermiteFlow
               <ArrowRight className="h-4 w-4" />
             </MButton>
@@ -166,50 +174,43 @@ export default function HermiteLabs() {
             {PRODUCTS.map(p => {
               const Card = (
                 <div
-                  className="flex h-full flex-col rounded-2xl border p-6 transition-colors"
-                  style={{
-                    borderColor: p.live
-                      ? "var(--mkt-primary)"
-                      : "var(--mkt-hairline)",
-                    background: "var(--mkt-surface-1)",
-                  }}
+                  className="relative flex h-full flex-col border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] p-6 transition-colors hover:border-[var(--mkt-hairline-strong)]"
+                  style={{ borderRadius: "var(--radius-action)" }}
                 >
-                  <div className="flex items-center justify-between">
+                  {/* A product's own colour identifies it, as a 2px top rule.
+                      This is the only colour on the parent site, and it names
+                      the product rather than decorating the page. */}
+                  {p.tint && (
                     <span
-                      className="flex h-10 w-10 items-center justify-center rounded-xl"
-                      style={{
-                        background: p.live
-                          ? "color-mix(in oklab, var(--mkt-primary) 16%, transparent)"
-                          : "var(--mkt-surface-3)",
-                        color: p.live
-                          ? "var(--mkt-primary-hover)"
-                          : "var(--mkt-ink-subtle)",
-                      }}
-                    >
+                      aria-hidden
+                      className="absolute inset-x-0 top-0 h-0.5"
+                      style={{ background: p.tint }}
+                    />
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="flex h-10 w-10 items-center justify-center border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-3)] text-[var(--mkt-ink-subtle)]">
                       <p.icon className="h-5 w-5" />
                     </span>
                     <span
-                      className="rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest"
+                      className="border px-2.5 py-1 font-[family-name:var(--mono)] text-[10px] uppercase tracking-[0.14em] text-[var(--mkt-ink-tertiary)]"
                       style={{
                         borderColor: "var(--mkt-hairline)",
-                        color: p.live
-                          ? "var(--mkt-success)"
-                          : "var(--mkt-ink-tertiary)",
+                        borderRadius: "var(--radius-pill)",
                       }}
                     >
                       {p.live ? "Live" : "Coming soon"}
                     </span>
                   </div>
-                  <h3 className="mt-4 text-[18px] font-semibold text-[var(--mkt-ink)]">
+                  <h3 className="mt-4 text-[17px] font-semibold tracking-[-0.015em] text-[var(--mkt-ink)]">
                     {p.name}
                   </h3>
-                  <p className="text-[12px] font-medium uppercase tracking-wider text-[var(--mkt-primary-hover)]">
+                  <p className="mt-1 font-[family-name:var(--mono)] text-[10.5px] uppercase tracking-[0.16em] text-[var(--mkt-ink-tertiary)]">
                     {p.category}
                   </p>
-                  <p className="mt-2 flex-1 text-[14px] leading-relaxed text-[var(--mkt-ink-subtle)]">
+                  <p className="mt-3 flex-1 text-[13px] leading-[1.5] text-[var(--mkt-ink-subtle)]">
                     {p.blurb}
                   </p>
-                  <p className="mt-4 flex items-center gap-1 font-mono text-[12px] text-[var(--mkt-ink-tertiary)]">
+                  <p className="mt-4 flex items-center gap-1 font-[family-name:var(--mono)] text-[11px] text-[var(--mkt-ink-tertiary)]">
                     {p.domain}
                     {p.href ? <ArrowUpRight className="h-3.5 w-3.5" /> : null}
                   </p>

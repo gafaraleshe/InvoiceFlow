@@ -32,23 +32,34 @@ export function Eyebrow({ children }: { children: ReactNode }) {
 type ButtonVariant = "primary" | "secondary" | "ghost" | "inverse";
 type ButtonSize = "sm" | "md" | "lg";
 
+/**
+ * Brand system, § Components: all button labels are mono, uppercase, 0.14em
+ * tracking, radius 2px. Never rounded pills for actions, and no drop shadows —
+ * depth comes from hairlines and a background shift.
+ */
 const buttonBase =
-  "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-150 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--mkt-primary-focus)]/60 disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius-action)] border " +
+  "font-[family-name:var(--mono)] uppercase leading-none tracking-[0.14em] " +
+  "transition-[background-color,border-color,color] duration-[var(--dur-base)] ease-[var(--ease-out)] " +
+  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 " +
+  "focus-visible:ring-offset-[var(--mkt-canvas)] disabled:opacity-50";
 
 const buttonVariants: Record<ButtonVariant, string> = {
+  // The accent CTA. One per page — this is the ~5%.
   primary:
-    "bg-[var(--mkt-primary)] text-white hover:bg-[var(--mkt-primary-hover)] shadow-[0_1px_2px_rgba(0,0,0,0.4)]",
+    "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-ink)] hover:brightness-110",
   secondary:
-    "bg-[var(--mkt-surface-1)] text-[var(--mkt-ink)] border border-[var(--mkt-hairline-strong)] hover:border-[var(--mkt-mock-faint)] hover:bg-[var(--mkt-surface-2)]",
+    "border-[var(--mkt-hairline-strong)] bg-transparent text-[var(--mkt-ink)] hover:border-[var(--mkt-mock-faint)] hover:bg-[var(--mkt-surface-2)]",
   ghost:
-    "text-[var(--mkt-ink-muted)] hover:text-[var(--mkt-ink)] hover:bg-[var(--mkt-surface-3)]",
-  inverse: "bg-white text-black hover:bg-[#f5f6f6]",
+    "border-[var(--mkt-hairline)] bg-transparent text-[var(--mkt-ink-subtle)] hover:border-[var(--mkt-hairline-strong)] hover:text-[var(--mkt-ink)]",
+  inverse:
+    "border-[var(--paper)] bg-[var(--paper)] text-[var(--mkt-canvas)] hover:border-[var(--mkt-ink-muted)] hover:bg-[var(--mkt-ink-muted)]",
 };
 
 const buttonSizes: Record<ButtonSize, string> = {
-  sm: "h-8 px-3 text-[13px]",
-  md: "h-9 px-4 text-[14px]",
-  lg: "h-11 px-5 text-[15px]",
+  sm: "h-8 px-4 text-[10px]",
+  md: "h-10 px-5 text-[10.5px]",
+  lg: "h-12 px-6 text-[10.5px]",
 };
 
 export function MButton({
