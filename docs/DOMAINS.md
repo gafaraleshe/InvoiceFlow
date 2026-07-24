@@ -1,7 +1,27 @@
 # Domains & deployment — Hermite Labs
 
-One Vercel project serves both brands from a single deployment; a host check in
-the client (`client/src/lib/host.ts`) decides which site renders.
+**One repo, one Vercel project, one deployment.** Hermite Labs (the parent
+site) and Hermite Flow (the product) are the same codebase; a host check in the
+client (`client/src/lib/host.ts`) decides which site renders. There is no
+separate "Flow" project.
+
+## Home repo: `gafaraleshe/hermite`
+
+The platform was transferred here from `gafaraleshe/InvoiceFlow` — the full
+history lives on the **`main`** branch of `gafaraleshe/hermite`. (The Hermite
+Resolve-plugin work is unaffected on its own branch,
+`claude/hermite-resolve-plugin-cf4zzx`.)
+
+Remaining one-time steps (dashboard-only):
+
+- **GitHub**: repo `hermite` → Settings → Default branch → `main`, and archive
+  `gafaraleshe/InvoiceFlow` (its history is fully contained here).
+- **Vercel**: project `gafitenisons-projects/invoice-flow` → Settings → Git →
+  connect `gafaraleshe/hermite` (production branch `main`), and Settings →
+  General → rename the project to `hermite`. One project serves both
+  hermitelabs.com and flow.hermitelabs.com.
+- The photography site (`shotbygafar`) stays its own repo/project — it's a
+  separate website that *talks to* Hermite Flow over the API.
 
 | Host | Serves |
 |---|---|
