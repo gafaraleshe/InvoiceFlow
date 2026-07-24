@@ -1,10 +1,10 @@
 {
-  "name": "invoiceflow-mcp",
+  "name": "@hermitelabs/flow-mcp",
   "version": "1.0.0",
-  "description": "Model Context Protocol server for the InvoiceFlow REST API — manage clients and invoices from Claude.",
+  "description": "Model Context Protocol server for the Hermite Flow REST API — manage bookings, clients and invoices from Claude.",
   "type": "module",
   "bin": {
-    "invoiceflow-mcp": "dist/index.js"
+    "hermite-flow-mcp": "dist/index.js"
   },
   "files": ["dist", "README.md"],
   "engines": {

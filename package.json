@@ -1,5 +1,5 @@
 {
-  "name": "invoice-flow",
+  "name": "hermite-flow",
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
@@ -10,6 +10,8 @@
     "start": "NODE_ENV=production node dist/index.js",
     "check": "tsc --noEmit",
     "gen:openapi": "tsx scripts/gen-openapi.ts",
+    "connect": "node scripts/connect.mjs",
+    "seed:owner": "tsx scripts/seed-owner.ts",
     "format": "prettier --write .",
     "test": "vitest run",
     "db:push": "drizzle-kit generate && drizzle-kit migrate",

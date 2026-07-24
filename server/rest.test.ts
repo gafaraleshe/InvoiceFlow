@@ -6,7 +6,12 @@ import express, {
 } from "express";
 import http from "node:http";
 import { TRPCError } from "@trpc/server";
-import { createRestApi, toCreateInvoice, pagination } from "./rest";
+import {
+  createRestApi,
+  toCreateInvoice,
+  toCreateBooking,
+  pagination,
+} from "./rest";
 import { bearerToken } from "./rest/auth";
 import { handleError } from "./rest/errors";
 import { resolveApiKeyContext } from "./db";
@@ -50,6 +55,28 @@ describe("REST helpers", () => {
       unitPrice: 100,
     });
     expect(typeof mapped.dueDate).toBe("number");
+  });
+
+  it("maps a snake_case booking body to the tRPC shape", () => {
+    const mapped = toCreateBooking({
+      name: "Ada Lovelace",
+      email: "ada@example.com",
+      service_type: "Wedding",
+      package: "Wedding Film & Photo",
+      date: "2026-09-01",
+      amount: "1200",
+      source: "shotbygafar",
+      auto_invoice: true,
+      auto_send: true,
+    });
+    expect(mapped.name).toBe("Ada Lovelace");
+    expect(mapped.serviceType).toBe("Wedding");
+    expect(mapped.packageName).toBe("Wedding Film & Photo");
+    expect(mapped.eventDate).toBe("2026-09-01");
+    expect(mapped.amount).toBe(1200);
+    expect(mapped.source).toBe("shotbygafar");
+    expect(mapped.autoInvoice).toBe(true);
+    expect(mapped.autoSend).toBe(true);
   });
 });
 
@@ -117,6 +144,7 @@ const FAKE_CTX = {
     organizationName: "Test Org",
     role: "owner" as const,
   },
+  scopes: ["owner"] as string[],
 };
 
 /** Auth middleware that injects a fake key context (bypasses the DB lookup). */
