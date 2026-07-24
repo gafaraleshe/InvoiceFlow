@@ -41,7 +41,7 @@ const allFeatures = [
   {
     icon: Repeat,
     title: "Recurring billing",
-    body: "Set it once and let Sigma issue and send invoices on whatever cadence you need.",
+    body: "Set it once and let Hermite Flow issue and send invoices on whatever cadence you need.",
   },
   {
     icon: Globe,
@@ -115,7 +115,7 @@ const crmConnectors = ["Salesforce", "HubSpot", "Pipedrive", "Zoho"];
 const crmPoints = [
   "Two-way sync of clients, contacts, and deals — no copy-paste",
   "Push paid-invoice and revenue events straight into your pipeline",
-  "Map Sigma fields to your CRM's custom objects",
+  "Map Hermite Flow fields to your CRM's custom objects",
   "Real-time webhooks and a full REST API for anything bespoke",
 ];
 
@@ -147,7 +147,7 @@ const spotlights = [
   {
     eyebrow: "Automate",
     title: "Stop chasing. Start collecting.",
-    body: "Configure a reminder schedule once and Sigma runs the follow-ups for you — flipping invoices to paid the instant the money arrives.",
+    body: "Configure a reminder schedule once and Hermite Flow runs the follow-ups for you — flipping invoices to paid the instant the money arrives.",
     points: [
       "Schedule reminders by due date or status",
       "Automatic overdue notices",
@@ -225,7 +225,7 @@ export default function Features() {
                 Connect billing to your CRM
               </h2>
               <p className="mt-5 text-[17px] leading-relaxed text-[var(--mkt-ink-subtle)]">
-                On Enterprise, Sigma syncs both ways with the CRM your
+                On Enterprise, Hermite Flow syncs both ways with the CRM your
                 revenue team already lives in — so a closed deal becomes an
                 invoice, and a paid invoice updates the pipeline, without anyone
                 rekeying data.

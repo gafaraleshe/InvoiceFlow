@@ -1,5 +1,5 @@
 /**
- * Sigma data + service layer (Supabase Postgres, multi-tenant).
+ * Hermite Flow data + service layer (Supabase Postgres, multi-tenant).
  *
  * Every function is scoped to an `organizationId`. The tRPC layer resolves the
  * caller's active org from their Supabase identity (see _core/context.ts) and

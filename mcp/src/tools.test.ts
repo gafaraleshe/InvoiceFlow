@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { tools } from "./tools.js";
-import type { SigmaClient } from "./client.js";
+import type { HermiteFlowClient } from "./client.js";
 
 function findTool(name: string) {
   const t = tools.find(t => t.name === name);
@@ -67,7 +67,7 @@ describe("tool handlers", () => {
   it("get_client passes the id through", async () => {
     const c = fakeClient();
     const out = await findTool("get_client").handler(
-      c as unknown as SigmaClient,
+      c as unknown as HermiteFlowClient,
       { id: "abc" }
     );
     expect(c.getClient).toHaveBeenCalledWith("abc");
@@ -78,7 +78,7 @@ describe("tool handlers", () => {
     const c = fakeClient();
     const body = { name: "Acme", email: "a@acme.test" };
     await findTool("create_client").handler(
-      c as unknown as SigmaClient,
+      c as unknown as HermiteFlowClient,
       body
     );
     expect(c.createClient).toHaveBeenCalledWith(body);
@@ -86,7 +86,7 @@ describe("tool handlers", () => {
 
   it("update_client splits id from the body", async () => {
     const c = fakeClient();
-    await findTool("update_client").handler(c as unknown as SigmaClient, {
+    await findTool("update_client").handler(c as unknown as HermiteFlowClient, {
       id: "c1",
       name: "New",
     });
@@ -96,7 +96,7 @@ describe("tool handlers", () => {
   it("update_invoice_status maps to updateInvoice({status})", async () => {
     const c = fakeClient();
     await findTool("update_invoice_status").handler(
-      c as unknown as SigmaClient,
+      c as unknown as HermiteFlowClient,
       { id: "in1", status: "paid" }
     );
     expect(c.updateInvoice).toHaveBeenCalledWith("in1", { status: "paid" });
@@ -105,7 +105,7 @@ describe("tool handlers", () => {
   it("send_invoice_email passes recipient and message", async () => {
     const c = fakeClient();
     await findTool("send_invoice_email").handler(
-      c as unknown as SigmaClient,
+      c as unknown as HermiteFlowClient,
       { id: "in1", to: "x@y.z", message: "hi" }
     );
     expect(c.sendInvoice).toHaveBeenCalledWith("in1", {
@@ -117,7 +117,7 @@ describe("tool handlers", () => {
   it("get_dashboard_stats needs no args", async () => {
     const c = fakeClient();
     const out = await findTool("get_dashboard_stats").handler(
-      c as unknown as SigmaClient,
+      c as unknown as HermiteFlowClient,
       {}
     );
     expect(c.getDashboardStats).toHaveBeenCalled();

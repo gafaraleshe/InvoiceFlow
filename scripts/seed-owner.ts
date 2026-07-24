@@ -3,7 +3,7 @@
  *
  * This provisions a "special access" tenant (default: SHOTBYGAFAR) on the
  * Business plan and mints an owner-scoped API key that unlocks every
- * capability. Use it to connect your own booking site to Sigma.
+ * capability. Use it to connect your own booking site to Hermite Flow.
  *
  *   DATABASE_URL=... pnpm seed:owner
  *
@@ -14,7 +14,7 @@
  *   OWNER_KEY_NAME   API key label            (default: "SHOTBYGAFAR booking site")
  *
  * The plaintext key is printed ONCE — copy it into your booking site's
- * SIGMA_API_KEY. It is stored only as a SHA-256 hash.
+ * HERMITE_FLOW_API_KEY. It is stored only as a SHA-256 hash.
  */
 import { eq } from "drizzle-orm";
 import { db } from "../server/db/client";
@@ -86,8 +86,8 @@ async function main() {
   console.log(`  scopes: owner (full special access)`);
   console.log("─".repeat(60));
   console.log("");
-  console.log("Set it on your booking site as SIGMA_API_KEY, then run:");
-  console.log("  node scripts/connect.mjs --url <your-sigma-origin> --key <key>");
+  console.log("Set it on your booking site as HERMITE_FLOW_API_KEY, then run:");
+  console.log("  node scripts/connect.mjs --url <your-hermite-flow-origin> --key <key>");
 
   process.exit(0);
 }

@@ -220,7 +220,7 @@ function DashboardLayoutContent({
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="font-bold tracking-tight truncate text-primary">
-                    Sigma
+                    Hermite Flow
                   </span>
                 </div>
               ) : null}
@@ -302,7 +302,7 @@ function DashboardLayoutContent({
               <div className="flex items-center gap-3">
                 <div className="flex flex-col gap-1">
                   <span className="tracking-tight text-foreground font-medium">
-                    {activeMenuItem?.label ?? "Sigma"}
+                    {activeMenuItem?.label ?? "Hermite Flow"}
                   </span>
                 </div>
               </div>

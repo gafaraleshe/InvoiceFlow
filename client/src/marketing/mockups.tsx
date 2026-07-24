@@ -23,7 +23,7 @@ const num = (v: number) => Math.round(v).toLocaleString("en-GB");
 /**
  * Faux product-UI "screenshots". Per DESIGN.md, product screenshots are the
  * protagonist of every section, so these are built as high-fidelity HTML/CSS
- * renders of the actual Sigma app, framed in dark surface-1 panels.
+ * renders of the actual Hermite Flow app, framed in dark surface-1 panels.
  */
 
 /** App-window chrome wrapper with traffic-light dots + a fake URL bar. */
@@ -188,7 +188,7 @@ function MiniChart() {
 }
 
 /**
- * The hero "screenshot": the full Sigma dashboard.
+ * The hero "screenshot": the full Hermite Flow dashboard.
  */
 export function ProductDashboardMock({ className }: { className?: string }) {
   return (
@@ -201,7 +201,7 @@ export function ProductDashboardMock({ className }: { className?: string }) {
               I
             </div>
             <span className="text-[14px] font-semibold tracking-tight text-[var(--mkt-ink)]">
-              Sigma
+              Hermite Flow
             </span>
           </div>
           <nav className="mt-4 flex flex-col gap-0.5">
@@ -418,7 +418,7 @@ export function InvoiceComposerMock({ className }: { className?: string }) {
             <div className="flex items-start justify-between">
               <div>
                 <div className="text-[15px] font-bold tracking-tight text-[var(--mkt-primary)]">
-                  Sigma
+                  Hermite Flow
                 </div>
                 <div className="mt-0.5 text-[10px] text-neutral-500">
                   Your Company Ltd

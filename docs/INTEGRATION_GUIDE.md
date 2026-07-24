@@ -1,10 +1,10 @@
-# Sigma — Integration Guide
+# Hermite Flow — Integration Guide
 
-_Connect any booking site to Sigma in a few minutes. Every booking becomes a
+_Connect any booking site to Hermite Flow in a few minutes. Every booking becomes a
 client and an invoice, and (optionally) an email goes out via Resend — no manual
 data entry._
 
-Sigma is invoicing for creatives, by **Gaffy Studios**. This guide shows the
+Hermite Flow is invoicing for creatives, by **Gaffy Studios**. This guide shows the
 fastest path from "someone booked a shoot" to "invoice in their inbox".
 
 ---
@@ -26,7 +26,7 @@ Dashboard → **Integrations** → **Create key**.
 Verify the key and write a ready-to-paste env file:
 
 ```bash
-node scripts/connect.mjs --url https://your-sigma.app --key ifk_live_xxx
+node scripts/connect.mjs --url https://flow.hermitelabs.com --key ifk_live_xxx
 # ✓ authenticated as SHOTBYGAFAR
 # ✓ access: owner (full)
 # ✓ wrote .env.invoiceflow
@@ -35,8 +35,8 @@ node scripts/connect.mjs --url https://your-sigma.app --key ifk_live_xxx
 This writes:
 
 ```dotenv
-SIGMA_API_URL=https://your-sigma.app
-SIGMA_API_KEY=ifk_live_xxx
+HERMITE_FLOW_API_URL=https://flow.hermitelabs.com
+HERMITE_FLOW_API_KEY=ifk_live_xxx
 ```
 
 ## 3. Send a booking
@@ -45,8 +45,8 @@ SIGMA_API_KEY=ifk_live_xxx
 invoice immediately:
 
 ```bash
-curl -X POST https://your-sigma.app/api/v1/bookings \
-  -H "Authorization: Bearer $SIGMA_API_KEY" \
+curl -X POST https://flow.hermitelabs.com/api/v1/bookings \
+  -H "Authorization: Bearer $HERMITE_FLOW_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Ada Lovelace",
@@ -125,18 +125,18 @@ served at `/api/v1/openapi.json`.
 
 ## Connect from Claude (MCP)
 
-The [`@gaffystudios/sigma-mcp`](../mcp) server exposes the whole API — including
+The [`@hermitelabs/flow-mcp`](../mcp) server exposes the whole API — including
 bookings — as tools, so you can run your CRM from Claude in natural language.
 
 ```json
 {
   "mcpServers": {
-    "sigma": {
+    "hermite-flow": {
       "command": "node",
       "args": ["/absolute/path/to/mcp/dist/index.js"],
       "env": {
-        "SIGMA_API_URL": "https://your-sigma.app",
-        "SIGMA_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
+        "HERMITE_FLOW_API_URL": "https://flow.hermitelabs.com",
+        "HERMITE_FLOW_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
       }
     }
   }
@@ -145,7 +145,7 @@ bookings — as tools, so you can run your CRM from Claude in natural language.
 
 ## Notes
 
-- `SIGMA_API_URL` / `SIGMA_API_KEY` are the current env names; the legacy
+- `HERMITE_FLOW_API_URL` / `HERMITE_FLOW_API_KEY` are the current env names; the legacy
   `INVOICEFLOW_API_URL` / `INVOICEFLOW_API_KEY` still work as a fallback.
 - Delivery is best-effort: if Resend isn't configured, the booking and invoice
   still persist and `emailed` is `false` — nothing is lost.

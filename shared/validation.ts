@@ -97,7 +97,7 @@ export const bookingStatusValues = [
 
 /**
  * A booking as submitted by a booking site (e.g. SHOTBYGAFAR).
- * `autoInvoice` asks Sigma to raise a draft invoice from `amount`
+ * `autoInvoice` asks Hermite Flow to raise a draft invoice from `amount`
  * immediately; `autoSend` additionally emails it to the customer via Resend.
  */
 export const createBookingSchema = z.object({
