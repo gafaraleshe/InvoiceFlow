@@ -22,12 +22,13 @@
     "check": "tsc --noEmit",
     "gen:openapi": "tsx scripts/gen-openapi.ts",
     "gen:assets": "python3 scripts/gen-brand-assets.py",
+    "gen:bootstrap": "node scripts/gen-bootstrap-sql.mjs",
     "connect": "node scripts/connect.mjs",
     "seed:owner": "tsx scripts/seed-owner.ts",
     "format": "prettier --write .",
     "test": "vitest run",
     "db:push": "drizzle-kit generate && drizzle-kit migrate",
-    "db:pg:generate": "drizzle-kit generate --config drizzle.config.pg.ts",
+    "db:pg:generate": "drizzle-kit generate --config drizzle.config.pg.ts && node scripts/gen-bootstrap-sql.mjs",
     "db:pg:migrate": "drizzle-kit migrate --config drizzle.config.pg.ts"
   },
   "dependencies": {
