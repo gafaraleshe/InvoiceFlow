@@ -1,7 +1,7 @@
 # AUTO-GENERATED from server/rest/openapi.ts — run `pnpm gen:openapi`.
 openapi: 3.0.3
 info:
-  title: InvoiceFlow API
+  title: Hermite Flow API
   version: 1.0.0
   description: "Public REST API for managing clients, invoices and billing.
     Authenticate with an API key (`Authorization: Bearer ifk_...`) minted in the

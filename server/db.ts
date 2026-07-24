@@ -1,5 +1,5 @@
 /**
- * InvoiceFlow data + service layer (Supabase Postgres, multi-tenant).
+ * Hermite Flow data + service layer (Supabase Postgres, multi-tenant).
  *
  * Every function is scoped to an `organizationId`. The tRPC layer resolves the
  * caller's active org from their Supabase identity (see _core/context.ts) and
@@ -13,6 +13,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { db } from "./db/client";
 import {
   apiKeys,
+  bookings,
   clients,
   invoices,
   lineItems,
@@ -519,6 +520,227 @@ export async function getDashboardStats(orgId: string) {
   };
 }
 
+/* ── bookings (CRM) ─────────────────────────────────────────────────────── */
+
+type BookingInput = {
+  name: string;
+  email: string;
+  phone?: string | null;
+  serviceType?: string | null;
+  packageName?: string | null;
+  eventDate?: string | null; // YYYY-MM-DD
+  location?: string | null;
+  message?: string | null;
+  amount?: number | null;
+  currency?: string;
+  source?: string;
+  metadata?: Record<string, unknown> | null;
+};
+
+const isoDay = (d: Date = new Date()) => d.toISOString().slice(0, 10);
+
+export async function getBookings(
+  orgId: string,
+  opts?: { status?: string; search?: string; limit?: number; offset?: number }
+) {
+  const conditions = [eq(bookings.organizationId, orgId)];
+  if (opts?.status && opts.status !== "all") {
+    conditions.push(eq(bookings.status, opts.status as never));
+  }
+  if (opts?.search) {
+    const q = `%${opts.search}%`;
+    conditions.push(
+      or(
+        ilike(bookings.name, q),
+        ilike(bookings.email, q),
+        ilike(bookings.serviceType, q),
+        ilike(bookings.packageName, q)
+      )!
+    );
+  }
+  return db
+    .select()
+    .from(bookings)
+    .where(and(...conditions))
+    .orderBy(desc(bookings.createdAt))
+    .limit(opts?.limit ?? 50)
+    .offset(opts?.offset ?? 0);
+}
+
+export async function getBookingCount(orgId: string, status?: string) {
+  const conditions = [eq(bookings.organizationId, orgId)];
+  if (status && status !== "all") {
+    conditions.push(eq(bookings.status, status as never));
+  }
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(bookings)
+    .where(and(...conditions));
+  return row?.count ?? 0;
+}
+
+export async function getBookingById(id: string, orgId: string) {
+  const [row] = await db
+    .select()
+    .from(bookings)
+    .where(and(eq(bookings.id, id), eq(bookings.organizationId, orgId)))
+    .limit(1);
+  return row;
+}
+
+export async function createBooking(orgId: string, data: BookingInput) {
+  const [row] = await db
+    .insert(bookings)
+    .values({
+      organizationId: orgId,
+      name: data.name,
+      email: data.email,
+      phone: data.phone ?? null,
+      serviceType: data.serviceType ?? null,
+      packageName: data.packageName ?? null,
+      eventDate: data.eventDate ?? null,
+      location: data.location ?? null,
+      message: data.message ?? null,
+      amount: data.amount != null ? String(data.amount) : null,
+      currency: data.currency ?? "GBP",
+      source: data.source ?? "api",
+      metadata: data.metadata ?? null,
+    })
+    .returning();
+  return row;
+}
+
+export async function updateBookingStatus(
+  id: string,
+  orgId: string,
+  status: (typeof bookings.status.enumValues)[number]
+) {
+  const [row] = await db
+    .update(bookings)
+    .set({ status, updatedAt: new Date() })
+    .where(and(eq(bookings.id, id), eq(bookings.organizationId, orgId)))
+    .returning();
+  return row;
+}
+
+export async function deleteBooking(id: string, orgId: string) {
+  await db
+    .delete(bookings)
+    .where(and(eq(bookings.id, id), eq(bookings.organizationId, orgId)));
+  return { success: true };
+}
+
+/** Find an existing client by email within an org, or create one. */
+export async function upsertClientByEmail(
+  orgId: string,
+  data: { name: string; email: string; phone?: string | null }
+) {
+  const [existing] = await db
+    .select()
+    .from(clients)
+    .where(
+      and(eq(clients.organizationId, orgId), eq(clients.email, data.email))
+    )
+    .limit(1);
+  if (existing) return existing;
+  return createClient(orgId, {
+    name: data.name,
+    email: data.email,
+    phone: data.phone ?? null,
+  });
+}
+
+/**
+ * Convert a booking into a draft invoice: ensure a client exists, raise a
+ * single-line invoice for the quoted amount, and link both back to the booking.
+ * Returns the created invoice (with line items) or throws if it can't price it.
+ */
+export async function convertBookingToInvoice(
+  id: string,
+  orgId: string,
+  opts?: { amount?: number; vatRate?: number }
+) {
+  const booking = await getBookingById(id, orgId);
+  if (!booking) throw new Error("Booking not found");
+
+  const amount = opts?.amount ?? (booking.amount ? Number(booking.amount) : 0);
+  if (!amount || amount <= 0) {
+    throw new Error(
+      "Booking has no quoted amount — pass an amount to convert it to an invoice."
+    );
+  }
+
+  const client = await upsertClientByEmail(orgId, {
+    name: booking.name,
+    email: booking.email,
+    phone: booking.phone,
+  });
+
+  const description =
+    booking.packageName ||
+    booking.serviceType ||
+    "Photography services";
+
+  const invoice = await createInvoice(
+    orgId,
+    {
+      clientId: client.id,
+      issueDate: isoDay(),
+      dueDate: isoDay(
+        new Date(Date.now() + (client.paymentTerms ?? 30) * 86_400_000)
+      ),
+      vatRate: opts?.vatRate ?? 20,
+      currency: booking.currency,
+      notes: bookingNotes(booking),
+    },
+    [{ description, quantity: 1, unitPrice: amount }]
+  );
+
+  await db
+    .update(bookings)
+    .set({
+      clientId: client.id,
+      invoiceId: invoice?.id ?? null,
+      status: booking.status === "new" ? "quoted" : booking.status,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(bookings.id, id), eq(bookings.organizationId, orgId)));
+
+  return invoice;
+}
+
+function bookingNotes(b: {
+  serviceType: string | null;
+  eventDate: string | null;
+  location: string | null;
+}): string {
+  const parts: string[] = [];
+  if (b.serviceType) parts.push(`Service: ${b.serviceType}`);
+  if (b.eventDate) parts.push(`Date: ${b.eventDate}`);
+  if (b.location) parts.push(`Location: ${b.location}`);
+  return parts.join(" · ");
+}
+
+export async function getBookingStats(orgId: string) {
+  const [row] = await db
+    .select({
+      total: sql<number>`count(*)::int`,
+      newCount: sql<number>`coalesce(sum(case when ${bookings.status} = 'new' then 1 else 0 end), 0)::int`,
+      confirmedCount: sql<number>`coalesce(sum(case when ${bookings.status} = 'confirmed' then 1 else 0 end), 0)::int`,
+      completedCount: sql<number>`coalesce(sum(case when ${bookings.status} = 'completed' then 1 else 0 end), 0)::int`,
+      pipelineValue: sql<string>`coalesce(sum(case when ${bookings.status} in ('new','contacted','quoted','confirmed') then ${bookings.amount} else 0 end), 0)`,
+    })
+    .from(bookings)
+    .where(eq(bookings.organizationId, orgId));
+  return {
+    total: Number(row?.total ?? 0),
+    newCount: Number(row?.newCount ?? 0),
+    confirmedCount: Number(row?.confirmedCount ?? 0),
+    completedCount: Number(row?.completedCount ?? 0),
+    pipelineValue: Number(row?.pipelineValue ?? 0),
+  };
+}
+
 /* ── API keys (public REST auth) ────────────────────────────────────────── */
 
 const API_KEY_BYTES = 24;
@@ -531,6 +753,7 @@ function hashApiKey(raw: string): string {
 export type ApiKeyContext = {
   user: { id: string; email: string | null; fullName: string | null };
   active: ActiveContext;
+  scopes: string[];
 };
 
 /**
@@ -540,7 +763,7 @@ export type ApiKeyContext = {
 export async function createApiKey(
   organizationId: string,
   name: string,
-  opts?: { test?: boolean }
+  opts?: { test?: boolean; scopes?: string[] }
 ) {
   const secret = randomBytes(API_KEY_BYTES).toString("base64url");
   const key = `ifk_${opts?.test ? "test" : "live"}_${secret}`;
@@ -551,11 +774,13 @@ export async function createApiKey(
       name,
       prefix: key.slice(0, 12), // ifk_live_XXX — safe to display
       hashedKey: hashApiKey(key),
+      scopes: opts?.scopes ?? [],
     })
     .returning({
       id: apiKeys.id,
       name: apiKeys.name,
       prefix: apiKeys.prefix,
+      scopes: apiKeys.scopes,
       createdAt: apiKeys.createdAt,
     });
   return { key, apiKey: row };
@@ -568,6 +793,7 @@ export async function listApiKeys(organizationId: string) {
       id: apiKeys.id,
       name: apiKeys.name,
       prefix: apiKeys.prefix,
+      scopes: apiKeys.scopes,
       lastUsedAt: apiKeys.lastUsedAt,
       revokedAt: apiKeys.revokedAt,
       createdAt: apiKeys.createdAt,
@@ -640,6 +866,7 @@ export async function resolveApiKeyContext(
       organizationName: org.name,
       role: owner?.role ?? "admin",
     },
+    scopes: key.scopes ?? [],
   };
 }
 

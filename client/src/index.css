@@ -45,7 +45,7 @@
 :root {
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --primary: oklch(0.45 0.2 260);
+  --primary: #0007cd; /* Hermite Flow electric-blue accent */
   --primary-foreground: oklch(0.98 0 0);
   --sidebar-primary: oklch(0.5 0.2 260);
   --sidebar-primary-foreground: oklch(0.98 0 0);
@@ -81,7 +81,7 @@
 }
 
 .dark {
-  --primary: var(--color-blue-700);
+  --primary: #1a26ff; /* Hermite Flow electric-blue accent (dark) */
   --primary-foreground: var(--color-blue-50);
   --sidebar-primary: var(--color-blue-500);
   --sidebar-primary-foreground: var(--color-blue-50);
@@ -145,10 +145,11 @@
   /* Light theme is the base; dark values are overridden under `.dark .mkt`
      (the ThemeProvider toggles `.dark` on <html>). Every marketing component
      references these tokens, so both themes stay in sync from one place. */
-  --mkt-primary: #5e6ad2;
-  --mkt-primary-hover: #4954c9;
-  --mkt-primary-focus: #5e69d1;
-  --mkt-primary-soft: #4954c9;
+  /* Composio-inspired electric-blue voltage (see composio/DESIGN.md). */
+  --mkt-primary: #0007cd;
+  --mkt-primary-hover: #0005a3;
+  --mkt-primary-focus: #1a26ff;
+  --mkt-primary-soft: #1a26ff;
   --mkt-ink: #0c0d10;
   --mkt-ink-muted: #3a3d44;
   --mkt-ink-subtle: #5a5f68;
@@ -183,10 +184,11 @@
 }
 
 .dark .mkt {
-  --mkt-primary: #5e6ad2;
-  --mkt-primary-hover: #828fff;
-  --mkt-primary-focus: #5e69d1;
-  --mkt-primary-soft: #aab2f5;
+  /* Brighter electric-blue glow for the dark canvas. */
+  --mkt-primary: #1a26ff;
+  --mkt-primary-hover: #4b57ff;
+  --mkt-primary-focus: #1a26ff;
+  --mkt-primary-soft: #7b83ff;
   --mkt-ink: #f7f8f8;
   --mkt-ink-muted: #d0d6e0;
   --mkt-ink-subtle: #8a8f98;

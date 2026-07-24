@@ -24,6 +24,10 @@ import {
   Check,
   Zap,
   Globe,
+  Cloud,
+  Wallet,
+  Bot,
+  KeyRound,
 } from "lucide-react";
 import { Link } from "wouter";
 import { motion, useReducedMotion } from "motion/react";
@@ -79,7 +83,7 @@ const stats = [
   {
     n: 2.4,
     fmt: (v: number) => `£${v.toFixed(1)}B+`,
-    label: "Invoiced through InvoiceFlow",
+    label: "Invoiced through Hermite Flow",
   },
   {
     n: 11,
@@ -101,7 +105,7 @@ const stats = [
 const testimonials = [
   {
     quote:
-      "We replaced three tools and a spreadsheet with InvoiceFlow. Our DSO dropped by two weeks in the first month.",
+      "We replaced three tools and a spreadsheet with Hermite Flow. Our DSO dropped by two weeks in the first month.",
     name: "Sofia Marchetti",
     role: "Finance Lead, Atlas Logistics",
   },
@@ -152,15 +156,16 @@ export default function Landing() {
           >
             <Pill className="mb-6">
               <Sparkles className="h-3.5 w-3.5 text-[var(--mkt-primary-hover)]" />
-              Now with automated payment reminders
+              From booking to paid — automatically
             </Pill>
             <h1 className="mkt-display max-w-[16ch] text-[clamp(40px,7vw,80px)] text-[var(--mkt-ink)]">
-              Invoicing that gets you paid
+              Invoicing for creatives
             </h1>
             <p className="mt-6 max-w-[56ch] text-[clamp(17px,2vw,20px)] leading-relaxed text-[var(--mkt-ink-subtle)]">
-              InvoiceFlow is the modern invoicing platform for teams that take
-              billing seriously. Create polished invoices, automate follow-ups,
-              and track every pound — all from one fast, focused workspace.
+              Hermite Flow turns bookings into paid invoices for photographers,
+              filmmakers, designers and studios. Connect your booking site and
+              every enquiry becomes a client, a branded invoice, and an email —
+              on its own. By Gaffy Studios.
             </p>
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
               <MButton size="lg" href={getLoginUrl()}>
@@ -226,7 +231,7 @@ export default function Landing() {
           <SectionHeading
             eyebrow="Everything you need"
             title="A complete billing workflow, end to end"
-            description="From the first draft to the final payment, InvoiceFlow handles the entire lifecycle so you can stop chasing and start collecting."
+            description="From the first draft to the final payment, Hermite Flow handles the entire lifecycle so you can stop chasing and start collecting."
           />
           <Stagger className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {features.map(f => (
@@ -307,7 +312,7 @@ export default function Landing() {
                 Reminders that chase payments so you don't have to
               </h2>
               <p className="mt-5 text-[17px] leading-relaxed text-[var(--mkt-ink-subtle)]">
-                Set a schedule once and InvoiceFlow handles the rest — gentle
+                Set a schedule once and Hermite Flow handles the rest — gentle
                 nudges before the due date, firm reminders after, and an instant
                 status flip the moment a payment lands.
               </p>
@@ -392,6 +397,9 @@ export default function Landing() {
         </Container>
       </section>
 
+      {/* ===== Hermite Labs ecosystem ===== */}
+      <HermiteLabsSection />
+
       {/* ===== CTA banner ===== */}
       <section className="pb-28">
         <Container>
@@ -418,7 +426,7 @@ export default function Landing() {
                 Start getting paid faster today
               </h2>
               <p className="mx-auto mt-4 max-w-[52ch] text-[17px] text-[var(--mkt-ink-subtle)]">
-                Join thousands of teams running their billing on InvoiceFlow.
+                Join thousands of teams running their billing on Hermite Flow.
                 Free to start — no credit card, no setup calls.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -444,5 +452,164 @@ export default function Landing() {
         </Container>
       </section>
     </>
+  );
+}
+
+// ── Hermite Labs ecosystem ──────────────────────────────────────────────────
+// A Composio-styled dark band (electric-blue voltage) that showcases the wider
+// Hermite Labs suite. Deliberately dark in both site themes — a spotlight band.
+
+const LABS = {
+  canvas: "#0f0f0f",
+  card: "#181818",
+  hairline: "#2a2a2a",
+  primary: "#0007cd",
+  glow: "#1a26ff",
+  ink: "#ffffff",
+  body: "#a8a8a8",
+  cyan: "#00d4ff",
+  success: "#33d17a",
+};
+
+const HERMITE_PRODUCTS = [
+  {
+    icon: FileText,
+    name: "Hermite Flow",
+    category: "CRM + Invoicing",
+    domain: "flow.hermitelabs.com",
+    blurb: "Bookings to paid invoices, on autopilot. The one you're looking at.",
+    live: true,
+  },
+  {
+    icon: Bot,
+    name: "Hermite AI",
+    category: "AI tools",
+    domain: "ai.hermitelabs.com",
+    blurb: "Copywriting, replies and agents that plug into your workflow.",
+    live: false,
+  },
+  {
+    icon: KeyRound,
+    name: "Hermite Auth",
+    category: "Authentication",
+    domain: "auth.hermitelabs.com",
+    blurb: "One sign-in across every Hermite Labs product. SSO-ready.",
+    live: false,
+  },
+  {
+    icon: Cloud,
+    name: "Hermite Cloud",
+    category: "Cloud services",
+    domain: "cloud.hermitelabs.com",
+    blurb: "Storage, delivery and hosting for your files and galleries.",
+    live: false,
+  },
+  {
+    icon: Wallet,
+    name: "Hermite Finance",
+    category: "Smart budgeting",
+    domain: "finance.hermitelabs.com",
+    blurb: "AI budgeting and money tips built for a creative income.",
+    live: false,
+  },
+  {
+    icon: BarChart3,
+    name: "Hermite Analytics",
+    category: "Business intelligence",
+    domain: "analytics.hermitelabs.com",
+    blurb: "Product and revenue analytics — a PostHog for your studio.",
+    live: false,
+  },
+];
+
+function HermiteLabsSection() {
+  return (
+    <section className="pb-24">
+      <Container>
+        <div
+          className="relative overflow-hidden rounded-[28px] border px-6 py-14 sm:px-12"
+          style={{ borderColor: LABS.hairline, background: LABS.canvas }}
+        >
+          {/* central electric-blue spotlight — the Composio signature */}
+          <div
+            className="pointer-events-none absolute -top-28 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full opacity-40 blur-[120px]"
+            style={{ background: LABS.glow }}
+          />
+          <div className="relative text-center">
+            <span
+              className="inline-block rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em]"
+              style={{ borderColor: LABS.hairline, color: LABS.cyan }}
+            >
+              Hermite Labs
+            </span>
+            <h2
+              className="mkt-display mx-auto mt-5 max-w-[20ch] text-[clamp(28px,4.5vw,46px)]"
+              style={{ color: LABS.ink }}
+            >
+              One platform for your whole creative business
+            </h2>
+            <p
+              className="mx-auto mt-4 max-w-[56ch] text-[16px] leading-relaxed"
+              style={{ color: LABS.body }}
+            >
+              Hermite Flow is the first of a growing suite by Gaffy Studios.
+              One account, one design language, everything that runs a studio.
+            </p>
+          </div>
+
+          <div className="relative mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {HERMITE_PRODUCTS.map(p => (
+              <div
+                key={p.name}
+                className="flex flex-col rounded-2xl border p-6 transition-colors"
+                style={{
+                  borderColor: p.live ? "rgba(0,7,205,0.5)" : LABS.hairline,
+                  background: LABS.card,
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <span
+                    className="flex h-10 w-10 items-center justify-center rounded-xl"
+                    style={{
+                      background: p.live ? "rgba(0,7,205,0.18)" : "#222",
+                      color: p.live ? LABS.cyan : LABS.body,
+                    }}
+                  >
+                    <p.icon className="h-5 w-5" />
+                  </span>
+                  <span
+                    className="rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest"
+                    style={{
+                      borderColor: LABS.hairline,
+                      color: p.live ? LABS.success : LABS.body,
+                    }}
+                  >
+                    {p.live ? "Live" : "Coming soon"}
+                  </span>
+                </div>
+                <h3 className="mt-4 text-[17px] font-semibold" style={{ color: LABS.ink }}>
+                  {p.name}
+                </h3>
+                <p
+                  className="text-[12px] font-medium uppercase tracking-wider"
+                  style={{ color: LABS.cyan }}
+                >
+                  {p.category}
+                </p>
+                <p className="mt-2 flex-1 text-[14px] leading-relaxed" style={{ color: LABS.body }}>
+                  {p.blurb}
+                </p>
+                <p
+                  className="mt-4 font-mono text-[12px]"
+                  style={{ color: p.live ? LABS.cyan : "#666" }}
+                >
+                  {p.domain}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Container>
+    </section>
   );
 }

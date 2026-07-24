@@ -32,6 +32,7 @@ alter table public.line_items     enable row level security;
 alter table public.api_keys       enable row level security;
 alter table public.subscriptions  enable row level security;
 alter table public.payments       enable row level security;
+alter table public.bookings       enable row level security;
 
 -- A user can see/update only their own profile row.
 create policy users_self on public.users
@@ -62,6 +63,10 @@ create policy subscriptions_org on public.subscriptions
   with check (public.is_org_member(organization_id));
 
 create policy payments_org on public.payments
+  for all using (public.is_org_member(organization_id))
+  with check (public.is_org_member(organization_id));
+
+create policy bookings_org on public.bookings
   for all using (public.is_org_member(organization_id))
   with check (public.is_org_member(organization_id));
 

@@ -1,6 +1,6 @@
-# InvoiceFlow — Product & Engineering Plan
+# Hermite Flow — Product & Engineering Plan
 
-> The single source of truth for turning InvoiceFlow from a marketing site into a
+> The single source of truth for turning Hermite Flow from a marketing site into a
 > shippable, multi-tenant invoicing SaaS. Read alongside `SETUP_GUIDE.md`
 > (accounts & keys) and `API.md` (public REST API).
 
@@ -25,7 +25,7 @@ multi-tenant MVP.
 
 ## 1. Vision & positioning
 
-InvoiceFlow is a fast, focused invoicing platform for small teams and freelancers.
+Hermite Flow is a fast, focused invoicing platform for small teams and freelancers.
 The job-to-be-done: **create polished invoices, send them, and get paid faster** —
 with automated reminders and a clean dashboard, without accounting-suite bloat.
 

@@ -6,7 +6,7 @@
 export const openapiSpec = {
   openapi: "3.0.3",
   info: {
-    title: "InvoiceFlow API",
+    title: "Hermite Flow API",
     version: "1.0.0",
     description:
       "Public REST API for managing clients, invoices and billing. " +

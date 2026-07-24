@@ -4,14 +4,14 @@
  * and returns concise structured data. index.ts registers these on the server.
  */
 import { z, type ZodRawShape } from "zod";
-import type { InvoiceFlowClient } from "./client.js";
+import type { HermiteFlowClient } from "./client.js";
 
 export interface ToolDef {
   name: string;
   description: string;
   shape: ZodRawShape;
   handler: (
-    client: InvoiceFlowClient,
+    client: HermiteFlowClient,
     args: Record<string, unknown>
   ) => Promise<unknown>;
 }
@@ -171,6 +171,94 @@ export const tools: ToolDef[] = [
     description: "Generate (and store) the PDF for an invoice; returns its path.",
     shape: { id: z.string().uuid() },
     handler: (c, a) => c.generateInvoicePdf(a.id as string),
+  },
+
+  // ── Bookings (CRM) ──
+  {
+    name: "list_bookings",
+    description:
+      "List bookings/enquiries from your booking sites, with status filter and pagination.",
+    shape: {
+      page: z.number().int().min(1).optional(),
+      limit: z.number().int().min(1).max(100).optional(),
+      status: z
+        .enum([
+          "all",
+          "new",
+          "contacted",
+          "quoted",
+          "confirmed",
+          "completed",
+          "cancelled",
+        ])
+        .optional(),
+      search: z.string().optional(),
+    },
+    handler: (c, a) => c.listBookings(a),
+  },
+  {
+    name: "get_booking",
+    description: "Retrieve a single booking by id.",
+    shape: { id: z.string().uuid() },
+    handler: (c, a) => c.getBooking(a.id as string),
+  },
+  {
+    name: "create_booking",
+    description:
+      "Create a booking. Set auto_invoice to raise a draft invoice from `amount`, and auto_send to also email it via Resend.",
+    shape: {
+      name: z.string().min(1).max(255),
+      email: z.string().email().max(320),
+      phone: z.string().max(50).nullish(),
+      service_type: z.string().max(120).nullish(),
+      package: z.string().max(120).nullish(),
+      date: z.string().max(40).nullish(),
+      location: z.string().max(255).nullish(),
+      message: z.string().max(8000).nullish(),
+      amount: z.number().min(0).nullish(),
+      source: z.string().max(80).optional(),
+      auto_invoice: z.boolean().optional(),
+      auto_send: z.boolean().optional(),
+    },
+    handler: (c, a) => c.createBooking(a),
+  },
+  {
+    name: "update_booking_status",
+    description:
+      "Move a booking along the pipeline (new/contacted/quoted/confirmed/completed/cancelled).",
+    shape: {
+      id: z.string().uuid(),
+      status: z.enum([
+        "new",
+        "contacted",
+        "quoted",
+        "confirmed",
+        "completed",
+        "cancelled",
+      ]),
+    },
+    handler: (c, a) => c.updateBookingStatus(a.id as string, a.status as string),
+  },
+  {
+    name: "convert_booking_to_invoice",
+    description:
+      "Turn a booking into a draft invoice (reusing/creating the client). Set send to email it too.",
+    shape: {
+      id: z.string().uuid(),
+      amount: z.number().min(0).optional(),
+      send: z.boolean().optional(),
+    },
+    handler: (c, a) =>
+      c.convertBooking(a.id as string, {
+        amount: a.amount as number | undefined,
+        send: a.send as boolean | undefined,
+      }),
+  },
+  {
+    name: "get_booking_stats",
+    description: "Booking pipeline stats: totals, new/confirmed/completed counts, pipeline value.",
+    shape: {},
+    handler: c => c.getBookingStats(),
   },
 
   // ── Dashboard ──

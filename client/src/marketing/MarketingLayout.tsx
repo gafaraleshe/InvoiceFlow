@@ -50,12 +50,12 @@ const footerColumns: {
     ],
   },
   {
-    title: "Legal",
+    title: "Hermite Labs",
     links: [
-      { label: "Privacy", href: "/" },
-      { label: "Terms", href: "/" },
-      { label: "Security", href: "/" },
-      { label: "DPA", href: "/" },
+      { label: "Hermite Labs", href: "https://hermitelabs.com" },
+      { label: "Hermite AI", href: "https://ai.hermitelabs.com" },
+      { label: "Hermite Auth", href: "https://auth.hermitelabs.com" },
+      { label: "Hermite Analytics", href: "https://analytics.hermitelabs.com" },
     ],
   },
 ];
@@ -67,9 +67,9 @@ function Wordmark() {
       className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-[var(--mkt-ink)]"
     >
       <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--mkt-primary)] text-[13px] font-bold text-white">
-        I
+        H
       </span>
-      InvoiceFlow
+      Hermite Flow
     </Link>
   );
 }
@@ -184,8 +184,8 @@ function Footer() {
           <div className="col-span-2">
             <Wordmark />
             <p className="mt-4 max-w-[34ch] text-[14px] leading-relaxed text-[var(--mkt-ink-subtle)]">
-              Invoicing built for modern teams. Create, send, and get paid —
-              without the busywork.
+              Invoicing for creatives. Turn every booking into a paid invoice —
+              without the busywork. Part of Hermite Labs.
             </p>
             <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-[var(--mkt-hairline)] bg-[var(--mkt-surface-1)] px-3 py-1.5 text-[12px] text-[var(--mkt-ink-muted)]">
               <span className="h-2 w-2 rounded-full bg-[var(--mkt-success)]" />
@@ -198,27 +198,39 @@ function Footer() {
                 {col.title}
               </div>
               <ul className="space-y-2.5">
-                {col.links.map((link, i) => (
-                  <li key={`${link.label}-${i}`}>
-                    <Link
-                      href={link.href}
-                      className="text-[13px] text-[var(--mkt-ink-subtle)] transition-colors hover:text-[var(--mkt-ink)]"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
+                {col.links.map((link, i) => {
+                  const external = link.href.startsWith("http");
+                  const cls =
+                    "text-[13px] text-[var(--mkt-ink-subtle)] transition-colors hover:text-[var(--mkt-ink)]";
+                  return (
+                    <li key={`${link.label}-${i}`}>
+                      {external ? (
+                        <a href={link.href} className={cls}>
+                          {link.label}
+                        </a>
+                      ) : (
+                        <Link href={link.href} className={cls}>
+                          {link.label}
+                        </Link>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
         </div>
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-[var(--mkt-hairline-soft)] pt-6 sm:flex-row">
           <span className="text-[12px] text-[var(--mkt-ink-tertiary)]">
-            © {new Date().getFullYear()} InvoiceFlow, Inc. All rights reserved.
+            © {new Date().getFullYear()} Hermite Labs · Gaffy Studios. All
+            rights reserved.
           </span>
-          <span className="text-[12px] text-[var(--mkt-ink-tertiary)]">
-            Made for teams that get paid on time.
-          </span>
+          <a
+            href="https://hermitelabs.com"
+            className="text-[12px] text-[var(--mkt-ink-tertiary)] hover:text-[var(--mkt-ink)]"
+          >
+            Part of Hermite Labs →
+          </a>
         </div>
       </Container>
     </footer>

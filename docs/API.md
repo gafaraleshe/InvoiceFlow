@@ -1,4 +1,4 @@
-# InvoiceFlow Public API (v1)
+# Hermite Flow Public API (v1)
 
 A versioned, key-authenticated REST API over the same domain services that power the
 app. Designed for customers and integrations to manage clients, invoices, and payments
@@ -155,7 +155,7 @@ invoices. It talks to the API over HTTP using:
 
 | Variable | Example |
 |----------|---------|
-| `INVOICEFLOW_API_URL` | `https://invoice-flow-teal.vercel.app` |
+| `INVOICEFLOW_API_URL` | `https://flow.hermitelabs.com` |
 | `INVOICEFLOW_API_KEY` | `ifk_live_…` |
 
 Configure it in `.mcp.json` (Claude Code) or `claude_desktop_config.json`:
@@ -165,9 +165,9 @@ Configure it in `.mcp.json` (Claude Code) or `claude_desktop_config.json`:
   "mcpServers": {
     "invoiceflow": {
       "command": "node",
-      "args": ["/absolute/path/to/InvoiceFlow/mcp/dist/index.js"],
+      "args": ["/absolute/path/to/Hermite Flow/mcp/dist/index.js"],
       "env": {
-        "INVOICEFLOW_API_URL": "https://invoice-flow-teal.vercel.app",
+        "INVOICEFLOW_API_URL": "https://flow.hermitelabs.com",
         "INVOICEFLOW_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
       }
     }

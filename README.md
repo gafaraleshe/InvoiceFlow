@@ -1,10 +1,10 @@
 <p align="center">
-  <h1 align="center">InvoiceFlow</h1>
+  <h1 align="center">Hermite Flow</h1>
   <p align="center">
     A production-grade invoice management system for freelancers and small businesses, built with TypeScript, React, Express, and tRPC.
   </p>
   <p align="center">
-    <a href="https://github.com/gafaraleshe/InvoiceFlow/actions"><img src="https://github.com/gafaraleshe/InvoiceFlow/actions/workflows/ci.yml/badge.svg" alt="CI/CD"></a>
+    <a href="https://github.com/gafaraleshe/Hermite Flow/actions"><img src="https://github.com/gafaraleshe/Hermite Flow/actions/workflows/ci.yml/badge.svg" alt="CI/CD"></a>
     <img src="https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript" alt="TypeScript">
     <img src="https://img.shields.io/badge/Node.js-22-green?logo=node.js" alt="Node.js">
     <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" alt="React">
@@ -16,7 +16,7 @@
 
 ## 📐 Building the product (roadmap & docs)
 
-We're evolving InvoiceFlow from an app into a **shippable, multi-tenant invoicing SaaS**
+We're evolving Hermite Flow from an app into a **shippable, multi-tenant invoicing SaaS**
 (Supabase Auth + Postgres, Polar.sh subscriptions, Stripe invoice payments, Resend email,
 a public REST API, all on Vercel). Start here:
 
@@ -26,7 +26,7 @@ a public REST API, all on Vercel). Start here:
 | [`docs/SETUP_GUIDE.md`](docs/SETUP_GUIDE.md) | Click-by-click setup for Supabase, Resend, Polar.sh, Stripe, and Vercel (+ env vars) |
 | [`docs/API.md`](docs/API.md) | Public REST API (`/api/v1`) design — auth, resources, pagination, OpenAPI |
 | [`.env.example`](.env.example) | Every environment variable the product needs |
-| [`docs/InvoiceFlow-Product-Guide.pdf`](docs/InvoiceFlow-Product-Guide.pdf) | One-page-per-topic PDF for you **and your clients** — summary, setup, costs, timeline |
+| [`docs/Hermite Flow-Product-Guide.pdf`](docs/Hermite Flow-Product-Guide.pdf) | One-page-per-topic PDF for you **and your clients** — summary, setup, costs, timeline |
 
 > Regenerate the PDF after editing the guide: `node scripts/generate-guide-pdf.mjs`.
 
@@ -34,7 +34,7 @@ a public REST API, all on Vercel). Start here:
 
 ## Overview
 
-**InvoiceFlow** is a full-stack invoice management application designed for freelancers and small businesses operating in the UK. It handles the complete invoicing lifecycle — from creating clients and drafting invoices with itemised line items, through automatic UK VAT (20%) calculation, to generating professional invoice documents and emailing them directly to clients via the Resend API.
+**Hermite Flow** is a full-stack invoice management application designed for freelancers and small businesses operating in the UK. It handles the complete invoicing lifecycle — from creating clients and drafting invoices with itemised line items, through automatic UK VAT (20%) calculation, to generating professional invoice documents and emailing them directly to clients via the Resend API.
 
 The system features a clean, responsive dashboard UI with real-time statistics, a type-safe API layer powered by tRPC, OAuth 2.0 authentication with role-based access control, and a comprehensive test suite with 34 passing tests. It ships with Docker Compose for containerised deployment and a GitHub Actions CI/CD pipeline that runs linting, type checking, tests, and Docker builds on every push.
 
@@ -275,8 +275,8 @@ package (`node mcp/dist/index.js`) and is configured with two env vars —
 
 ```bash
 # Clone the repository
-git clone https://github.com/gafaraleshe/InvoiceFlow.git
-cd InvoiceFlow
+git clone https://github.com/gafaraleshe/Hermite Flow.git
+cd Hermite Flow
 
 # Install dependencies
 pnpm install
@@ -317,7 +317,7 @@ docker compose up -d
 | `VITE_APP_ID` | Yes | OAuth application ID |
 | `VITE_OAUTH_PORTAL_URL` | Yes | OAuth login portal URL |
 | `RESEND_API_KEY` | No | Resend API key for email delivery (simulated if absent) |
-| `RESEND_FROM_EMAIL` | No | Sender email address (defaults to `InvoiceFlow <invoices@resend.dev>`) |
+| `RESEND_FROM_EMAIL` | No | Sender email address (defaults to `Hermite Flow <invoices@resend.dev>`) |
 
 ---
 
@@ -370,7 +370,7 @@ The GitHub Actions workflow (`.github/workflows/ci.yml`) runs on every push and 
 
 ## VAT Calculation Logic
 
-InvoiceFlow computes UK VAT automatically on every invoice. The calculation follows this formula:
+Hermite Flow computes UK VAT automatically on every invoice. The calculation follows this formula:
 
 ```
 Line Item Amount = Quantity × Unit Price

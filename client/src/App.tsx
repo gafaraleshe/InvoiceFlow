@@ -8,6 +8,7 @@ import DashboardLayout from "./components/DashboardLayout";
 import { ClerkGate } from "./_core/ClerkGate";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import BookingsPage from "./pages/Bookings";
 import InvoicesPage from "./pages/Invoices";
 import InvoiceDetailPage from "./pages/InvoiceDetail";
 import CreateInvoicePage from "./pages/CreateInvoice";
@@ -19,6 +20,8 @@ import EditClientPage from "./pages/EditClient";
 import IntegrationsPage from "./pages/Integrations";
 import MarketingLayout from "./marketing/MarketingLayout";
 import Landing from "./pages/marketing/Landing";
+import HermiteLabs from "./pages/marketing/HermiteLabs";
+import { isLabsHost } from "./lib/host";
 import Pricing from "./pages/marketing/Pricing";
 import Features from "./pages/marketing/Features";
 import About from "./pages/marketing/About";
@@ -47,6 +50,13 @@ function ScrollToTop() {
 }
 
 function MarketingArea() {
+  // hermitelabs.com (apex) serves the Hermite Labs parent site; flow.hermitelabs.com
+  // (and everything else) serves the Hermite Flow product. `/labs` forces the
+  // parent site on any host.
+  const [location] = useLocation();
+  if (isLabsHost() || location === "/labs") {
+    return <HermiteLabs />;
+  }
   return (
     <MarketingLayout>
       <Switch>
@@ -67,6 +77,7 @@ function AppArea() {
     <DashboardLayout>
       <Switch>
         <Route path="/dashboard" component={Home} />
+        <Route path="/bookings" component={BookingsPage} />
         <Route path="/invoices" component={InvoicesPage} />
         <Route path="/invoices/new" component={CreateInvoicePage} />
         <Route path="/invoices/:id/edit" component={EditInvoicePage} />
