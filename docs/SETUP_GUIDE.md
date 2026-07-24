@@ -12,6 +12,13 @@ Environment Variables. Never commit real keys.
 
 ## 1. Supabase (database + auth + storage) — **do this first**
 
+> **The live HermiteFlow project already exists** — project ref
+> **`uuccxbuaixwzyanatyow`**
+> (<https://supabase.com/dashboard/project/uuccxbuaixwzyanatyow>). This is the
+> project `.mcp.json` points at and the one to use. Skip step 1 and start at
+> step 2 to collect its credentials; step 1 is only for standing up a brand-new
+> environment from scratch.
+
 1. Go to <https://supabase.com> → **New project**. Name it `hermiteflow`. Pick a strong
    DB password and the region closest to your users. Wait for it to provision.
 2. **Project Settings → API**, copy:
