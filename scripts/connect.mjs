@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 /**
- * Sigma connect — a one-command connector (Composio-style) for wiring a
- * booking site to Sigma.
+ * Hermite Flow connect — a one-command connector (Composio-style) for wiring a
+ * booking site to Hermite Flow.
  *
  * It verifies your API key against the live API, tells you which workspace and
  * access level the key has, and writes a ready-to-paste `.env.invoiceflow`
- * (SIGMA_API_URL / SIGMA_API_KEY) plus a copy-paste booking snippet.
+ * (HERMITE_FLOW_API_URL / HERMITE_FLOW_API_KEY) plus a copy-paste booking snippet.
  *
  * Usage:
- *   node scripts/connect.mjs --url https://your-sigma.app --key ifk_live_xxx
- *   npx @gaffystudios/sigma-connect --url <origin> --key <key>   (once published)
+ *   node scripts/connect.mjs --url https://flow.hermitelabs.com --key ifk_live_xxx
+ *   npx @hermitelabs/flow-connect --url <origin> --key <key>   (once published)
  *
  * Flags:
- *   --url   <origin>   Your Sigma site origin ("/api/v1" is appended automatically)
+ *   --url   <origin>   Your Hermite Flow site origin ("/api/v1" is appended automatically)
  *   --key   <ifk_...>  An API key (create one in Settings → Integrations)
  *   --out   <path>     Env file to write (default: .env.invoiceflow)
  *   --no-write         Verify only; don't write any file
@@ -44,13 +44,13 @@ function normalizeBase(url) {
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const url = args.url || process.env.SIGMA_API_URL;
-  const key = args.key || process.env.SIGMA_API_KEY;
+  const url = args.url || process.env.HERMITE_FLOW_API_URL;
+  const key = args.key || process.env.HERMITE_FLOW_API_KEY;
   const outPath = args.out || ".env.invoiceflow";
   const shouldWrite = args.write !== false;
 
   console.log("");
-  console.log(`  ${blue("Σ")} ${blue("Sigma connect")}  ${dim("— by Gaffy Studios")}`);
+  console.log(`  ${blue("≈")} ${blue("Hermite Flow connect")}  ${dim("— by Gaffy Studios")}`);
   console.log("");
 
   if (!url || !key) {
@@ -94,9 +94,9 @@ async function main() {
 
   if (shouldWrite) {
     const env = [
-      "# Written by `sigma connect`. Point your booking site at Sigma.",
-      `SIGMA_API_URL=${url}`,
-      `SIGMA_API_KEY=${key}`,
+      "# Written by `hermite-flow connect`. Point your booking site at Hermite Flow.",
+      `HERMITE_FLOW_API_URL=${url}`,
+      `HERMITE_FLOW_API_KEY=${key}`,
       "",
     ].join("\n");
     writeFileSync(outPath, env);

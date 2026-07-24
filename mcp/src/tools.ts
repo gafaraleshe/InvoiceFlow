@@ -4,14 +4,14 @@
  * and returns concise structured data. index.ts registers these on the server.
  */
 import { z, type ZodRawShape } from "zod";
-import type { SigmaClient } from "./client.js";
+import type { HermiteFlowClient } from "./client.js";
 
 export interface ToolDef {
   name: string;
   description: string;
   shape: ZodRawShape;
   handler: (
-    client: SigmaClient,
+    client: HermiteFlowClient,
     args: Record<string, unknown>
   ) => Promise<unknown>;
 }

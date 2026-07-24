@@ -1,4 +1,4 @@
-# Sigma — Setup & Connections Guide
+# Hermite Flow — Setup & Connections Guide
 
 Everything **you** need to create and connect so I can build and ship the product.
 Work top to bottom — that's the order I need them. Copy each value into `.env`
@@ -72,7 +72,7 @@ I handle the schema, migrations, and RLS policies in code.
 
 ## 5. Vercel (hosting)
 
-1. <https://vercel.com> → **Add New → Project** → import `gafaraleshe/Sigma`.
+1. <https://vercel.com> → **Add New → Project** → import `gafaraleshe/Hermite Flow`.
    It auto-detects `vercel.json` (build `vite build`, output `dist/public`).
 2. **Settings → Environment Variables**: paste every variable from `.env.example`
    (Production + Preview). This is where the app reads its secrets in production.

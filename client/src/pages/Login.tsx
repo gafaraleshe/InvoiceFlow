@@ -25,7 +25,7 @@ export default function Login() {
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[var(--mkt-primary)] text-[14px] font-bold text-white">
             I
           </span>
-          Sigma
+          Hermite Flow
         </Link>
 
         <div className="mkt-panel rounded-2xl p-7">
@@ -34,7 +34,7 @@ export default function Login() {
           </h1>
           <p className="mt-1.5 text-[14px] text-[var(--mkt-ink-subtle)]">
             {mode === "signin"
-              ? "Sign in to your Sigma workspace."
+              ? "Sign in to your Hermite Flow workspace."
               : "Start invoicing in under two minutes."}
           </p>
 
@@ -56,7 +56,7 @@ export default function Login() {
 
           <p className="mt-5 text-center text-[13px] text-[var(--mkt-ink-subtle)]">
             {mode === "signin"
-              ? "New to Sigma?"
+              ? "New to Hermite Flow?"
               : "Already have an account?"}{" "}
             <button
               onClick={() => setMode(mode === "signin" ? "signup" : "signin")}

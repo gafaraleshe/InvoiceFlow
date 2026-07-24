@@ -1,10 +1,10 @@
 /**
- * Thin HTTP client for the Sigma public REST API (`/api/v1`).
+ * Thin HTTP client for the Hermite Flow public REST API (`/api/v1`).
  * The MCP tools talk to the deployed API over HTTP with an API key — they do
  * not import server code, so this package stays independently deployable.
  */
 export interface ClientConfig {
-  baseUrl: string; // site origin, e.g. https://invoice-flow-teal.vercel.app
+  baseUrl: string; // site origin, e.g. https://flow.hermitelabs.com
   apiKey: string; // ifk_live_… / ifk_test_…
   fetchImpl?: typeof fetch;
 }
@@ -20,7 +20,7 @@ export class ApiError extends Error {
   }
 }
 
-export class SigmaClient {
+export class HermiteFlowClient {
   private readonly base: string;
   private readonly apiKey: string;
   private readonly doFetch: typeof fetch;

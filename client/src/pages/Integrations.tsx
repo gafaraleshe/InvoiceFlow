@@ -28,7 +28,7 @@ import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 
 /*
- * Integrations — the "connection tool" for Sigma.
+ * Integrations — the "connection tool" for Hermite Flow.
  *
  * The connect panel is styled after the Composio design reference
  * (composio/DESIGN.md): a dark, technical surface with an electric-blue
@@ -160,7 +160,7 @@ export default function IntegrationsPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Integrations</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Connect your booking site to Sigma — enquiries become clients
+            Connect your booking site to Hermite Flow — enquiries become clients
             and invoices automatically.
           </p>
         </div>
@@ -208,7 +208,7 @@ export default function IntegrationsPage() {
             One command to connect a booking site
           </h2>
           <p className="mt-2 max-w-xl text-sm" style={{ color: CX.body }}>
-            Create an API key, then point your site at Sigma. Every booking
+            Create an API key, then point your site at Hermite Flow. Every booking
             posts to <code style={{ color: CX.cyan }}>/api/v1/bookings</code> and,
             with <code style={{ color: CX.cyan }}>auto_send</code>, an invoice is
             emailed via Resend on the spot.

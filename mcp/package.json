@@ -1,10 +1,10 @@
 {
-  "name": "@gaffystudios/sigma-mcp",
+  "name": "@hermitelabs/flow-mcp",
   "version": "1.0.0",
-  "description": "Model Context Protocol server for the Sigma REST API — manage bookings, clients and invoices from Claude.",
+  "description": "Model Context Protocol server for the Hermite Flow REST API — manage bookings, clients and invoices from Claude.",
   "type": "module",
   "bin": {
-    "sigma-mcp": "dist/index.js"
+    "hermite-flow-mcp": "dist/index.js"
   },
   "files": ["dist", "README.md"],
   "engines": {

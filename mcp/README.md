@@ -1,10 +1,10 @@
-# @gaffystudios/sigma-mcp
+# @hermitelabs/flow-mcp
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server that exposes
-the **Sigma REST API** as tools, so assistants like Claude can manage your
+the **Hermite Flow REST API** as tools, so assistants like Claude can manage your
 clients and invoices in natural language.
 
-It talks to the deployed Sigma API over HTTP with an API key — it does not
+It talks to the deployed Hermite Flow API over HTTP with an API key — it does not
 need database access or the app source.
 
 ## Tools
@@ -32,8 +32,8 @@ Two environment variables:
 
 | Variable | Example | Notes |
 |----------|---------|-------|
-| `SIGMA_API_URL` | `https://invoice-flow-teal.vercel.app` | Your site origin. `/api/v1` is appended automatically. |
-| `SIGMA_API_KEY` | `ifk_live_…` | Create one in the dashboard → **Settings → Integrations → API keys**. |
+| `HERMITE_FLOW_API_URL` | `https://flow.hermitelabs.com` | Your site origin. `/api/v1` is appended automatically. |
+| `HERMITE_FLOW_API_KEY` | `ifk_live_…` | Create one in the dashboard → **Settings → Integrations → API keys**. |
 
 ## Install & build
 
@@ -46,8 +46,8 @@ pnpm build      # -> dist/index.js
 Run it standalone (for a quick check — it speaks MCP over stdio):
 
 ```bash
-SIGMA_API_URL=https://invoice-flow-teal.vercel.app \
-SIGMA_API_KEY=ifk_live_xxx \
+HERMITE_FLOW_API_URL=https://flow.hermitelabs.com \
+HERMITE_FLOW_API_KEY=ifk_live_xxx \
 node dist/index.js
 ```
 
@@ -58,12 +58,12 @@ Add to `.mcp.json` in your project root (or `~/.claude.json`):
 ```json
 {
   "mcpServers": {
-    "sigma": {
+    "hermite-flow": {
       "command": "node",
-      "args": ["/absolute/path/to/Sigma/mcp/dist/index.js"],
+      "args": ["/absolute/path/to/Hermite Flow/mcp/dist/index.js"],
       "env": {
-        "SIGMA_API_URL": "https://invoice-flow-teal.vercel.app",
-        "SIGMA_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
+        "HERMITE_FLOW_API_URL": "https://flow.hermitelabs.com",
+        "HERMITE_FLOW_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
       }
     }
   }
@@ -78,12 +78,12 @@ Add to `.mcp.json` in your project root (or `~/.claude.json`):
 ```json
 {
   "mcpServers": {
-    "sigma": {
+    "hermite-flow": {
       "command": "node",
-      "args": ["/absolute/path/to/Sigma/mcp/dist/index.js"],
+      "args": ["/absolute/path/to/Hermite Flow/mcp/dist/index.js"],
       "env": {
-        "SIGMA_API_URL": "https://invoice-flow-teal.vercel.app",
-        "SIGMA_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
+        "HERMITE_FLOW_API_URL": "https://flow.hermitelabs.com",
+        "HERMITE_FLOW_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
       }
     }
   }
@@ -91,7 +91,7 @@ Add to `.mcp.json` in your project root (or `~/.claude.json`):
 ```
 
 Restart Claude Desktop after editing. If you publish the package, you can use
-`"command": "npx", "args": ["-y", "@gaffystudios/sigma-mcp"]` instead of an absolute path.
+`"command": "npx", "args": ["-y", "@hermitelabs/flow-mcp"]` instead of an absolute path.
 
 ## Develop
 
