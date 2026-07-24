@@ -79,7 +79,7 @@ const stats = [
   {
     n: 2.4,
     fmt: (v: number) => `£${v.toFixed(1)}B+`,
-    label: "Invoiced through InvoiceFlow",
+    label: "Invoiced through Sigma",
   },
   {
     n: 11,
@@ -101,7 +101,7 @@ const stats = [
 const testimonials = [
   {
     quote:
-      "We replaced three tools and a spreadsheet with InvoiceFlow. Our DSO dropped by two weeks in the first month.",
+      "We replaced three tools and a spreadsheet with Sigma. Our DSO dropped by two weeks in the first month.",
     name: "Sofia Marchetti",
     role: "Finance Lead, Atlas Logistics",
   },
@@ -152,15 +152,16 @@ export default function Landing() {
           >
             <Pill className="mb-6">
               <Sparkles className="h-3.5 w-3.5 text-[var(--mkt-primary-hover)]" />
-              Now with automated payment reminders
+              From booking to paid — automatically
             </Pill>
             <h1 className="mkt-display max-w-[16ch] text-[clamp(40px,7vw,80px)] text-[var(--mkt-ink)]">
-              Invoicing that gets you paid
+              Invoicing for creatives
             </h1>
             <p className="mt-6 max-w-[56ch] text-[clamp(17px,2vw,20px)] leading-relaxed text-[var(--mkt-ink-subtle)]">
-              InvoiceFlow is the modern invoicing platform for teams that take
-              billing seriously. Create polished invoices, automate follow-ups,
-              and track every pound — all from one fast, focused workspace.
+              Sigma turns bookings into paid invoices for photographers,
+              filmmakers, designers and studios. Connect your booking site and
+              every enquiry becomes a client, a branded invoice, and an email —
+              on its own. By Gaffy Studios.
             </p>
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
               <MButton size="lg" href={getLoginUrl()}>
@@ -226,7 +227,7 @@ export default function Landing() {
           <SectionHeading
             eyebrow="Everything you need"
             title="A complete billing workflow, end to end"
-            description="From the first draft to the final payment, InvoiceFlow handles the entire lifecycle so you can stop chasing and start collecting."
+            description="From the first draft to the final payment, Sigma handles the entire lifecycle so you can stop chasing and start collecting."
           />
           <Stagger className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {features.map(f => (
@@ -307,7 +308,7 @@ export default function Landing() {
                 Reminders that chase payments so you don't have to
               </h2>
               <p className="mt-5 text-[17px] leading-relaxed text-[var(--mkt-ink-subtle)]">
-                Set a schedule once and InvoiceFlow handles the rest — gentle
+                Set a schedule once and Sigma handles the rest — gentle
                 nudges before the due date, firm reminders after, and an instant
                 status flip the moment a payment lands.
               </p>
@@ -418,7 +419,7 @@ export default function Landing() {
                 Start getting paid faster today
               </h2>
               <p className="mx-auto mt-4 max-w-[52ch] text-[17px] text-[var(--mkt-ink-subtle)]">
-                Join thousands of teams running their billing on InvoiceFlow.
+                Join thousands of teams running their billing on Sigma.
                 Free to start — no credit card, no setup calls.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">

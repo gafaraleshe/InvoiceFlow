@@ -1,5 +1,5 @@
 /**
- * InvoiceFlow — multi-tenant Postgres schema (Supabase).
+ * Sigma — multi-tenant Postgres schema (Supabase).
  *
  * This is the Phase 1 data model from docs/PRODUCT_PLAN.md. Every tenant row is
  * owned by an `organization`; access is scoped by membership and backstopped by
@@ -53,6 +53,14 @@ export const paymentStatus = pgEnum("payment_status", [
   "succeeded",
   "failed",
   "refunded",
+]);
+export const bookingStatus = pgEnum("booking_status", [
+  "new",
+  "contacted",
+  "quoted",
+  "confirmed",
+  "completed",
+  "cancelled",
 ]);
 
 const timestamps = {
@@ -211,6 +219,48 @@ export const lineItems = pgTable(
   t => [index("line_items_invoice_idx").on(t.invoiceId)]
 );
 
+/* ── bookings (CRM — enquiries from booking sites like SHOTBYGAFAR) ──────── */
+export const bookings = pgTable(
+  "bookings",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    // Who the booking is for. A client row is created/linked on conversion.
+    clientId: uuid("client_id").references(() => clients.id, {
+      onDelete: "set null",
+    }),
+    // The invoice raised for this booking, once converted.
+    invoiceId: uuid("invoice_id").references(() => invoices.id, {
+      onDelete: "set null",
+    }),
+    name: varchar("name", { length: 255 }).notNull(),
+    email: varchar("email", { length: 320 }).notNull(),
+    phone: varchar("phone", { length: 50 }),
+    // What was booked — e.g. "Wedding", "Portrait Session".
+    serviceType: varchar("service_type", { length: 120 }),
+    packageName: varchar("package_name", { length: 120 }),
+    eventDate: date("event_date"),
+    location: varchar("location", { length: 255 }),
+    message: text("message"),
+    // Quoted amount (ex-VAT). Numeric string, converted for arithmetic only.
+    amount: numeric("amount", { precision: 14, scale: 2 }),
+    currency: varchar("currency", { length: 3 }).default("GBP").notNull(),
+    status: bookingStatus("status").default("new").notNull(),
+    // Where the booking came from — the site slug or "manual"/"api".
+    source: varchar("source", { length: 80 }).default("api").notNull(),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+    ...timestamps,
+  },
+  t => [
+    index("bookings_org_idx").on(t.organizationId),
+    index("bookings_status_idx").on(t.status),
+    index("bookings_email_idx").on(t.email),
+    index("bookings_created_idx").on(t.createdAt),
+  ]
+);
+
 /* ── api keys (public REST API auth) ────────────────────────────────────── */
 export const apiKeys = pgTable(
   "api_keys",
@@ -306,6 +356,8 @@ export type Invoice = typeof invoices.$inferSelect;
 export type InsertInvoice = typeof invoices.$inferInsert;
 export type LineItem = typeof lineItems.$inferSelect;
 export type InsertLineItem = typeof lineItems.$inferInsert;
+export type Booking = typeof bookings.$inferSelect;
+export type InsertBooking = typeof bookings.$inferInsert;
 export type ApiKey = typeof apiKeys.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;
 export type Payment = typeof payments.$inferSelect;

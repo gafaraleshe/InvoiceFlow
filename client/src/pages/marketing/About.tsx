@@ -44,7 +44,7 @@ const milestones = [
   {
     year: "2025",
     title: "10,000 teams",
-    body: "Crossed ten thousand teams billing on InvoiceFlow.",
+    body: "Crossed ten thousand teams billing on Sigma.",
   },
   {
     year: "2026",
@@ -80,7 +80,7 @@ export default function About() {
             We're building the billing tool we always wanted
           </h1>
           <p className="mt-5 max-w-[58ch] text-[18px] leading-relaxed text-[var(--mkt-ink-subtle)]">
-            InvoiceFlow started with a simple frustration: getting paid was
+            Sigma started with a simple frustration: getting paid was
             harder than doing the work. So we built a focused, fast platform
             that makes invoicing effortless — and getting paid inevitable.
           </p>
@@ -96,7 +96,7 @@ export default function About() {
               <span className="text-[var(--mkt-primary-hover)]">on time, every time.</span>"
             </p>
             <p className="mt-6 text-[14px] text-[var(--mkt-ink-tertiary)]">
-              — The InvoiceFlow team
+              — The Sigma team
             </p>
           </div>
         </Container>

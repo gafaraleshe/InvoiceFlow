@@ -84,6 +84,59 @@ export const sendInvoiceEmailSchema = z.object({
   message: z.string().optional(),
 });
 
+// ─── Booking Schemas (CRM) ──────────────────────────────────────────────────
+
+export const bookingStatusValues = [
+  "new",
+  "contacted",
+  "quoted",
+  "confirmed",
+  "completed",
+  "cancelled",
+] as const;
+
+/**
+ * A booking as submitted by a booking site (e.g. SHOTBYGAFAR).
+ * `autoInvoice` asks Sigma to raise a draft invoice from `amount`
+ * immediately; `autoSend` additionally emails it to the customer via Resend.
+ */
+export const createBookingSchema = z.object({
+  name: z.string().min(1, "Name is required").max(255),
+  email: z.string().email("Invalid email address").max(320),
+  phone: z.string().max(50).optional().nullable(),
+  serviceType: z.string().max(120).optional().nullable(),
+  packageName: z.string().max(120).optional().nullable(),
+  eventDate: z.string().max(40).optional().nullable(), // YYYY-MM-DD
+  location: z.string().max(255).optional().nullable(),
+  message: z.string().max(8000).optional().nullable(),
+  amount: z.number().min(0).optional().nullable(),
+  currency: z.string().length(3).optional(),
+  source: z.string().max(80).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional().nullable(),
+  autoInvoice: z.boolean().optional(),
+  autoSend: z.boolean().optional(),
+});
+
+export const updateBookingStatusSchema = z.object({
+  id: z.string().uuid(),
+  status: z.enum(bookingStatusValues),
+});
+
+export const bookingIdSchema = z.object({
+  id: z.string().uuid(),
+});
+
+export const bookingListQuerySchema = listQuerySchema.extend({
+  status: z.enum(["all", ...bookingStatusValues]).default("all"),
+});
+
+/** Convert an existing booking into a draft invoice. */
+export const convertBookingSchema = z.object({
+  id: z.string().uuid(),
+  amount: z.number().min(0).optional(), // override the quoted amount
+  send: z.boolean().optional(), // also email the invoice
+});
+
 // ─── Organization Schemas ────────────────────────────────────────────────────
 
 export const createOrganizationSchema = z.object({
@@ -96,9 +149,24 @@ export const switchOrganizationSchema = z.object({
 
 // ─── API Key Schemas ────────────────────────────────────────────────────────
 
+/**
+ * Known API-key scopes. `owner` is the "special access" scope: it unlocks every
+ * capability (used for the account owner's own booking sites, e.g. SHOTBYGAFAR).
+ */
+export const apiKeyScopeValues = [
+  "owner",
+  "clients:read",
+  "clients:write",
+  "invoices:read",
+  "invoices:write",
+  "bookings:read",
+  "bookings:write",
+] as const;
+
 export const createApiKeySchema = z.object({
   name: z.string().min(1, "Name is required").max(120),
   test: z.boolean().optional(),
+  scopes: z.array(z.enum(apiKeyScopeValues)).optional(),
 });
 
 export const apiKeyIdSchema = z.object({

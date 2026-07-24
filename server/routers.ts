@@ -12,6 +12,11 @@ import {
   createOrganizationSchema,
   createApiKeySchema,
   apiKeyIdSchema,
+  createBookingSchema,
+  updateBookingStatusSchema,
+  bookingIdSchema,
+  bookingListQuerySchema,
+  convertBookingSchema,
 } from "@shared/validation";
 import { systemRouter } from "./_core/systemRouter";
 import {
@@ -328,6 +333,7 @@ const apiKeysRouter = router({
       // Returns the plaintext key exactly once — the client must store it.
       return db.createApiKey(ctx.active.organizationId, input.name, {
         test: input.test,
+        scopes: input.scopes,
       });
     }),
   revoke: adminProcedure
@@ -337,6 +343,145 @@ const apiKeysRouter = router({
       if (!row)
         throw new TRPCError({ code: "NOT_FOUND", message: "API key not found" });
       return { success: true } as const;
+    }),
+});
+
+// ─── Booking Router (CRM) ─────────────────────────────────────────────────────
+// Bookings are enquiries captured from a booking site (e.g. SHOTBYGAFAR) or
+// entered by hand. They can be auto-converted into invoices and emailed.
+
+/** Generate + email an invoice (mirrors invoice.sendEmail, reusable here). */
+async function emailInvoice(
+  invoiceId: string,
+  orgId: string,
+  message?: string
+): Promise<{ sentTo: string | null }> {
+  const invoice = await db.getInvoiceById(invoiceId, orgId);
+  if (!invoice) throw new Error("Invoice not found");
+  const recipient = invoice.clientEmail;
+  if (!recipient) return { sentTo: null };
+
+  let pdfPath = invoice.pdfPath;
+  if (!pdfPath) {
+    const { generateInvoicePdf } = await import("./pdfGenerator");
+    const result = await generateInvoicePdf(invoice);
+    pdfPath = result.pdfPath;
+    await db.updateInvoicePdf(invoiceId, orgId, result.pdfPath);
+  }
+  const { sendInvoiceEmail } = await import("./emailService");
+  await sendInvoiceEmail({
+    to: recipient,
+    invoiceNumber: invoice.number,
+    clientName: invoice.clientName || "Client",
+    total: invoice.total,
+    dueDate: invoice.dueDate,
+    pdfUrl: pdfPath ?? "",
+    message,
+  });
+  if (invoice.status === "draft") {
+    await db.updateInvoiceStatus(invoiceId, orgId, "sent");
+  }
+  return { sentTo: recipient };
+}
+
+const bookingRouter = router({
+  list: protectedProcedure
+    .input(bookingListQuerySchema)
+    .query(async ({ ctx, input }) => {
+      const org = ctx.active.organizationId;
+      const [items, total] = await Promise.all([
+        db.getBookings(org, input),
+        db.getBookingCount(org, input.status),
+      ]);
+      return { items, total, limit: input.limit, offset: input.offset };
+    }),
+
+  stats: protectedProcedure.query(async ({ ctx }) => {
+    return db.getBookingStats(ctx.active.organizationId);
+  }),
+
+  getById: protectedProcedure
+    .input(bookingIdSchema)
+    .query(async ({ ctx, input }) => {
+      const booking = await db.getBookingById(
+        input.id,
+        ctx.active.organizationId
+      );
+      if (!booking)
+        throw new TRPCError({ code: "NOT_FOUND", message: "Booking not found" });
+      return booking;
+    }),
+
+  create: protectedProcedure
+    .input(createBookingSchema)
+    .mutation(async ({ ctx, input }) => {
+      const org = ctx.active.organizationId;
+      const { autoInvoice, autoSend, ...data } = input;
+      const booking = await db.createBooking(org, data);
+
+      let invoice = null;
+      let emailed = false;
+      // Auto-raise an invoice when asked and a quoted amount is present.
+      if ((autoInvoice || autoSend) && data.amount && data.amount > 0) {
+        invoice = await db.convertBookingToInvoice(booking.id, org, {
+          amount: data.amount,
+        });
+        if (autoSend && invoice) {
+          try {
+            const { sentTo } = await emailInvoice(invoice.id, org);
+            emailed = !!sentTo;
+            if (emailed) await db.updateBookingStatus(booking.id, org, "quoted");
+          } catch (err) {
+            // Delivery is best-effort — the booking + invoice still persist.
+            console.error("[booking] auto-send failed:", err);
+          }
+        }
+      }
+
+      const fresh = await db.getBookingById(booking.id, org);
+      return { booking: fresh ?? booking, invoice, emailed };
+    }),
+
+  updateStatus: adminProcedure
+    .input(updateBookingStatusSchema)
+    .mutation(async ({ ctx, input }) => {
+      const org = ctx.active.organizationId;
+      const existing = await db.getBookingById(input.id, org);
+      if (!existing)
+        throw new TRPCError({ code: "NOT_FOUND", message: "Booking not found" });
+      return db.updateBookingStatus(input.id, org, input.status);
+    }),
+
+  convertToInvoice: adminProcedure
+    .input(convertBookingSchema)
+    .mutation(async ({ ctx, input }) => {
+      const org = ctx.active.organizationId;
+      try {
+        const invoice = await db.convertBookingToInvoice(input.id, org, {
+          amount: input.amount,
+        });
+        let emailed = false;
+        if (input.send && invoice) {
+          const { sentTo } = await emailInvoice(invoice.id, org);
+          emailed = !!sentTo;
+        }
+        return { invoice, emailed };
+      } catch (err) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: err instanceof Error ? err.message : "Could not convert booking",
+        });
+      }
+    }),
+
+  delete: adminProcedure
+    .input(bookingIdSchema)
+    .mutation(async ({ ctx, input }) => {
+      const org = ctx.active.organizationId;
+      const existing = await db.getBookingById(input.id, org);
+      if (!existing)
+        throw new TRPCError({ code: "NOT_FOUND", message: "Booking not found" });
+      return db.deleteBooking(input.id, org);
     }),
 });
 
@@ -373,6 +518,7 @@ export const appRouter = router({
   organization: orgRouter,
   clients: clientRouter,
   invoice: invoiceRouter,
+  booking: bookingRouter,
   dashboard: dashboardRouter,
   apiKeys: apiKeysRouter,
 });

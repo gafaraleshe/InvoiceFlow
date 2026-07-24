@@ -25,6 +25,7 @@ import {
   LayoutDashboard,
   FileText,
   Users,
+  CalendarCheck,
   Plug,
   LogOut,
   PanelLeft,
@@ -42,6 +43,7 @@ const toggleDash =
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+  { icon: CalendarCheck, label: "Bookings", path: "/bookings" },
   { icon: FileText, label: "Invoices", path: "/invoices" },
   { icon: Users, label: "Clients", path: "/clients" },
   { icon: Plug, label: "Integrations", path: "/settings/integrations" },
@@ -218,7 +220,7 @@ function DashboardLayoutContent({
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="font-bold tracking-tight truncate text-primary">
-                    InvoiceFlow
+                    Sigma
                   </span>
                 </div>
               ) : null}
@@ -300,7 +302,7 @@ function DashboardLayoutContent({
               <div className="flex items-center gap-3">
                 <div className="flex flex-col gap-1">
                   <span className="tracking-tight text-foreground font-medium">
-                    {activeMenuItem?.label ?? "InvoiceFlow"}
+                    {activeMenuItem?.label ?? "Sigma"}
                   </span>
                 </div>
               </div>
