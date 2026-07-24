@@ -231,7 +231,7 @@ The public REST API already exists at `/api/v1` (`server/rest/`, 508 lines), mou
 | `/me` | GET |
 | `/clients`, `/clients/:id` | GET, POST, GET, PATCH, DELETE |
 | `/invoices`, `/invoices/:id` | GET, POST, GET, PATCH, DELETE |
-| `/invoices/:id/pdf`, `/invoices/:id/send` | GET, POST |
+| `/invoices/:id/pdf`, `/invoices/:id/send` | POST, POST |
 | `/bookings`, `/bookings/:id`, `/bookings/:id/convert`, `/bookings/stats` | GET, POST, GET, PATCH, DELETE, POST, GET |
 | `/dashboard/stats` | GET |
 | `/openapi.json` | GET |
@@ -381,3 +381,49 @@ Also note `npx getdesign@latest add composio` (Phase 5a) — I have not run it. 
 Baseline is green (typecheck ✓, 51/51 tests ✓, build ✓) — so Phase 1 has a clean gate to measure against. No secrets found in either repo. Three unauthenticated production endpoints flagged in §4 for your attention, independent of this migration.
 
 **Awaiting your approval and answers to §7 before touching code.**
+
+---
+
+## Addendum — post-audit findings (added after Phases 1 + runtime verification)
+
+Found by standing up a local Postgres 16 and running the app against it. None of
+these were visible from static reading.
+
+**A1 — `bookings` was missing from both fresh-install artifacts. (Fixed.)**
+The table and its enum shipped in migration `0001` but reached neither
+`drizzle/pg/apply.sql` nor `server/db/bootstrap-sql.ts`. Any database created
+via the documented Supabase SQL Editor path or `/api/bootstrap-db` came up with
+**10 tables instead of 11 and no `bookings` at all** — so the entire CRM
+surface (`/api/v1/bookings*`) failed at runtime. Both artifacts are now
+generated from the schema and guarded by `server/bootstrap-sql.test.ts`.
+
+**A2 — a from-scratch migration run fails. (Worked around, not fixed.)**
+`0001` alters `memberships.user_id` to `varchar` while the FK to `users.id`
+still points at a `uuid`; Postgres rejects it with *key columns are of
+incompatible types*. The old `apply.sql` masked this by being hand-merged.
+Fresh installs now use `drizzle-kit export`, which sidesteps the ordering
+entirely. **`pnpm db:pg:migrate` against an empty database still fails** — it
+works only on databases that already have `0000` applied. Fixing that properly
+means a corrective migration; flagged rather than done, since editing applied
+migrations is against the rules you set.
+
+**A3 — RLS policies had drifted in the opposite direction. (Fixed.)**
+`policies.sql` had the `bookings` policy but compared `auth.uid()` (uuid)
+against Clerk string ids (varchar) with no cast — Postgres rejects it outright.
+`apply.sql` had the `::text` casts but not `bookings`. Each file was missing
+what the other had; both are now correct.
+
+**A4 — invoice PDF generation is broken without undocumented vendor
+credentials. (Documented, not fixed.)** `POST /api/v1/invoices/:id/pdf` returns
+`"Storage proxy credentials missing: set BUILT_IN_FORGE_API_URL and
+BUILT_IN_FORGE_API_KEY"`. These belong to the Manus/Forge scaffolding in §5 and
+were absent from `.env.example`. Now documented there. Replacing the proxy with
+direct S3 or Supabase Storage is the real fix.
+
+**A5 — everything else works.** Verified against a database built only from the
+regenerated `apply.sql`: API-key auth (401/401/200), booking → convert →
+`INV-2026-001` at `4800.00 + 960.00 VAT = 5760.00` with the client auto-created
+from the booking, booking relinked and advanced to `quoted`, pagination,
+dashboard rollups, and the `not_found` / `validation_error` envelopes. **22
+checks passed.** The two known gaps behaved exactly as recorded: **no
+`X-RateLimit-*` headers**, and **OpenAPI reports `3.0.3`**.
