@@ -20,6 +20,8 @@ import EditClientPage from "./pages/EditClient";
 import IntegrationsPage from "./pages/Integrations";
 import MarketingLayout from "./marketing/MarketingLayout";
 import Landing from "./pages/marketing/Landing";
+import HermiteLabs from "./pages/marketing/HermiteLabs";
+import { isLabsHost } from "./lib/host";
 import Pricing from "./pages/marketing/Pricing";
 import Features from "./pages/marketing/Features";
 import About from "./pages/marketing/About";
@@ -48,6 +50,13 @@ function ScrollToTop() {
 }
 
 function MarketingArea() {
+  // hermitelabs.com (apex) serves the Hermite Labs parent site; flow.hermitelabs.com
+  // (and everything else) serves the Hermite Flow product. `/labs` forces the
+  // parent site on any host.
+  const [location] = useLocation();
+  if (isLabsHost() || location === "/labs") {
+    return <HermiteLabs />;
+  }
   return (
     <MarketingLayout>
       <Switch>
