@@ -351,7 +351,10 @@ I've stopped here as instructed. Five questions — the first four are the re-sc
 The prompt wants 4 repos (`hermite-flow`, `hermite-flow-api`, `hermite-shared`, `hermite-web`). `docs/DOMAINS.md` and `client/src/lib/host.ts` implement a deliberate **one repo, one Vercel project** decision, already shipped. Splitting means unpicking the host-routing design, running 4 CI setups and a private npm registry for a solo-maintained product, and the marketing site currently lives *inside* the app (`client/src/pages/marketing/`).
 → **My recommendation: keep one repo for now.** Extract `@hermite/brand` first (Phase 5 needs it and HermiteCut will consume it), and split further only when a second product actually needs the code. I'll do the full 4-repo split if you want it — I'd just rather you choose it than inherit it.
 
-**Q2 — Which Supabase project?** `fakimjxhuusiwzzljqzg` (platform) or `cyrzdfzxgpbcctzftvkk` (hermite site waitlist)? Keep both separate, or consolidate? The prompt assumes one.
+**Q2 — Which Supabase project?** ✅ **Resolved:** the live project is
+**`uuccxbuaixwzyanatyow`**. `.mcp.json` and `docs/SETUP_GUIDE.md` now point at
+it; the two earlier refs (`fakimjxhuusiwzzljqzg`, `cyrzdfzxgpbcctzftvkk`) are
+treated as stale.
 
 **Q3 — Drizzle vs Supabase migrations.** Schema is currently Drizzle-managed (`drizzle/pg/`). `supabase db pull` would create a parallel, competing baseline in `supabase/migrations/`. Options: (a) keep Drizzle as sole truth and skip the Supabase migration workflow, (b) migrate fully to Supabase migrations and retire Drizzle Kit, (c) run both. **I recommend (a)** — it's already working, and (c) reliably causes drift.
 
@@ -397,15 +400,24 @@ via the documented Supabase SQL Editor path or `/api/bootstrap-db` came up with
 surface (`/api/v1/bookings*`) failed at runtime. Both artifacts are now
 generated from the schema and guarded by `server/bootstrap-sql.test.ts`.
 
-**A2 — a from-scratch migration run fails. (Worked around, not fixed.)**
-`0001` alters `memberships.user_id` to `varchar` while the FK to `users.id`
-still points at a `uuid`; Postgres rejects it with *key columns are of
-incompatible types*. The old `apply.sql` masked this by being hand-merged.
-Fresh installs now use `drizzle-kit export`, which sidesteps the ordering
-entirely. **`pnpm db:pg:migrate` against an empty database still fails** — it
-works only on databases that already have `0000` applied. Fixing that properly
-means a corrective migration; flagged rather than done, since editing applied
-migrations is against the rules you set.
+**A2 — a from-scratch migration run failed. (Now fixed.)**
+`0001` altered `memberships.user_id` to `varchar` while the FK to `users.id`
+still pointed at a `uuid`; Postgres rejected it with error 42804, *key columns
+are of incompatible types*. The old hand-merged `apply.sql` masked this, so it
+only ever surfaced on the migrator path.
+
+`0001` now drops the constraint, retypes both columns, and re-adds it. Editing
+an applied migration is normally off-limits — it is safe here because the file
+as written could never have completed via the migrator, so no database can have
+applied it that way. To cover the case where one somehow did (editing the file
+changes its hash, which makes drizzle replay it), every statement is idempotent:
+the enum is created in an exception-swallowing `DO` block, table and indexes use
+`IF NOT EXISTS`, and each constraint is dropped before re-adding.
+
+Verified: migrator succeeds from empty (11 tables); a forced replay succeeds
+again with only *already exists, skipping* notices; and the migrator-built and
+`apply.sql`-built databases are structurally identical — **115 columns, 24
+constraints, 31 indexes, 6 enums**. The app runs correctly against both.
 
 **A3 — RLS policies had drifted in the opposite direction. (Fixed.)**
 `policies.sql` had the `bookings` policy but compared `auth.uid()` (uuid)
