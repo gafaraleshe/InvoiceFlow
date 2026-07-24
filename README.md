@@ -1,10 +1,13 @@
 <p align="center">
-  <h1 align="center">Hermite Flow</h1>
+  <h1 align="center">Hermite Labs</h1>
   <p align="center">
-    A production-grade invoice management system for freelancers and small businesses, built with TypeScript, React, Express, and tRPC.
+    Software for creative businesses, by Gaffy Studios. This repo is the Hermite Labs platform —
+    one deployment serving <a href="https://hermitelabs.com">hermitelabs.com</a> (the parent site)
+    and <a href="https://flow.hermitelabs.com">flow.hermitelabs.com</a> (<b>Hermite Flow</b>, the
+    CRM + invoicing product) via host-based routing. Built with TypeScript, React, Express, and tRPC.
   </p>
   <p align="center">
-    <a href="https://github.com/gafaraleshe/Hermite Flow/actions"><img src="https://github.com/gafaraleshe/Hermite Flow/actions/workflows/ci.yml/badge.svg" alt="CI/CD"></a>
+    <a href="https://github.com/gafaraleshe/hermitelabs/actions"><img src="https://github.com/gafaraleshe/hermitelabs/actions/workflows/ci.yml/badge.svg" alt="CI/CD"></a>
     <img src="https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript" alt="TypeScript">
     <img src="https://img.shields.io/badge/Node.js-22-green?logo=node.js" alt="Node.js">
     <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" alt="React">
@@ -26,7 +29,7 @@ a public REST API, all on Vercel). Start here:
 | [`docs/SETUP_GUIDE.md`](docs/SETUP_GUIDE.md) | Click-by-click setup for Supabase, Resend, Polar.sh, Stripe, and Vercel (+ env vars) |
 | [`docs/API.md`](docs/API.md) | Public REST API (`/api/v1`) design — auth, resources, pagination, OpenAPI |
 | [`.env.example`](.env.example) | Every environment variable the product needs |
-| [`docs/Hermite Flow-Product-Guide.pdf`](docs/Hermite Flow-Product-Guide.pdf) | One-page-per-topic PDF for you **and your clients** — summary, setup, costs, timeline |
+| [`docs/InvoiceFlow-Product-Guide.pdf`](docs/InvoiceFlow-Product-Guide.pdf) | One-page-per-topic PDF for you **and your clients** — summary, setup, costs, timeline |
 
 > Regenerate the PDF after editing the guide: `node scripts/generate-guide-pdf.mjs`.
 
@@ -275,7 +278,7 @@ package (`node mcp/dist/index.js`) and is configured with two env vars —
 
 ```bash
 # Clone the repository
-git clone https://github.com/gafaraleshe/Hermite Flow.git
+git clone https://github.com/gafaraleshe/hermitelabs.git
 cd Hermite Flow
 
 # Install dependencies
