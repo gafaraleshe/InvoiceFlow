@@ -20,7 +20,8 @@ import EditClientPage from "./pages/EditClient";
 import IntegrationsPage from "./pages/Integrations";
 import MarketingLayout from "./marketing/MarketingLayout";
 import Landing from "./pages/marketing/Landing";
-import HermiteLabs from "./pages/marketing/HermiteLabs";
+import HermiteLabsHome from "./pages/marketing/labs/Home";
+import HermiteFlowProduct from "./pages/marketing/labs/Flow";
 import { isLabsHost } from "./lib/host";
 import Pricing from "./pages/marketing/Pricing";
 import Features from "./pages/marketing/Features";
@@ -55,13 +56,29 @@ function ScrollToTop() {
   return null;
 }
 
+function LabsArea() {
+  // The Hermite Labs parent site (hermitelabs.com). It has its own multi-page
+  // Composio chrome; `/flow` is the full Hermite Flow product page. Preview
+  // routes are mirrored under `/labs/*` so any host (localhost, Vercel
+  // previews) can browse the parent site.
+  return (
+    <Switch>
+      <Route path="/" component={HermiteLabsHome} />
+      <Route path="/flow" component={HermiteFlowProduct} />
+      <Route path="/labs" component={HermiteLabsHome} />
+      <Route path="/labs/flow" component={HermiteFlowProduct} />
+      <Route component={HermiteLabsHome} />
+    </Switch>
+  );
+}
+
 function MarketingArea() {
   // hermitelabs.com (apex) serves the Hermite Labs parent site; flow.hermitelabs.com
   // (and everything else) serves the HermiteFlow product. `/labs` forces the
   // parent site on any host.
   const [location] = useLocation();
-  if (isLabsHost() || location === "/labs") {
-    return <HermiteLabs />;
+  if (isLabsHost() || location === "/labs" || location.startsWith("/labs/")) {
+    return <LabsArea />;
   }
   return (
     <MarketingLayout>
