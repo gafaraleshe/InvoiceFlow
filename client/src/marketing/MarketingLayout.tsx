@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { getLoginUrl } from "@/const";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Container, MButton } from "./primitives";
+import { HermiteMark } from "@/brand/HermiteMark";
 import type { ReactNode } from "react";
 
 const toggleMkt =
@@ -64,12 +65,11 @@ function Wordmark() {
   return (
     <Link
       href="/"
-      className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-[var(--mkt-ink)]"
+      className="flex items-center gap-[11px] text-[19px] font-semibold tracking-[-0.035em] text-[var(--mkt-ink)]"
     >
-      <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--mkt-primary)] text-[13px] font-bold text-white">
-        H
-      </span>
-      HermiteFlow
+      {/* Accent lands on the right crossbar segment only — never the whole mark. */}
+      <HermiteMark size={22} product="flow" title="HermiteFlow" />
+      Hermite<span className="text-[var(--accent)]">Flow</span>
     </Link>
   );
 }
@@ -128,7 +128,9 @@ function TopNav() {
           <MButton variant="ghost" size="sm" href={getLoginUrl()}>
             Sign in
           </MButton>
-          <MButton variant="primary" size="sm" href={getLoginUrl()}>
+          {/* Paper, not accent: the hero CTA is the single accent on the page.
+              Two accent buttons would blow the ~5% budget. */}
+          <MButton variant="inverse" size="sm" href={getLoginUrl()}>
             Get started
           </MButton>
         </div>
@@ -239,7 +241,9 @@ function Footer() {
 
 export default function MarketingLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="mkt min-h-screen">
+    // HermiteFlow surfaces carry the product accent. Setting `data-product` is
+    // the entire theming mechanism — it flips `--accent` in brand/tokens.css.
+    <div className="mkt min-h-screen" data-product="flow">
       <TopNav />
       <main>{children}</main>
       <Footer />
