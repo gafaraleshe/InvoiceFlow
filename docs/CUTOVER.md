@@ -72,16 +72,63 @@ have it: **Settings → Database → Database password → Reset database passwo
 
 <https://dashboard.clerk.com>
 
+### 3a. Keys and domain
+
 1. **API Keys** → copy:
    - `Publishable key` (`pk_live_…` / `pk_test_…`) → `VITE_CLERK_PUBLISHABLE_KEY`
    - `Secret key` (`sk_live_…` / `sk_test_…`) → `CLERK_SECRET_KEY`
 2. **Configure → Domains** (or **Paths**) → add `flow.hermitelabs.com` as an
    allowed origin / satellite domain.
 3. **User & Authentication → Email, Phone, Username** → enable **Email address**
-   so you can sign in. Enable Google too if you want it.
+   so you can sign in with email.
 
 > The secret key is server-only. The publishable key is safe in the browser —
 > that is why it carries the `VITE_` prefix.
+
+### 3b. Google sign-in
+
+The login page uses Clerk's `<SignIn>` / `<SignUp>` components
+(`client/src/pages/Login.tsx`), so **enabling Google in the dashboard makes the
+Google button appear on its own — there is no code change to make.**
+
+**On a development instance** Clerk provides shared OAuth credentials, so this
+is all it takes:
+
+1. **SSO connections** → **Add connection** → **For all users**
+2. Choose **Google** → save.
+
+**On a production instance you must supply your own Google credentials.** Shared
+credentials do not work in production.
+
+1. In Clerk: **SSO connections** → **Add connection** → **For all users** →
+   **Google**.
+2. Toggle on **Enable for sign-up and sign-in** *and* **Use custom credentials**.
+3. **Copy the Authorized Redirect URI** Clerk shows you — you need it in a
+   moment, and it is easy to miss.
+4. Open <https://console.cloud.google.com/> → create or select a project →
+   **APIs & Services → Credentials → Create Credentials → OAuth client ID** →
+   application type **Web application**.
+5. **Authorized JavaScript origins** — add:
+   - `https://flow.hermitelabs.com`
+   - `http://localhost:3000` (for local dev)
+6. **Authorized redirect URIs** — paste the URI you copied from Clerk in step 3.
+7. Save, then copy the **Client ID** and **Client Secret**.
+8. Back in Clerk, paste both into the Google connection and save.
+9. Test at <https://flow.hermitelabs.com/login> — a **Continue with Google**
+   button should now be present.
+
+> ⚠️ **Set the Google app's publishing status to "In production."** New OAuth
+> apps default to **Testing**, which caps you at 100 users and shows an
+> unverified-app warning. Google Cloud Console → **APIs & Services → OAuth
+> consent screen → Publish app**. Verification checks your app name, logo and
+> requested scopes, so allow time for it before launch.
+
+Two further notes from Clerk's documentation:
+
+- Google **blocks authentication inside WebViews**. If you ever embed the sign-in
+  page in a native shell, Google sign-in will fail there.
+- Email subaddresses containing `+`, `=` or `#` are blocked by default. That is
+  a sensible security default — leave it on unless you have a reason not to.
 
 ---
 
