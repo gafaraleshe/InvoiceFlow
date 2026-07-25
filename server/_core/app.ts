@@ -15,10 +15,22 @@ export function createApp() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-  // Unauthenticated diagnostics: reports whether the server env + database are
-  // wired up correctly. Returns booleans/types only (no secret values). Safe to
-  // remove once the deployment is confirmed healthy.
-  app.get("/api/health", async (_req, res) => {
+  /**
+   * Readiness probe — the first thing to hit when a deploy misbehaves.
+   *
+   * Each failing check carries a `fix` naming the exact thing to set, so a
+   * broken deployment diagnoses itself instead of failing silently at sign-in.
+   *
+   * Anonymous callers get pass/fail plus those hints and nothing else. Schema
+   * detail (database name, table list, column types) is only returned with
+   * `?secret=<CRON_SECRET>` — it is useful for debugging but is not something
+   * to hand to the public internet.
+   */
+  app.get("/api/health", async (req, res) => {
+    const detailed =
+      Boolean(process.env.CRON_SECRET) &&
+      req.query.secret === process.env.CRON_SECRET;
+
     const clerkSecret = Boolean(process.env.CLERK_SECRET_KEY);
     const databaseUrl = Boolean(
       process.env.DATABASE_URL ||
@@ -26,42 +38,88 @@ export function createApp() {
         process.env.POSTGRES_PRISMA_URL
     );
 
-    let dbConnect = "unknown";
+    let dbConnect = false;
     let currentDatabase: string | null = null;
     let usersIdType: string | null = null;
     let publicTables: string[] = [];
+    let schemaApplied = false;
     let error: string | undefined;
-    try {
-      const meta = (await db.execute(
-        sql`select current_database() as db`
-      )) as unknown as { db: string }[];
-      currentDatabase = meta[0]?.db ?? null;
-      dbConnect = "ok";
 
-      const tbls = (await db.execute(
-        sql`select table_name from information_schema.tables where table_schema = 'public' order by table_name`
-      )) as unknown as { table_name: string }[];
-      publicTables = tbls.map(t => t.table_name);
+    if (databaseUrl) {
+      try {
+        const meta = (await db.execute(
+          sql`select current_database() as db`
+        )) as unknown as { db: string }[];
+        currentDatabase = meta[0]?.db ?? null;
+        dbConnect = true;
 
-      // NB: filter by schema — Supabase also has auth.users (always uuid).
-      const rows = (await db.execute(
-        sql`select data_type from information_schema.columns where table_schema = 'public' and table_name = 'users' and column_name = 'id'`
-      )) as unknown as { data_type: string }[];
-      usersIdType = rows[0]?.data_type ?? "table-missing";
-    } catch (e) {
-      dbConnect = "error";
-      error = e instanceof Error ? e.message : String(e);
+        const tbls = (await db.execute(
+          sql`select table_name from information_schema.tables where table_schema = 'public' order by table_name`
+        )) as unknown as { table_name: string }[];
+        publicTables = tbls.map(t => t.table_name);
+
+        // Every table the app actually needs. `bookings` is the one that went
+        // missing before — the CRM fails at runtime without it.
+        const required = [
+          "api_keys",
+          "bookings",
+          "clients",
+          "invoices",
+          "line_items",
+          "memberships",
+          "organizations",
+          "users",
+        ];
+        schemaApplied = required.every(t => publicTables.includes(t));
+
+        // NB: filter by schema — Supabase also has auth.users (always uuid).
+        const rows = (await db.execute(
+          sql`select data_type from information_schema.columns where table_schema = 'public' and table_name = 'users' and column_name = 'id'`
+        )) as unknown as { data_type: string }[];
+        usersIdType = rows[0]?.data_type ?? "table-missing";
+      } catch (e) {
+        error = e instanceof Error ? e.message : String(e);
+      }
     }
 
-    res.json({
-      ok: clerkSecret && databaseUrl && dbConnect === "ok",
-      clerkSecret,
-      databaseUrl,
-      dbConnect,
-      currentDatabase,
-      usersIdType, // expect "character varying"; "uuid" => migration not applied
-      publicTables,
-      error,
+    const checks = [
+      {
+        name: "clerk_secret_key",
+        ok: clerkSecret,
+        fix: "Set CLERK_SECRET_KEY (Clerk dashboard → API keys) in your host's environment variables. Sign-in cannot be verified without it.",
+      },
+      {
+        name: "database_url",
+        ok: databaseUrl,
+        fix: "Set DATABASE_URL to the Supabase pooled connection string (Project Settings → Database → Connection string → URI, Transaction mode).",
+      },
+      {
+        name: "database_reachable",
+        ok: dbConnect,
+        fix: "The connection string is set but the database refused it. Check the password and that the project is not paused.",
+      },
+      {
+        name: "schema_applied",
+        ok: schemaApplied,
+        fix: "Run drizzle/pg/apply.sql in the Supabase SQL Editor (or `pnpm db:pg:migrate`). Missing tables mean the CRM will fail at runtime.",
+      },
+      {
+        name: "users_id_is_varchar",
+        ok: usersIdType === "character varying",
+        fix: "users.id must be varchar — Clerk ids are strings, not uuids. Re-apply drizzle/pg/apply.sql.",
+      },
+    ];
+
+    const failing = checks.filter(c => !c.ok);
+    res.status(failing.length ? 503 : 200).json({
+      ok: failing.length === 0,
+      checks: checks.map(c => ({
+        name: c.name,
+        ok: c.ok,
+        ...(c.ok ? {} : { fix: c.fix }),
+      })),
+      ...(error ? { error } : {}),
+      ...(detailed ? { currentDatabase, usersIdType, publicTables } : {}),
     });
   });
 
