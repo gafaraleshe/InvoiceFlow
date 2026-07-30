@@ -272,7 +272,7 @@ export default function IntegrationsPage() {
               </div>
             ) : (
               <div className="divide-y">
-                {activeKeys.map((k: any) => (
+                {activeKeys.map(k => (
                   <div
                     key={k.id}
                     className="flex items-center justify-between gap-4 px-5 py-3.5"

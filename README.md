@@ -23,12 +23,12 @@ We're evolving HermiteFlow from an app into a **shippable, multi-tenant invoicin
 (Supabase Auth + Postgres, Polar.sh subscriptions, Stripe invoice payments, Resend email,
 a public REST API, all on Vercel). Start here:
 
-| Document | What it covers |
-|---|---|
-| [`docs/PRODUCT_PLAN.md`](docs/PRODUCT_PLAN.md) | Architecture, multi-tenant data model, security, scalability, and the phased roadmap |
-| [`docs/SETUP_GUIDE.md`](docs/SETUP_GUIDE.md) | Click-by-click setup for Supabase, Resend, Polar.sh, Stripe, and Vercel (+ env vars) |
-| [`docs/API.md`](docs/API.md) | Public REST API (`/api/v1`) design — auth, resources, pagination, OpenAPI |
-| [`.env.example`](.env.example) | Every environment variable the product needs |
+| Document                                                                   | What it covers                                                                        |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| [`docs/PRODUCT_PLAN.md`](docs/PRODUCT_PLAN.md)                             | Architecture, multi-tenant data model, security, scalability, and the phased roadmap  |
+| [`docs/SETUP_GUIDE.md`](docs/SETUP_GUIDE.md)                               | Click-by-click setup for Supabase, Resend, Polar.sh, Stripe, and Vercel (+ env vars)  |
+| [`docs/API.md`](docs/API.md)                                               | Public REST API (`/api/v1`) design — auth, resources, pagination, OpenAPI             |
+| [`.env.example`](.env.example)                                             | Every environment variable the product needs                                          |
 | [`docs/HermiteFlow-Product-Guide.pdf`](docs/HermiteFlow-Product-Guide.pdf) | One-page-per-topic PDF for you **and your clients** — summary, setup, costs, timeline |
 
 > Regenerate the PDF after editing the guide: `node scripts/generate-guide-pdf.mjs`.
@@ -45,38 +45,38 @@ The system features a clean, responsive dashboard UI with real-time statistics, 
 
 ## Features
 
-| Category | Details |
-|---|---|
-| **Client Management** | Full CRUD operations storing name, email, company, address (line 1, line 2, city, postcode, country), phone, payment terms (configurable 1–365 days), and notes |
-| **Invoice Management** | Full CRUD with dynamic line items, auto-generated invoice numbers (`INV-YYYY-NNN`), issue/due dates, and optional notes |
-| **VAT Calculation** | Automatic UK VAT at 20% (configurable 0–100%) with precise subtotal, VAT amount, and total computation |
-| **Status Tracking** | Four-stage lifecycle: `draft` → `sent` → `paid` / `overdue`, with automatic overdue flagging for past-due invoices |
-| **Document Generation** | Professional HTML invoice documents with full company/client details, line item tables, and VAT breakdown, stored in S3 |
-| **Email Delivery** | Send invoices to clients via the Resend API with branded HTML email templates containing invoice summary and document link |
-| **Authentication** | OAuth 2.0 sign-in with session-based cookies, protected and public procedure separation |
-| **Role-Based Access** | Admin and user roles with `adminProcedure` middleware enforcing elevated permissions |
-| **Dashboard** | Real-time KPI cards (total revenue, outstanding amount, invoice count, overdue count) and recent invoices table |
-| **Input Validation** | Zod schemas enforcing type safety on all API inputs across clients, invoices, line items, and query parameters |
-| **Testing** | 34 Vitest tests covering VAT calculations, authentication flows, RBAC, input validation, and line item computations |
-| **CI/CD** | GitHub Actions pipeline with lint, type check, test, build, and Docker build stages |
-| **Containerisation** | Multi-stage Dockerfile and Docker Compose with PostgreSQL, health checks, and volume persistence |
+| Category                | Details                                                                                                                                                         |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Client Management**   | Full CRUD operations storing name, email, company, address (line 1, line 2, city, postcode, country), phone, payment terms (configurable 1–365 days), and notes |
+| **Invoice Management**  | Full CRUD with dynamic line items, auto-generated invoice numbers (`INV-YYYY-NNN`), issue/due dates, and optional notes                                         |
+| **VAT Calculation**     | Automatic UK VAT at 20% (configurable 0–100%) with precise subtotal, VAT amount, and total computation                                                          |
+| **Status Tracking**     | Four-stage lifecycle: `draft` → `sent` → `paid` / `overdue`, with automatic overdue flagging for past-due invoices                                              |
+| **Document Generation** | Professional HTML invoice documents with full company/client details, line item tables, and VAT breakdown, stored in S3                                         |
+| **Email Delivery**      | Send invoices to clients via the Resend API with branded HTML email templates containing invoice summary and document link                                      |
+| **Authentication**      | OAuth 2.0 sign-in with session-based cookies, protected and public procedure separation                                                                         |
+| **Role-Based Access**   | Admin and user roles with `adminProcedure` middleware enforcing elevated permissions                                                                            |
+| **Dashboard**           | Real-time KPI cards (total revenue, outstanding amount, invoice count, overdue count) and recent invoices table                                                 |
+| **Input Validation**    | Zod schemas enforcing type safety on all API inputs across clients, invoices, line items, and query parameters                                                  |
+| **Testing**             | 34 Vitest tests covering VAT calculations, authentication flows, RBAC, input validation, and line item computations                                             |
+| **CI/CD**               | GitHub Actions pipeline with lint, type check, test, build, and Docker build stages                                                                             |
+| **Containerisation**    | Multi-stage Dockerfile and Docker Compose with PostgreSQL, health checks, and volume persistence                                                                |
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| **Frontend** | React 19, Tailwind CSS 4, shadcn/ui, Radix UI, Recharts, Wouter |
-| **Backend** | Node.js 22, Express 4, tRPC 11, Superjson |
-| **Database** | MySQL/TiDB via Drizzle ORM with migration support |
-| **Validation** | Zod 4 with shared schemas between client and server |
-| **Authentication** | OAuth 2.0 with JWT session cookies (via Jose) |
-| **Email** | Resend API (direct HTTP integration) |
-| **Storage** | AWS S3 for invoice document storage |
-| **Testing** | Vitest with tRPC caller-based unit tests |
-| **Build** | Vite 7 (frontend), esbuild (server), TypeScript 5.9 |
-| **DevOps** | Docker, Docker Compose, GitHub Actions |
+| Layer              | Technology                                                      |
+| ------------------ | --------------------------------------------------------------- |
+| **Frontend**       | React 19, Tailwind CSS 4, shadcn/ui, Radix UI, Recharts, Wouter |
+| **Backend**        | Node.js 22, Express 4, tRPC 11, Superjson                       |
+| **Database**       | MySQL/TiDB via Drizzle ORM with migration support               |
+| **Validation**     | Zod 4 with shared schemas between client and server             |
+| **Authentication** | OAuth 2.0 with JWT session cookies (via Jose)                   |
+| **Email**          | Resend API (direct HTTP integration)                            |
+| **Storage**        | AWS S3 for invoice document storage                             |
+| **Testing**        | Vitest with tRPC caller-based unit tests                        |
+| **Build**          | Vite 7 (frontend), esbuild (server), TypeScript 5.9             |
+| **DevOps**         | Docker, Docker Compose, GitHub Actions                          |
 
 ---
 
@@ -175,41 +175,41 @@ All API procedures are exposed via tRPC under `/api/trpc`. The application uses 
 
 ### Authentication
 
-| Procedure | Type | Auth | Description |
-|---|---|---|---|
-| `auth.me` | Query | Public | Returns the current authenticated user or `null` |
-| `auth.logout` | Mutation | Public | Clears the session cookie and logs out |
+| Procedure     | Type     | Auth   | Description                                      |
+| ------------- | -------- | ------ | ------------------------------------------------ |
+| `auth.me`     | Query    | Public | Returns the current authenticated user or `null` |
+| `auth.logout` | Mutation | Public | Clears the session cookie and logs out           |
 
 ### Clients
 
-| Procedure | Type | Auth | Description |
-|---|---|---|---|
-| `clients.list` | Query | Protected | List clients with pagination and search |
-| `clients.getById` | Query | Protected | Get a single client by ID |
-| `clients.create` | Mutation | Protected | Create a new client |
-| `clients.update` | Mutation | Protected | Update an existing client |
-| `clients.delete` | Mutation | Protected | Delete a client (fails if client has invoices) |
+| Procedure         | Type     | Auth      | Description                                    |
+| ----------------- | -------- | --------- | ---------------------------------------------- |
+| `clients.list`    | Query    | Protected | List clients with pagination and search        |
+| `clients.getById` | Query    | Protected | Get a single client by ID                      |
+| `clients.create`  | Mutation | Protected | Create a new client                            |
+| `clients.update`  | Mutation | Protected | Update an existing client                      |
+| `clients.delete`  | Mutation | Protected | Delete a client (fails if client has invoices) |
 
 ### Invoices
 
-| Procedure | Type | Auth | Description |
-|---|---|---|---|
-| `invoice.list` | Query | Protected | List invoices with status/client filters and pagination |
-| `invoice.getById` | Query | Protected | Get invoice with line items |
-| `invoice.create` | Mutation | Protected | Create invoice with line items (auto-generates number, calculates VAT) |
-| `invoice.update` | Mutation | Protected | Update invoice and line items (blocked for paid invoices) |
-| `invoice.updateStatus` | Mutation | Protected | Change invoice status (draft/sent/paid/overdue) |
-| `invoice.delete` | Mutation | Protected | Delete invoice (blocked for paid invoices) |
-| `invoice.generatePdf` | Mutation | Protected | Generate and store invoice document |
-| `invoice.sendEmail` | Mutation | Protected | Email invoice to client via Resend (auto-generates document if needed) |
+| Procedure              | Type     | Auth      | Description                                                            |
+| ---------------------- | -------- | --------- | ---------------------------------------------------------------------- |
+| `invoice.list`         | Query    | Protected | List invoices with status/client filters and pagination                |
+| `invoice.getById`      | Query    | Protected | Get invoice with line items                                            |
+| `invoice.create`       | Mutation | Protected | Create invoice with line items (auto-generates number, calculates VAT) |
+| `invoice.update`       | Mutation | Protected | Update invoice and line items (blocked for paid invoices)              |
+| `invoice.updateStatus` | Mutation | Protected | Change invoice status (draft/sent/paid/overdue)                        |
+| `invoice.delete`       | Mutation | Protected | Delete invoice (blocked for paid invoices)                             |
+| `invoice.generatePdf`  | Mutation | Protected | Generate and store invoice document                                    |
+| `invoice.sendEmail`    | Mutation | Protected | Email invoice to client via Resend (auto-generates document if needed) |
 
 ### Dashboard
 
-| Procedure | Type | Auth | Description |
-|---|---|---|---|
-| `dashboard.stats` | Query | Protected | Revenue totals, invoice count, overdue count |
-| `dashboard.recentInvoices` | Query | Protected | Last 5 invoices |
-| `dashboard.flagOverdue` | Mutation | Protected | Flag all past-due invoices as overdue |
+| Procedure                  | Type     | Auth      | Description                                  |
+| -------------------------- | -------- | --------- | -------------------------------------------- |
+| `dashboard.stats`          | Query    | Protected | Revenue totals, invoice count, overdue count |
+| `dashboard.recentInvoices` | Query    | Protected | Last 5 invoices                              |
+| `dashboard.flagOverdue`    | Mutation | Protected | Flag all past-due invoices as overdue        |
 
 ---
 
@@ -228,23 +228,23 @@ shown once; only a SHA-256 hash + prefix are stored.
 Authorization: Bearer ifk_live_xxxxxxxxxxxxxxxx
 ```
 
-| Method & path | Description |
-|---|---|
-| `GET /api/v1/clients` | List clients (`?page=&limit=&search=`) |
-| `POST /api/v1/clients` | Create a client |
-| `GET /api/v1/clients/{id}` | Retrieve a client |
-| `PATCH /api/v1/clients/{id}` | Update a client |
-| `DELETE /api/v1/clients/{id}` | Delete a client (409 if it has invoices) |
-| `GET /api/v1/invoices` | List invoices (`?page=&limit=&status=&client_id=`) |
-| `POST /api/v1/invoices` | Create an invoice (totals/VAT computed) |
-| `GET /api/v1/invoices/{id}` | Retrieve an invoice |
-| `PATCH /api/v1/invoices/{id}` | Update / change status |
-| `DELETE /api/v1/invoices/{id}` | Delete a draft invoice |
-| `POST /api/v1/invoices/{id}/send` | Email the invoice to the client |
-| `POST /api/v1/invoices/{id}/pdf` | Generate the invoice PDF |
-| `GET /api/v1/dashboard/stats` | Revenue / outstanding / counts |
-| `GET /api/v1/me` | The organization this key belongs to |
-| `GET /api/v1/openapi.json` | OpenAPI 3.0 document (no key required) |
+| Method & path                     | Description                                        |
+| --------------------------------- | -------------------------------------------------- |
+| `GET /api/v1/clients`             | List clients (`?page=&limit=&search=`)             |
+| `POST /api/v1/clients`            | Create a client                                    |
+| `GET /api/v1/clients/{id}`        | Retrieve a client                                  |
+| `PATCH /api/v1/clients/{id}`      | Update a client                                    |
+| `DELETE /api/v1/clients/{id}`     | Delete a client (409 if it has invoices)           |
+| `GET /api/v1/invoices`            | List invoices (`?page=&limit=&status=&client_id=`) |
+| `POST /api/v1/invoices`           | Create an invoice (totals/VAT computed)            |
+| `GET /api/v1/invoices/{id}`       | Retrieve an invoice                                |
+| `PATCH /api/v1/invoices/{id}`     | Update / change status                             |
+| `DELETE /api/v1/invoices/{id}`    | Delete a draft invoice                             |
+| `POST /api/v1/invoices/{id}/send` | Email the invoice to the client                    |
+| `POST /api/v1/invoices/{id}/pdf`  | Generate the invoice PDF                           |
+| `GET /api/v1/dashboard/stats`     | Revenue / outstanding / counts                     |
+| `GET /api/v1/me`                  | The organization this key belongs to               |
+| `GET /api/v1/openapi.json`        | OpenAPI 3.0 document (no key required)             |
 
 - **Pagination:** `?page=` (1-based) + `?limit=` (max 100). Responses:
   `{ data, page, limit, total, total_pages }`.
@@ -272,31 +272,68 @@ package (`node mcp/dist/index.js`) and is configured with two env vars —
 
 - **Node.js** 22 or later
 - **pnpm** 10 or later
-- A running database instance (connection string via `DATABASE_URL`)
+- **PostgreSQL** 14 or later — either a local server or a Supabase project
 
-### Installation
+### Quickstart: run it locally and sign in
+
+This path needs **no third-party accounts** — no Clerk, no Supabase, no Resend.
+It uses a local Postgres and a development-only sign-in.
 
 ```bash
-# Clone the repository
 git clone https://github.com/gafaraleshe/hermite.git
 cd hermite
-
-# Install dependencies
 pnpm install
 
-# Set up environment variables
-# DATABASE_URL, JWT_SECRET, and OAuth variables are required
-# RESEND_API_KEY is optional (emails are simulated without it)
+# 1. A database to point at
+createdb hermiteflow
 
-# Generate and apply database migrations
-pnpm drizzle-kit generate
-pnpm drizzle-kit migrate
+# 2. Environment
+cat > .env <<'EOF'
+NODE_ENV=development
+APP_URL=http://localhost:3000
+VITE_APP_URL=http://localhost:3000
+DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/hermiteflow
+DEV_AUTH=1            # server: accept development sign-in
+VITE_DEV_AUTH=1       # browser: show the development sign-in form
+CRON_SECRET=local-dev-secret
+EOF
 
-# Start the development server
+# 3. Schema (tables + RLS). Works on a plain Postgres as well as Supabase.
+psql "$DATABASE_URL" -f drizzle/pg/apply.sql
+
+# 4. Optional: clients, invoices across every status, and bookings to click through
+pnpm seed:dev
+
+# 5. Go
 pnpm dev
 ```
 
-The application will be available at `http://localhost:3000`.
+Open <http://localhost:3000/login>, enter any email (the form pre-fills
+`dev@example.com`, which is what `pnpm seed:dev` populates) and press **Sign in**.
+First sign-in for an email provisions a workspace automatically.
+
+Check the wiring at any time with <http://localhost:3000/api/health> — it reports
+each requirement individually and names the exact thing to set for anything
+failing.
+
+> **`DEV_AUTH` is not authentication.** It accepts whatever identity the caller
+> claims, with no password and no verification. It is ignored in production
+> builds, and a production server with `DEV_AUTH` set refuses to start rather
+> than serve traffic. Set Clerk keys (below) for anything reachable by anyone
+> else.
+
+### Signing in with Clerk (real authentication)
+
+Leave `DEV_AUTH`/`VITE_DEV_AUTH` unset and provide instead:
+
+```bash
+CLERK_SECRET_KEY=sk_test_…            # server — verifies session tokens
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_…  # browser
+```
+
+Clerk takes precedence: with a publishable key present the development form is
+never shown. See [`docs/SETUP_GUIDE.md`](docs/SETUP_GUIDE.md) for the click-by-click
+setup, and `docs/DOMAINS.md` for production origins.
 
 ### Docker Compose
 
@@ -312,37 +349,54 @@ docker compose up -d
 
 ### Environment Variables
 
-| Variable | Required | Description |
-|---|---|---|
-| `DATABASE_URL` | Yes | Database connection string |
-| `JWT_SECRET` | Yes | Secret key for signing session cookies |
-| `OAUTH_SERVER_URL` | Yes | OAuth provider base URL |
-| `VITE_APP_ID` | Yes | OAuth application ID |
-| `VITE_OAUTH_PORTAL_URL` | Yes | OAuth login portal URL |
-| `RESEND_API_KEY` | No | Resend API key for email delivery (simulated if absent) |
-| `RESEND_FROM_EMAIL` | No | Sender email address (defaults to `HermiteFlow <invoices@resend.dev>`) |
+Every variable, with provenance and notes, is documented in
+[`.env.example`](.env.example). The ones that gate the app starting usefully:
+
+| Variable                     | Required | Description                                                                                                                 |
+| ---------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`               | Yes      | Postgres connection string (pooled). `POSTGRES_URL` is read as a fallback, so Vercel's Supabase integration works unchanged |
+| `CLERK_SECRET_KEY`           | Yes¹     | Server-side Clerk key — verifies session tokens                                                                             |
+| `VITE_CLERK_PUBLISHABLE_KEY` | Yes¹     | Browser-side Clerk key                                                                                                      |
+| `DEV_AUTH`                   | No       | `1` accepts development sign-in instead of Clerk. Development only — refuses to run in production                           |
+| `VITE_DEV_AUTH`              | No       | `1` renders the development sign-in form. Ignored when a Clerk publishable key is set                                       |
+| `APP_URL` / `VITE_APP_URL`   | Yes      | Origin used for links in emails and invoice documents                                                                       |
+| `CRON_SECRET`                | No       | Gates `/api/jobs/*` and the detailed `/api/health` output                                                                   |
+| `RESEND_API_KEY`             | No       | Resend API key for email delivery (simulated if absent)                                                                     |
+| `RESEND_FROM_EMAIL`          | No       | Sender address (defaults to `HermiteFlow <invoices@resend.dev>`)                                                            |
+
+¹ Required unless `DEV_AUTH=1` is used for local development.
 
 ---
 
 ## Available Scripts
 
-| Command | Description |
-|---|---|
-| `pnpm dev` | Start the development server with hot reload |
-| `pnpm build` | Build the frontend (Vite) and backend (esbuild) for production |
-| `pnpm start` | Run the production build |
-| `pnpm check` | Run TypeScript type checking |
-| `pnpm format` | Format code with Prettier |
-| `pnpm test` | Run the Vitest test suite |
-| `pnpm db:push` | Generate and apply database migrations |
-| `pnpm gen:openapi` | Regenerate `openapi.yaml` from `server/rest/openapi.ts` |
-| `pnpm gen:assets` | Regenerate the placeholder brand assets (see below) |
+| Command              | Description                                                                                        |
+| -------------------- | -------------------------------------------------------------------------------------------------- |
+| `pnpm dev`           | Start the development server with hot reload                                                       |
+| `pnpm build`         | Build the frontend (Vite) and backend (esbuild) for production                                     |
+| `pnpm start`         | Run the production build                                                                           |
+| `pnpm check`         | Run TypeScript type checking                                                                       |
+| `pnpm format`        | Format code with Prettier                                                                          |
+| `pnpm test`          | Run the Vitest test suite                                                                          |
+| `pnpm db:push`       | Generate and apply database migrations                                                             |
+| `pnpm seed:dev`      | Fill the development workspace with clients, invoices, and bookings (`--reset` to wipe and reseed) |
+| `pnpm seed:owner`    | Provision the owner workspace and mint an API key                                                  |
+| `pnpm gen:bootstrap` | Regenerate `drizzle/pg/apply.sql` and `server/db/bootstrap-sql.ts` from the schema                 |
+| `pnpm gen:openapi`   | Regenerate `openapi.yaml` from `server/rest/openapi.ts`                                            |
+| `pnpm gen:assets`    | Regenerate the placeholder brand assets (see below)                                                |
 
 ---
 
 ## Testing
 
-The test suite contains **51 tests** across three test files (`server/hermiteflow.test.ts`, `server/rest.test.ts`, `server/auth.logout.test.ts`), all executed with Vitest using tRPC's `createCaller` for direct procedure testing without HTTP overhead.
+The test suite contains **93 tests** across five test files (`server/hermiteflow.test.ts`,
+`server/rest.test.ts`, `server/bootstrap-sql.test.ts`, `server/auth/devAuth.test.ts`,
+`server/auth.logout.test.ts`), all executed with Vitest using tRPC's `createCaller` for
+direct procedure testing without HTTP overhead.
+
+The suite runs **without a database** by design — the REST tests assert that a valid
+request passes auth, validation, and routing and only then fails at the data layer. The
+Vitest config blanks `DATABASE_URL` so a developer's real database is never touched.
 
 ```bash
 # Run all tests
@@ -351,14 +405,17 @@ pnpm test
 
 ### Test Coverage
 
-| Suite | Tests | What It Covers |
-|---|---|---|
-| **VAT Calculation** | 10 | Standard 20% rate, zero-rate, reduced rate, rounding precision, large amounts, multiple items, single penny, high-value invoices |
-| **Authentication Flows** | 4 | `auth.me` returns user/null, `auth.logout` clears cookies with correct options |
-| **Role-Based Access Control** | 5 | Protected procedures reject unauthenticated users, role assignment, admin/user distinction |
-| **Input Validation (Zod)** | 8 | Empty names, invalid emails, missing line items, negative payment terms, VAT rate bounds, invalid statuses, valid data acceptance |
-| **Line Item Calculations** | 6 | Single items, fractional quantities, subtotal aggregation, zero-value items, decimal precision |
-| **Auth Logout** | 1 | Cookie clearing with correct security options |
+| Suite                          | Tests | What It Covers                                                                                                                    |
+| ------------------------------ | ----- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **VAT Calculation**            | 10    | Standard 20% rate, zero-rate, reduced rate, rounding precision, large amounts, multiple items, single penny, high-value invoices  |
+| **Authentication Flows**       | 4     | `auth.me` returns user/null, `auth.logout` clears cookies with correct options                                                    |
+| **Role-Based Access Control**  | 5     | Protected procedures reject unauthenticated users, role assignment, admin/user distinction                                        |
+| **Input Validation (Zod)**     | 8     | Empty names, invalid emails, missing line items, negative payment terms, VAT rate bounds, invalid statuses, valid data acceptance |
+| **Line Item Calculations**     | 6     | Single items, fractional quantities, subtotal aggregation, zero-value items, decimal precision                                    |
+| **Auth Logout**                | 1     | Cookie clearing with correct security options                                                                                     |
+| **Public REST API**            | 19    | API-key auth, error mapping, validation, routing through to the data layer                                                        |
+| **Generated schema artifacts** | 28    | `apply.sql` / `BOOTSTRAP_SQL` cover every table, RLS is enabled, `auth.uid()` casts, local-Postgres stub                          |
+| **Development sign-in**        | 14    | Off by default, never active in production, refuses to boot a production server, token parsing rejects malformed input            |
 
 ---
 
@@ -386,17 +443,17 @@ are drawn with DejaVu Sans rather than Inter and are not final artwork.
 
 **Replace these with real exports before launch:**
 
-| File | Size / format | Used by |
-|---|---|---|
-| `favicon.ico` | 16/32/48/64 multi-size ICO | Legacy browser tabs |
-| `favicon.svg` | SVG, monochrome | Modern browser tabs (Hermite Labs) |
-| `favicon-flow.svg` | SVG, `#3ADCC8` crossbar | Modern browser tabs (HermiteFlow) |
-| `favicon-16x16.png`, `favicon-32x32.png` | PNG | Fallback tab icons |
-| `apple-touch-icon.png` | 180×180 PNG, no alpha | iOS home screen |
-| `icon-192.png`, `icon-512.png` | PNG | PWA / `site.webmanifest` |
-| `icon-512-maskable.png` | 512×512 PNG, 28% safe inset | Android maskable icon |
-| `og-image.png` | 1200×630 PNG | Hermite Labs OG/Twitter card |
-| `og-image-flow.png` | 1200×630 PNG | HermiteFlow OG/Twitter card |
+| File                                     | Size / format               | Used by                            |
+| ---------------------------------------- | --------------------------- | ---------------------------------- |
+| `favicon.ico`                            | 16/32/48/64 multi-size ICO  | Legacy browser tabs                |
+| `favicon.svg`                            | SVG, monochrome             | Modern browser tabs (Hermite Labs) |
+| `favicon-flow.svg`                       | SVG, `#3ADCC8` crossbar     | Modern browser tabs (HermiteFlow)  |
+| `favicon-16x16.png`, `favicon-32x32.png` | PNG                         | Fallback tab icons                 |
+| `apple-touch-icon.png`                   | 180×180 PNG, no alpha       | iOS home screen                    |
+| `icon-192.png`, `icon-512.png`           | PNG                         | PWA / `site.webmanifest`           |
+| `icon-512-maskable.png`                  | 512×512 PNG, 28% safe inset | Android maskable icon              |
+| `og-image.png`                           | 1200×630 PNG                | Hermite Labs OG/Twitter card       |
+| `og-image-flow.png`                      | 1200×630 PNG                | HermiteFlow OG/Twitter card        |
 
 Still outstanding (Phase 5 — brand system): light/dark **wordmark exports**, and
 per-product OG images for HermiteCut and HermiteMind. The monogram geometry and

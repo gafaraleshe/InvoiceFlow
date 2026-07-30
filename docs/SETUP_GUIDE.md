@@ -8,6 +8,11 @@ Environment Variables. Never commit real keys.
 > 🔒 Anything ending in `SECRET`, `SERVICE_ROLE`, or `KEY` is sensitive. Share with me
 > via your environment/Vercel, not in plain chat where possible.
 
+> **Just want to click around the product first?** You don't need any of this. A
+> local Postgres plus `DEV_AUTH=1` runs the whole app with a development sign-in —
+> see **Quickstart** in the [README](../README.md#quickstart-run-it-locally-and-sign-in).
+> Come back here when you're ready to put it in front of someone else.
+
 ---
 
 ## 1. Supabase (database + auth + storage) — **do this first**
@@ -24,10 +29,10 @@ Environment Variables. Never commit real keys.
 2. **Project Settings → API**, copy:
    - `Project URL` → `SUPABASE_URL` and `VITE_SUPABASE_URL`
    - `anon public` key → `VITE_SUPABASE_ANON_KEY`
-   - `service_role` key → `SUPABASE_SERVICE_ROLE_KEY` *(server only — never in the browser)*
+   - `service_role` key → `SUPABASE_SERVICE_ROLE_KEY` _(server only — never in the browser)_
 3. **Project Settings → API → JWT Settings**, copy `JWT Secret` → `SUPABASE_JWT_SECRET`.
 4. **Project Settings → Database → Connection string → "URI"** (enable **Use connection
-   pooling**, mode *Transaction*). Copy → `DATABASE_URL`. Also copy the **direct**
+   pooling**, mode _Transaction_). Copy → `DATABASE_URL`. Also copy the **direct**
    (non-pooled) URI → `DIRECT_URL` (used for migrations).
 5. **Authentication → Providers**: enable **Email**, and **Google** (optional now). Set
    **Site URL** to your domain (and `http://localhost:3000` for local).
@@ -44,7 +49,7 @@ I handle the schema, migrations, and RLS policies in code.
    (SPF, DKIM, DMARC) at your domain registrar. Wait for "Verified".
 3. Decide your from-address, e.g. `billing@yourdomain.com` → `EMAIL_FROM`.
 
-*Until the domain verifies, Resend test mode only sends to your own address — fine for dev.*
+_Until the domain verifies, Resend test mode only sends to your own address — fine for dev._
 
 ---
 
@@ -55,7 +60,7 @@ I handle the schema, migrations, and RLS policies in code.
    - **Starter** — free.
    - **Pro** — monthly + annual prices.
    - **Business** — monthly + annual prices.
-   Copy each **price/product ID** — paste them to me (or into `POLAR_PRODUCTS_JSON`).
+     Copy each **price/product ID** — paste them to me (or into `POLAR_PRODUCTS_JSON`).
 3. **Settings → Developers / API**: create an **Organization Access Token** →
    `POLAR_ACCESS_TOKEN`.
 4. **Webhooks → Add endpoint**: URL `https://YOURDOMAIN/api/webhooks/polar`, copy the
@@ -91,6 +96,7 @@ I handle the schema, migrations, and RLS policies in code.
 ---
 
 ## 6. Domain & DNS
+
 - Buy/own a domain (e.g. `hermitelabs.com`). Point it at Vercel (step 5.3).
 - Add Resend's email DNS records (step 2.2).
 - Set `APP_URL=https://yourdomain` and `VITE_APP_URL=https://yourdomain`.
@@ -98,6 +104,7 @@ I handle the schema, migrations, and RLS policies in code.
 ---
 
 ## 7. Sentry (optional, recommended)
+
 - <https://sentry.io> → new project (Node + React) → copy DSN → `SENTRY_DSN` /
   `VITE_SENTRY_DSN`.
 

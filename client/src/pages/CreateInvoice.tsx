@@ -157,7 +157,7 @@ export default function CreateInvoicePage() {
                     <SelectValue placeholder="Select a client" />
                   </SelectTrigger>
                   <SelectContent>
-                    {clientsData?.items.map((c: any) => (
+                    {clientsData?.items.map(c => (
                       <SelectItem key={c.id} value={String(c.id)}>
                         {c.name} {c.company ? `(${c.company})` : ""}
                       </SelectItem>

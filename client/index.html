@@ -23,10 +23,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="HermiteFlow" />
     <meta property="og:url" content="https://flow.hermitelabs.com/" />
-    <meta
-      property="og:title"
-      content="HermiteFlow — Invoicing for creatives"
-    />
+    <meta property="og:title" content="HermiteFlow — Invoicing for creatives" />
     <meta
       property="og:description"
       content="Turn every booking into a paid invoice — automatically. Part of Hermite Labs."
@@ -65,10 +62,11 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script
-      defer
-      src="%VITE_ANALYTICS_ENDPOINT%/umami"
-      data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"
-    ></script>
+    <!--
+      Analytics is injected from src/analytics.ts, not a static tag here: Vite
+      only substitutes %VITE_*% placeholders for variables that are actually
+      set, so with analytics unconfigured the literal "%VITE_ANALYTICS_ENDPOINT%"
+      shipped as a URL and every page load logged a failed request.
+    -->
   </body>
 </html>

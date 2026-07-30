@@ -8,6 +8,7 @@ import { createContext } from "./context";
 import { db, client } from "../db/client";
 import { BOOTSTRAP_SQL } from "../db/bootstrap-sql";
 import { createRestApi } from "../rest";
+import { DEV_AUTH_ENABLED } from "../auth/devAuth";
 
 export function createApp() {
   const app = express();
@@ -31,7 +32,10 @@ export function createApp() {
       Boolean(process.env.CRON_SECRET) &&
       req.query.secret === process.env.CRON_SECRET;
 
-    const clerkSecret = Boolean(process.env.CLERK_SECRET_KEY);
+    // Dev sign-in is an accepted substitute for Clerk locally — otherwise the
+    // probe reports 503 on a setup that is in fact working.
+    const clerkSecret =
+      Boolean(process.env.CLERK_SECRET_KEY) || DEV_AUTH_ENABLED;
     const databaseUrl = Boolean(
       process.env.DATABASE_URL ||
         process.env.POSTGRES_URL ||
@@ -86,7 +90,7 @@ export function createApp() {
       {
         name: "clerk_secret_key",
         ok: clerkSecret,
-        fix: "Set CLERK_SECRET_KEY (Clerk dashboard → API keys) in your host's environment variables. Sign-in cannot be verified without it.",
+        fix: "Set CLERK_SECRET_KEY (Clerk dashboard → API keys) in your host's environment variables. Sign-in cannot be verified without it. For local development only, DEV_AUTH=1 satisfies this check instead.",
       },
       {
         name: "database_url",
@@ -119,6 +123,9 @@ export function createApp() {
         ...(c.ok ? {} : { fix: c.fix }),
       })),
       ...(error ? { error } : {}),
+      // Stated unconditionally when on: an unverified-sign-in mode is not
+      // something to discover by reading the environment.
+      ...(DEV_AUTH_ENABLED ? { devAuth: true } : {}),
       ...(detailed ? { currentDatabase, usersIdType, publicTables } : {}),
     });
   });
@@ -154,7 +161,10 @@ export function createApp() {
     } catch (e) {
       res
         .status(500)
-        .json({ applied: false, error: e instanceof Error ? e.message : String(e) });
+        .json({
+          applied: false,
+          error: e instanceof Error ? e.message : String(e),
+        });
     }
   });
 

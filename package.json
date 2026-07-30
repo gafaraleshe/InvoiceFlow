@@ -25,6 +25,7 @@
     "gen:bootstrap": "node scripts/gen-bootstrap-sql.mjs",
     "connect": "node scripts/connect.mjs",
     "seed:owner": "tsx scripts/seed-owner.ts",
+    "seed:dev": "tsx scripts/seed-dev.ts",
     "format": "prettier --write .",
     "test": "vitest run",
     "db:push": "drizzle-kit generate && drizzle-kit migrate",

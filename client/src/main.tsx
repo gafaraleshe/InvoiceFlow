@@ -7,7 +7,10 @@ import superjson from "superjson";
 import App from "./App";
 import { getLoginUrl } from "./const";
 import { getAuthHeaders } from "./lib/auth";
+import { initAnalytics } from "./analytics";
 import "./index.css";
+
+initAnalytics();
 
 const queryClient = new QueryClient();
 
