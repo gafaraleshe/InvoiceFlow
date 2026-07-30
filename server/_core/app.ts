@@ -2,8 +2,8 @@ import "dotenv/config";
 import express from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { sql } from "drizzle-orm";
-import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
+import { flagOverdueInvoicesAllOrgs } from "../db";
 import { createContext } from "./context";
 import { db, client, dbConfigError } from "../db/client";
 import { BOOTSTRAP_SQL } from "../db/bootstrap-sql";
@@ -181,7 +181,29 @@ export function createApp() {
     }
   });
 
-  registerOAuthRoutes(app);
+  /**
+   * Scheduled maintenance. Gated by CRON_SECRET, which must be set — an unset
+   * secret denies every caller rather than opening the endpoint up.
+   *
+   * This is the only place the cross-tenant overdue sweep may run. The
+   * equivalent tRPC procedure is scoped to the caller's own organization.
+   */
+  app.get("/api/jobs/flag-overdue", async (req, res) => {
+    const secret = process.env.CRON_SECRET;
+    const provided =
+      req.query.secret ?? req.headers.authorization?.replace(/^Bearer /i, "");
+    if (!secret || provided !== secret) {
+      return res.status(401).json({ error: "unauthorized" });
+    }
+    try {
+      const flagged = await flagOverdueInvoicesAllOrgs();
+      res.json({ flagged });
+    } catch (e) {
+      res
+        .status(500)
+        .json({ error: e instanceof Error ? e.message : String(e) });
+    }
+  });
 
   // Public REST API (API-key auth) — separate from the web session's tRPC path.
   app.use("/api/v1", createRestApi());

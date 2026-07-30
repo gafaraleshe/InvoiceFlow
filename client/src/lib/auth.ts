@@ -72,29 +72,6 @@ function encodeDevToken(identity: DevIdentity): string {
 /** localStorage key holding the user's selected active organization id. */
 export const ACTIVE_ORG_KEY = "hermiteflow.activeOrg";
 
-/** Pre-rebrand key. Read once on boot so nobody loses their active org. */
-// TODO(hermite): remove after env cutover
-const LEGACY_ACTIVE_ORG_KEY = "invoiceflow.activeOrg";
-
-/**
- * Move a pre-rebrand active-org selection onto the new key. Runs once at
- * module load; a no-op for anyone who never had the old key.
- */
-// TODO(hermite): remove after env cutover
-function migrateLegacyActiveOrg(): void {
-  try {
-    if (localStorage.getItem(ACTIVE_ORG_KEY)) return;
-    const legacy = localStorage.getItem(LEGACY_ACTIVE_ORG_KEY);
-    if (!legacy) return;
-    localStorage.setItem(ACTIVE_ORG_KEY, legacy);
-    localStorage.removeItem(LEGACY_ACTIVE_ORG_KEY);
-  } catch {
-    // Storage unavailable (private mode, blocked cookies) — nothing to migrate.
-  }
-}
-
-if (typeof localStorage !== "undefined") migrateLegacyActiveOrg();
-
 type ClerkGlobal = {
   session?: { getToken: () => Promise<string | null> } | null;
 };

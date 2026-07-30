@@ -2,7 +2,7 @@
   "name": "hermite-labs",
   "version": "1.0.0",
   "private": true,
-  "description": "Hermite Labs — the parent site (hermitelabs.com) and HermiteFlow (flow.hermitelabs.com), served from one deployment.",
+  "description": "Hermite Labs \u2014 the parent site (hermitelabs.com) and HermiteFlow (flow.hermitelabs.com), served from one deployment.",
   "homepage": "https://hermitelabs.com",
   "repository": {
     "type": "git",
@@ -28,7 +28,6 @@
     "seed:dev": "tsx scripts/seed-dev.ts",
     "format": "prettier --write .",
     "test": "vitest run",
-    "db:push": "drizzle-kit generate && drizzle-kit migrate",
     "db:pg:generate": "drizzle-kit generate --config drizzle.config.pg.ts && node scripts/gen-bootstrap-sql.mjs",
     "db:pg:migrate": "drizzle-kit migrate --config drizzle.config.pg.ts"
   },
@@ -72,7 +71,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
-    "cookie": "^1.0.2",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.2",
     "drizzle-orm": "^0.44.5",
@@ -82,7 +80,6 @@
     "jose": "6.1.0",
     "lucide-react": "^0.453.0",
     "motion": "^12.42.2",
-    "mysql2": "^3.15.0",
     "nanoid": "^5.1.5",
     "next-themes": "^0.4.6",
     "postgres": "^3.4.9",

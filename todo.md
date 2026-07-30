@@ -76,7 +76,7 @@
 
 ## DevOps
 - [x] Docker Compose configuration (API + PostgreSQL)
-- [ ] GitHub Actions CI/CD pipeline (lint, test, build, docker) — not set up; no .github/workflows/
+- [x] GitHub Actions CI pipeline (typecheck, test, build, schema-artifact drift check)
 - [x] Dockerfile for the API (multi-stage build)
 - [x] .dockerignore file
 

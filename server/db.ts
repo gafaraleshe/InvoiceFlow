@@ -870,8 +870,36 @@ export async function resolveApiKeyContext(
   };
 }
 
-/** Flip sent invoices past their due date to overdue (all orgs). */
-export async function flagOverdueInvoices() {
+/**
+ * Flip sent invoices past their due date to overdue, for ONE organization.
+ *
+ * This is the variant any request-scoped caller must use. The unscoped sweep
+ * below writes rows belonging to every tenant, which is never correct to run on
+ * behalf of a signed-in user.
+ */
+export async function flagOverdueInvoicesForOrg(orgId: string) {
+  const rows = await db
+    .update(invoices)
+    .set({ status: "overdue" })
+    .where(
+      and(
+        eq(invoices.organizationId, orgId),
+        eq(invoices.status, "sent"),
+        sql`${invoices.dueDate} < current_date`
+      )
+    )
+    .returning({ id: invoices.id });
+  return rows.length;
+}
+
+/**
+ * Flip sent invoices past their due date to overdue across EVERY organization.
+ *
+ * Deliberately not reachable from a user request: it is an unbounded write over
+ * the whole table and crosses tenant boundaries. Only the CRON_SECRET-gated job
+ * endpoint (`GET /api/jobs/flag-overdue`) may call it.
+ */
+export async function flagOverdueInvoicesAllOrgs() {
   const rows = await db
     .update(invoices)
     .set({ status: "overdue" })

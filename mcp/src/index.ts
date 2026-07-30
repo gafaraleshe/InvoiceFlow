@@ -6,9 +6,6 @@
  * Configure with two environment variables:
  *   HERMITE_FLOW_API_URL  – your site origin, e.g. https://flow.hermitelabs.com
  *   HERMITE_FLOW_API_KEY  – an API key (ifk_live_… / ifk_test_…) from the dashboard
- *
- * The legacy INVOICEFLOW_* names still work as a fallback during the env
- * cutover; see main() below.
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -42,12 +39,8 @@ export function createServer(client: HermiteFlowClient): McpServer {
 }
 
 async function main() {
-  // Prefer the HERMITE_* names; fall back to the legacy INVOICEFLOW_* ones so
-  // existing MCP client configs keep working across the env cutover.
-  // TODO(hermite): remove after env cutover
-  const baseUrl = process.env.HERMITE_FLOW_API_URL ?? process.env.INVOICEFLOW_API_URL;
-  // TODO(hermite): remove after env cutover
-  const apiKey = process.env.HERMITE_FLOW_API_KEY ?? process.env.INVOICEFLOW_API_KEY;
+  const baseUrl = process.env.HERMITE_FLOW_API_URL;
+  const apiKey = process.env.HERMITE_FLOW_API_KEY;
   if (!baseUrl || !apiKey) {
     console.error(
       "hermite-flow-mcp: set HERMITE_FLOW_API_URL and HERMITE_FLOW_API_KEY in the environment."

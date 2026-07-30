@@ -300,8 +300,10 @@ const dashboardRouter = router({
   recentInvoices: protectedProcedure.query(async ({ ctx }) => {
     return db.getInvoices(ctx.active.organizationId, { limit: 5 });
   }),
-  flagOverdue: protectedProcedure.mutation(async () => {
-    const count = await db.flagOverdueInvoices();
+  // Scoped to the caller's organization. The cross-tenant sweep lives on the
+  // CRON_SECRET-gated job endpoint, not here.
+  flagOverdue: protectedProcedure.mutation(async ({ ctx }) => {
+    const count = await db.flagOverdueInvoicesForOrg(ctx.active.organizationId);
     return { flagged: count };
   }),
 });

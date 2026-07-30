@@ -40,7 +40,7 @@ a public REST API, all on Vercel). Start here:
 
 **HermiteFlow** is a full-stack invoice management application designed for freelancers and small businesses operating in the UK. It handles the complete invoicing lifecycle — from creating clients and drafting invoices with itemised line items, through automatic UK VAT (20%) calculation, to generating professional invoice documents and emailing them directly to clients via the Resend API.
 
-The system features a clean, responsive dashboard UI with real-time statistics, a type-safe API layer powered by tRPC, Clerk authentication with organization-scoped role-based access control, and a test suite with 93 passing tests. It ships with Docker Compose for containerised deployment. **There is no CI pipeline yet** — see [CI/CD Pipeline](#cicd-pipeline) below and run `pnpm check && pnpm test && pnpm build` before pushing.
+The system features a clean, responsive dashboard UI with real-time statistics, a type-safe API layer powered by tRPC, Clerk authentication with organization-scoped role-based access control, and a test suite with 106 passing tests. It ships with Docker Compose for containerised deployment. CI runs typecheck, tests and both builds on every push — see [CI/CD Pipeline](#cicd-pipeline).
 
 ---
 
@@ -58,8 +58,8 @@ The system features a clean, responsive dashboard UI with real-time statistics, 
 | **Role-Based Access**   | Per-organization roles (owner/admin/member/viewer) with `adminProcedure` middleware enforcing elevated permissions                                               |
 | **Dashboard**           | Real-time KPI cards (total revenue, outstanding amount, invoice count, overdue count) and recent invoices table                                                 |
 | **Input Validation**    | Zod schemas enforcing type safety on all API inputs across clients, invoices, line items, and query parameters                                                  |
-| **Testing**             | 93 Vitest tests covering VAT, auth flows, RBAC, validation, line items, the REST API, schema artifacts, and the dev-auth gate                                    |
-| **CI/CD**               | _Not set up yet_ — no `.github/workflows/`; run `pnpm check && pnpm test && pnpm build` locally                                                                  |
+| **Testing**             | 106 Vitest tests covering VAT, auth flows, RBAC, validation, line items, the REST API, schema artifacts, and the dev-auth gate                                    |
+| **CI/CD**               | GitHub Actions on every push and PR: typecheck, 106 tests, both builds, and a stale-schema-artifact check                                                        |
 | **Containerisation**    | Multi-stage Dockerfile and Docker Compose with PostgreSQL, health checks, and volume persistence                                                                |
 
 ---
@@ -77,7 +77,7 @@ The system features a clean, responsive dashboard UI with real-time statistics, 
 | **Storage**        | AWS S3 for invoice document storage                             |
 | **Testing**        | Vitest with tRPC caller-based unit tests                        |
 | **Build**          | Vite 7 (frontend), esbuild (server), TypeScript 5.9             |
-| **DevOps**         | Docker, Docker Compose (no CI pipeline yet)                     |
+| **DevOps**         | Docker, Docker Compose, GitHub Actions CI                       |
 
 ---
 
@@ -102,21 +102,20 @@ hermite-flow/
 │   │   └── lib/trpc.ts         # tRPC client binding
 │   └── index.html
 ├── server/
-│   ├── _core/                  # Framework plumbing (auth, context, OAuth)
+│   ├── _core/                  # Framework plumbing (app, context, tRPC, vite)
+│   ├── auth/                   # Clerk verification + development sign-in
 │   ├── routers.ts              # tRPC procedures (clients, invoices, dashboard)
 │   ├── db.ts                   # Database query helpers
 │   ├── pdfGenerator.ts         # Invoice document generation
 │   ├── emailService.ts         # Resend email integration
 │   ├── storage.ts              # S3 file storage helpers
-│   ├── hermiteflow.test.ts     # Comprehensive test suite (33 tests)
-│   └── auth.logout.test.ts     # Auth logout test (1 test)
-├── drizzle/
-│   ├── schema.ts               # Database tables (users, clients, invoices, line_items)
-│   └── relations.ts            # Drizzle ORM relations
+│   ├── db/                     # Drizzle schema + Postgres client
+│   ├── rest/                   # Public REST API (/api/v1, API-key auth)
+│   └── *.test.ts               # Vitest suites (106 tests)
+├── drizzle/pg/                 # Postgres migrations, RLS policies, apply.sql
 ├── shared/
 │   ├── validation.ts           # Zod schemas shared between client & server
-│   ├── const.ts                # Shared constants
-│   └── types.ts                # Shared TypeScript types
+│   └── const.ts                # Shared constants
 ├── Dockerfile                  # Multi-stage production build
 ├── docker-compose.yml          # Full-stack containerised setup
 ├── vitest.config.ts            # Test configuration
@@ -389,7 +388,7 @@ Every variable, with provenance and notes, is documented in
 
 ## Testing
 
-The test suite contains **93 tests** across five test files (`server/hermiteflow.test.ts`,
+The test suite contains **106 tests** across seven test files (`server/hermiteflow.test.ts`,
 `server/rest.test.ts`, `server/bootstrap-sql.test.ts`, `server/auth/devAuth.test.ts`,
 `server/auth.logout.test.ts`), all executed with Vitest using tRPC's `createCaller` for
 direct procedure testing without HTTP overhead.
@@ -421,16 +420,20 @@ pnpm test
 
 ## CI/CD Pipeline
 
-> **Not set up yet.** This repository has no `.github/workflows/` directory — an
-> earlier version of this README described a pipeline that was never committed.
-> Until it exists, run the checks locally before pushing:
->
-> ```bash
-> pnpm check && pnpm test && pnpm build
-> ```
->
-> The intended pipeline (to be added during cutover) is: type check → tests →
-> build → Docker image on pushes to `main`.
+`.github/workflows/ci.yml` runs on every push to `main` and every pull request:
+
+| Step | What it catches |
+|---|---|
+| `pnpm check` | Type errors — including the field-name mismatches that once left the invoice number and VAT columns silently blank |
+| `pnpm test` | The 106-test suite (VAT, RBAC, tenant isolation, REST API, dev-auth gating, schema artifacts) |
+| `pnpm build` + `pnpm build:vercel` | Both entrypoints — they use different esbuild entries, so one can break without the other |
+| `pnpm gen:bootstrap` diff | Stale generated schema artifacts, which previously shipped a database with no `bookings` table |
+
+Run the same checks locally before pushing:
+
+```bash
+pnpm check && pnpm test && pnpm build
+```
 
 ---
 

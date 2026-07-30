@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A newer push to the same branch makes the in-flight run obsolete.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm check
+
+      - name: Test
+        run: pnpm test
+
+      # Builds both entrypoints: `build` produces the long-running server,
+      # `build:vercel` produces the serverless bundle that actually ships.
+      # They use different esbuild entry points, so a break in one does not
+      # necessarily show up in the other.
+      - name: Build (server)
+        run: pnpm build
+
+      - name: Build (Vercel bundle)
+        run: pnpm build:vercel
+
+      # The schema artifacts are generated from server/db/schema.ts. If someone
+      # edits the schema without running `pnpm gen:bootstrap`, apply.sql and
+      # BOOTSTRAP_SQL silently fall behind — which previously shipped a database
+      # with no `bookings` table at all.
+      - name: Check generated schema artifacts are up to date
+        run: |
+          pnpm gen:bootstrap
+          if ! git diff --quiet -- drizzle/pg/apply.sql server/db/bootstrap-sql.ts; then
+            echo "::error::Generated schema artifacts are stale. Run 'pnpm gen:bootstrap' and commit the result."
+            git diff --stat -- drizzle/pg/apply.sql server/db/bootstrap-sql.ts
+            exit 1
+          fi
