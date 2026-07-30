@@ -66,7 +66,7 @@ describe("dev auth gating", () => {
     expect(m.DEV_AUTH_ENABLED).toBe(false);
   });
 
-  it("refuses to boot a production server with DEV_AUTH set", async () => {
+  it("refuses to boot a long-running production server with DEV_AUTH set", async () => {
     const m = await loadWith({ DEV_AUTH: "1", NODE_ENV: "production" });
     expect(() => m.assertDevAuthSafe()).toThrow(
       /must never be enabled in production/
@@ -76,6 +76,27 @@ describe("dev auth gating", () => {
   it("boots cleanly when DEV_AUTH is unset in production", async () => {
     const m = await loadWith({ DEV_AUTH: undefined, NODE_ENV: "production" });
     expect(() => m.assertDevAuthSafe()).not.toThrow();
+  });
+
+  it("flags — but does not throw on — the serverless misconfiguration", async () => {
+    // The serverless entrypoint must never throw at module scope: that fails
+    // every invocation including /api/health, the endpoint that diagnoses it.
+    const m = await loadWith({ DEV_AUTH: "1", NODE_ENV: "production" });
+    expect(m.DEV_AUTH_MISCONFIGURED).toBe(true);
+    expect(() => m.warnIfDevAuthMisconfigured()).not.toThrow();
+    // Inert either way — no dev token is accepted on this path.
+    expect(m.DEV_AUTH_ENABLED).toBe(false);
+  });
+
+  it("does not flag a correctly configured process", async () => {
+    for (const env of [
+      { DEV_AUTH: undefined, NODE_ENV: "production" },
+      { DEV_AUTH: "1", NODE_ENV: "development" },
+      { DEV_AUTH: undefined, NODE_ENV: "development" },
+    ]) {
+      const m = await loadWith(env);
+      expect(m.DEV_AUTH_MISCONFIGURED, JSON.stringify(env)).toBe(false);
+    }
   });
 });
 

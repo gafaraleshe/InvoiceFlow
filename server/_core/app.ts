@@ -5,10 +5,10 @@ import { sql } from "drizzle-orm";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
-import { db, client } from "../db/client";
+import { db, client, dbConfigError } from "../db/client";
 import { BOOTSTRAP_SQL } from "../db/bootstrap-sql";
 import { createRestApi } from "../rest";
-import { DEV_AUTH_ENABLED } from "../auth/devAuth";
+import { DEV_AUTH_ENABLED, DEV_AUTH_MISCONFIGURED } from "../auth/devAuth";
 
 export function createApp() {
   const app = express();
@@ -49,7 +49,7 @@ export function createApp() {
     let schemaApplied = false;
     let error: string | undefined;
 
-    if (databaseUrl) {
+    if (databaseUrl && !dbConfigError) {
       try {
         const meta = (await db.execute(
           sql`select current_database() as db`
@@ -98,9 +98,22 @@ export function createApp() {
         fix: "Set DATABASE_URL to the Supabase pooled connection string (Project Settings → Database → Connection string → URI, Transaction mode).",
       },
       {
+        name: "database_url_parses",
+        ok: !dbConfigError,
+        fix:
+          "DATABASE_URL is set but is not a valid connection string" +
+          (dbConfigError ? ` (${dbConfigError})` : "") +
+          ". Almost always an un-encoded password: percent-encode % as %25, @ as %40, + as %2B, / as %2F — or reset the database password to letters and digits only.",
+      },
+      {
         name: "database_reachable",
         ok: dbConnect,
         fix: "The connection string is set but the database refused it. Check the password and that the project is not paused.",
+      },
+      {
+        name: "dev_auth_not_in_production",
+        ok: !DEV_AUTH_MISCONFIGURED,
+        fix: "DEV_AUTH is set on a production deployment. It is being ignored (dev sign-in can never activate in production), but it must not be set here — remove it from this environment's variables.",
       },
       {
         name: "schema_applied",

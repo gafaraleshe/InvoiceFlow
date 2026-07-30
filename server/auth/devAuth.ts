@@ -40,25 +40,47 @@ const isProduction = process.env.NODE_ENV === "production";
 export const DEV_AUTH_ENABLED = envFlag(process.env.DEV_AUTH) && !isProduction;
 
 /**
- * Refuse to boot a production server that was asked to enable dev sign-in.
+ * `DEV_AUTH` is set on a production build — a misconfiguration.
  *
- * `DEV_AUTH_ENABLED` is already false in that case, so this is belt-and-braces:
- * a deploy with `DEV_AUTH=1` in its environment is a misconfiguration worth
- * failing loudly on, not silently ignoring.
+ * It is *inert*: `DEV_AUTH_ENABLED` is already false, so no dev token can ever
+ * be accepted here. This flag exists so the misconfiguration can be reported
+ * rather than merely ignored.
+ */
+export const DEV_AUTH_MISCONFIGURED =
+  envFlag(process.env.DEV_AUTH) && isProduction;
+
+const MISCONFIGURED_MESSAGE =
+  "DEV_AUTH is set but NODE_ENV=production. Dev sign-in accepts any " +
+  "identity without verification and must never be enabled in production. " +
+  "Unset DEV_AUTH.";
+
+/**
+ * Refuse to boot a long-running production server that was asked to enable dev
+ * sign-in. Throws, so the process exits non-zero and a supervisor treats it as
+ * the failure it is.
+ *
+ * Only for the long-running entrypoint (`server/_core/index.ts`). The
+ * serverless entry deliberately does NOT call this: there, throwing at module
+ * scope takes down every route including /api/health, turning a
+ * one-line-to-fix misconfiguration into an opaque FUNCTION_INVOCATION_FAILED
+ * with no way to diagnose it. That path reports `DEV_AUTH_MISCONFIGURED`
+ * through the health probe instead. The security property does not depend on
+ * this throw — it comes from `DEV_AUTH_ENABLED` being false in production.
  */
 export function assertDevAuthSafe(): void {
-  if (envFlag(process.env.DEV_AUTH) && isProduction) {
-    throw new Error(
-      "DEV_AUTH is set but NODE_ENV=production. Dev sign-in accepts any " +
-        "identity without verification and must never be enabled in " +
-        "production. Unset DEV_AUTH."
-    );
-  }
+  if (DEV_AUTH_MISCONFIGURED) throw new Error(MISCONFIGURED_MESSAGE);
   if (DEV_AUTH_ENABLED) {
     console.warn(
       "\n  ⚠  DEV_AUTH is ON — any caller can sign in as anyone, unverified.\n" +
         "     For local development only. Never set DEV_AUTH in a deployed environment.\n"
     );
+  }
+}
+
+/** Log the misconfiguration without throwing. For the serverless entrypoint. */
+export function warnIfDevAuthMisconfigured(): void {
+  if (DEV_AUTH_MISCONFIGURED) {
+    console.error(`[auth] ${MISCONFIGURED_MESSAGE} (it is being ignored)`);
   }
 }
 
