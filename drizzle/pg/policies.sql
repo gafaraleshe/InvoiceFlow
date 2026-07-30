@@ -8,6 +8,23 @@
 --
 -- Apply AFTER the generated schema migration (0000_*.sql).
 
+-- Local development: a plain Postgres has no `auth` schema, so every policy
+-- below would fail to compile on `auth.uid()`. Provide a stub that returns NULL
+-- (matching no rows) when the real Supabase function is absent. On Supabase the
+-- `auth` schema already exists, so this block is a no-op and the genuine
+-- `auth.uid()` is used. Keeps one SQL artifact working against both.
+do $bootstrap$
+begin
+  if to_regnamespace('auth') is null then
+    raise notice 'no auth schema (not Supabase) — installing a NULL auth.uid() stub for local development';
+    create schema auth;
+    execute $stub$
+      create function auth.uid() returns uuid language sql stable as 'select null::uuid'
+    $stub$;
+  end if;
+end
+$bootstrap$;
+
 -- Is the current PostgREST user a member of the given organization?
 -- NB: user ids are Clerk strings (varchar), auth.uid() is a uuid — hence ::text.
 create or replace function public.is_org_member(org uuid)

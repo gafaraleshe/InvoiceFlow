@@ -3,6 +3,7 @@ import { createServer } from "http";
 import net from "net";
 import { createApp } from "./app";
 import { serveStatic, setupVite } from "./vite";
+import { assertDevAuthSafe } from "../auth/devAuth";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -45,4 +46,12 @@ async function startServer() {
   });
 }
 
-startServer().catch(console.error);
+// Before anything else: refuse to run at all if DEV_AUTH is set on a production
+// build. Deliberately outside startServer's .catch — this must exit non-zero so
+// a supervisor or deploy treats it as the failure it is, not a silent no-op.
+assertDevAuthSafe();
+
+startServer().catch(error => {
+  console.error(error);
+  process.exitCode = 1;
+});

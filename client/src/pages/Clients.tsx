@@ -81,7 +81,7 @@ export default function ClientsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.items.map((client: any) => (
+                  {data.items.map(client => (
                     <tr
                       key={client.id}
                       className="border-b last:border-0 hover:bg-muted/50 cursor-pointer transition-colors"

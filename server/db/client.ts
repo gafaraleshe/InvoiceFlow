@@ -10,6 +10,11 @@
  * runtime; prepared statements are disabled because PgBouncer transaction
  * pooling does not support them.
  */
+// Load .env here rather than only in the server entrypoint: standalone scripts
+// (pnpm seed:dev, seed:owner) import this module directly, and without it they
+// silently fall through to the placeholder connection below. dotenv never
+// overrides variables already set, so a real deployment's env still wins.
+import "dotenv/config";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";

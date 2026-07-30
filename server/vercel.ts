@@ -8,5 +8,10 @@
  * tracer fail with ERR_MODULE_NOT_FOUND.
  */
 import { createApp } from "./_core/app";
+import { assertDevAuthSafe } from "./auth/devAuth";
+
+// Throws at cold start (failing the function loudly) rather than serving traffic
+// with unverified sign-in enabled.
+assertDevAuthSafe();
 
 export default createApp();
