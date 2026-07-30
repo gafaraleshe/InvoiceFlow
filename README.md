@@ -2,12 +2,13 @@
   <h1 align="center">Hermite Labs</h1>
   <p align="center">
     Software for creative businesses, by Gaffy Studios. This repo is the Hermite Labs platform —
-    one deployment serving <a href="https://hermitelabs.com">hermitelabs.com</a> (the parent site)
-    and <a href="https://flow.hermitelabs.com">flow.hermitelabs.com</a> (<b>HermiteFlow</b>, the
-    CRM + invoicing product) via host-based routing. Built with TypeScript, React, Express, and tRPC.
+    it deploys <a href="https://flow.hermitelabs.com">flow.hermitelabs.com</a> (<b>HermiteFlow</b>,
+    the CRM + invoicing product) and also carries the Hermite Labs parent site, which host-based
+    routing can serve from the same deployment. Today <a href="https://hermitelabs.com">hermitelabs.com</a>
+    is served by a separate project — see <a href="docs/DOMAINS.md">docs/DOMAINS.md</a>.
+    Built with TypeScript, React, Express, and tRPC.
   </p>
   <p align="center">
-    <a href="https://github.com/gafaraleshe/hermite/actions"><img src="https://github.com/gafaraleshe/hermite/actions/workflows/ci.yml/badge.svg" alt="CI/CD"></a>
     <img src="https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript" alt="TypeScript">
     <img src="https://img.shields.io/badge/Node.js-22-green?logo=node.js" alt="Node.js">
     <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" alt="React">
@@ -39,7 +40,7 @@ a public REST API, all on Vercel). Start here:
 
 **HermiteFlow** is a full-stack invoice management application designed for freelancers and small businesses operating in the UK. It handles the complete invoicing lifecycle — from creating clients and drafting invoices with itemised line items, through automatic UK VAT (20%) calculation, to generating professional invoice documents and emailing them directly to clients via the Resend API.
 
-The system features a clean, responsive dashboard UI with real-time statistics, a type-safe API layer powered by tRPC, OAuth 2.0 authentication with role-based access control, and a comprehensive test suite with 34 passing tests. It ships with Docker Compose for containerised deployment and a GitHub Actions CI/CD pipeline that runs linting, type checking, tests, and Docker builds on every push.
+The system features a clean, responsive dashboard UI with real-time statistics, a type-safe API layer powered by tRPC, Clerk authentication with organization-scoped role-based access control, and a test suite with 93 passing tests. It ships with Docker Compose for containerised deployment. **There is no CI pipeline yet** — see [CI/CD Pipeline](#cicd-pipeline) below and run `pnpm check && pnpm test && pnpm build` before pushing.
 
 ---
 
@@ -53,12 +54,12 @@ The system features a clean, responsive dashboard UI with real-time statistics, 
 | **Status Tracking**     | Four-stage lifecycle: `draft` → `sent` → `paid` / `overdue`, with automatic overdue flagging for past-due invoices                                              |
 | **Document Generation** | Professional HTML invoice documents with full company/client details, line item tables, and VAT breakdown, stored in S3                                         |
 | **Email Delivery**      | Send invoices to clients via the Resend API with branded HTML email templates containing invoice summary and document link                                      |
-| **Authentication**      | OAuth 2.0 sign-in with session-based cookies, protected and public procedure separation                                                                         |
-| **Role-Based Access**   | Admin and user roles with `adminProcedure` middleware enforcing elevated permissions                                                                            |
+| **Authentication**      | Clerk session tokens verified server-side; development-only sign-in for local work (`DEV_AUTH`)                                                                  |
+| **Role-Based Access**   | Per-organization roles (owner/admin/member/viewer) with `adminProcedure` middleware enforcing elevated permissions                                               |
 | **Dashboard**           | Real-time KPI cards (total revenue, outstanding amount, invoice count, overdue count) and recent invoices table                                                 |
 | **Input Validation**    | Zod schemas enforcing type safety on all API inputs across clients, invoices, line items, and query parameters                                                  |
-| **Testing**             | 34 Vitest tests covering VAT calculations, authentication flows, RBAC, input validation, and line item computations                                             |
-| **CI/CD**               | GitHub Actions pipeline with lint, type check, test, build, and Docker build stages                                                                             |
+| **Testing**             | 93 Vitest tests covering VAT, auth flows, RBAC, validation, line items, the REST API, schema artifacts, and the dev-auth gate                                    |
+| **CI/CD**               | _Not set up yet_ — no `.github/workflows/`; run `pnpm check && pnpm test && pnpm build` locally                                                                  |
 | **Containerisation**    | Multi-stage Dockerfile and Docker Compose with PostgreSQL, health checks, and volume persistence                                                                |
 
 ---
@@ -69,14 +70,14 @@ The system features a clean, responsive dashboard UI with real-time statistics, 
 | ------------------ | --------------------------------------------------------------- |
 | **Frontend**       | React 19, Tailwind CSS 4, shadcn/ui, Radix UI, Recharts, Wouter |
 | **Backend**        | Node.js 22, Express 4, tRPC 11, Superjson                       |
-| **Database**       | MySQL/TiDB via Drizzle ORM with migration support               |
+| **Database**       | Supabase Postgres via Drizzle ORM (postgres-js), RLS policies   |
 | **Validation**     | Zod 4 with shared schemas between client and server             |
-| **Authentication** | OAuth 2.0 with JWT session cookies (via Jose)                   |
+| **Authentication** | Clerk (`@clerk/backend` verifies session tokens)                |
 | **Email**          | Resend API (direct HTTP integration)                            |
 | **Storage**        | AWS S3 for invoice document storage                             |
 | **Testing**        | Vitest with tRPC caller-based unit tests                        |
 | **Build**          | Vite 7 (frontend), esbuild (server), TypeScript 5.9             |
-| **DevOps**         | Docker, Docker Compose, GitHub Actions                          |
+| **DevOps**         | Docker, Docker Compose (no CI pipeline yet)                     |
 
 ---
 
@@ -116,7 +117,6 @@ hermite-flow/
 │   ├── validation.ts           # Zod schemas shared between client & server
 │   ├── const.ts                # Shared constants
 │   └── types.ts                # Shared TypeScript types
-├── .github/workflows/ci.yml    # GitHub Actions CI/CD pipeline
 ├── Dockerfile                  # Multi-stage production build
 ├── docker-compose.yml          # Full-stack containerised setup
 ├── vitest.config.ts            # Test configuration
