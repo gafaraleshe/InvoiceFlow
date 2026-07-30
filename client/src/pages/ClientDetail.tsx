@@ -211,7 +211,7 @@ export default function ClientDetailPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {invoicesData.items.map((inv: any) => (
+                  {invoicesData.items.map(inv => (
                     <tr
                       key={inv.id}
                       className="border-b last:border-0 hover:bg-muted/50 cursor-pointer transition-colors"

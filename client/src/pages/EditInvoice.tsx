@@ -48,7 +48,7 @@ export default function EditInvoicePage() {
       setVatRate(Number(invoice.taxRate));
       setNotes(invoice.notes || "");
       setLineItems(
-        invoice.lineItems.map((item: any) => ({
+        invoice.lineItems.map(item => ({
           description: item.description,
           quantity: Number(item.quantity),
           unitPrice: Number(item.unitPrice),

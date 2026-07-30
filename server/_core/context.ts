@@ -4,6 +4,7 @@ import {
   verifyClerkToken,
   type AuthUser,
 } from "../auth/clerk";
+import { isDevToken, verifyDevToken } from "../auth/devAuth";
 import { resolveActiveContext, type ActiveContext } from "../db";
 
 export type TrpcContext = {
@@ -33,7 +34,12 @@ export async function createContext(
   // request, so public procedures keep working.
   try {
     const token = bearerFromHeader(opts.req.headers.authorization);
-    user = await verifyClerkToken(token);
+    // Dev tokens are only ever accepted when DEV_AUTH is on and this is not a
+    // production build; `verifyDevToken` returns null otherwise. The prefix
+    // check keeps the two token types from being fed to the wrong verifier.
+    user = isDevToken(token)
+      ? verifyDevToken(token)
+      : await verifyClerkToken(token);
   } catch (error) {
     console.error("[context] token verification failed:", error);
     user = null;

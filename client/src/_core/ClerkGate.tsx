@@ -1,6 +1,10 @@
 import { ClerkProvider } from "@clerk/clerk-react";
 import { Link } from "wouter";
-import { clerkConfigured, clerkPublishableKey } from "@/lib/auth";
+import {
+  clerkConfigured,
+  clerkPublishableKey,
+  devAuthEnabled,
+} from "@/lib/auth";
 import { useTheme } from "@/contexts/ThemeContext";
 
 /**
@@ -12,6 +16,10 @@ export function ClerkGate({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
+  // Dev sign-in replaces Clerk entirely — no provider, so nothing below this
+  // point may call a Clerk hook (see useAuth and Login, which both branch).
+  if (devAuthEnabled) return <>{children}</>;
+
   if (!clerkConfigured) {
     return (
       <div className="mkt flex min-h-screen items-center justify-center px-5 py-12 text-center">
@@ -20,10 +28,28 @@ export function ClerkGate({ children }: { children: React.ReactNode }) {
             Authentication isn&apos;t configured
           </h1>
           <p className="mt-3 text-[14px] leading-relaxed text-[var(--mkt-ink-subtle)]">
-            Set <code className="text-[var(--mkt-primary-soft)]">VITE_CLERK_PUBLISHABLE_KEY</code>{" "}
+            Set{" "}
+            <code className="text-[var(--mkt-primary-soft)]">
+              VITE_CLERK_PUBLISHABLE_KEY
+            </code>{" "}
             (and the server&apos;s{" "}
-            <code className="text-[var(--mkt-primary-soft)]">CLERK_SECRET_KEY</code>) to enable
-            sign-in. See <code className="text-[var(--mkt-primary-soft)]">docs/SETUP_GUIDE.md</code>.
+            <code className="text-[var(--mkt-primary-soft)]">
+              CLERK_SECRET_KEY
+            </code>
+            ) to enable sign-in. See{" "}
+            <code className="text-[var(--mkt-primary-soft)]">
+              docs/SETUP_GUIDE.md
+            </code>
+            .
+          </p>
+          <p className="mt-3 text-[13px] leading-relaxed text-[var(--mkt-ink-tertiary)]">
+            Running locally? Set{" "}
+            <code className="text-[var(--mkt-primary-soft)]">DEV_AUTH=1</code>{" "}
+            and{" "}
+            <code className="text-[var(--mkt-primary-soft)]">
+              VITE_DEV_AUTH=1
+            </code>{" "}
+            instead to sign in without Clerk — development only.
           </p>
           <Link
             href="/"

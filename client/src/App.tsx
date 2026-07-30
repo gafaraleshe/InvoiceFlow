@@ -32,7 +32,13 @@ import Login from "./pages/Login";
 
 // Path prefixes that belong to the authenticated dashboard app. Everything
 // else is served by the public marketing site.
-const APP_PREFIXES = ["/dashboard", "/invoices", "/clients", "/settings"];
+const APP_PREFIXES = [
+  "/dashboard",
+  "/bookings",
+  "/invoices",
+  "/clients",
+  "/settings",
+];
 
 function isAppPath(location: string) {
   return APP_PREFIXES.some(

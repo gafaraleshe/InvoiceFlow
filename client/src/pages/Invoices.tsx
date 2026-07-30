@@ -132,7 +132,7 @@ export default function InvoicesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.items.map((inv: any) => (
+                  {data.items.map(inv => (
                     <tr
                       key={inv.id}
                       className="border-b last:border-0 hover:bg-muted/50 cursor-pointer transition-colors"
@@ -140,7 +140,7 @@ export default function InvoicesPage() {
                     >
                       <td className="py-3 px-4">
                         <span className="font-mono text-sm font-medium">
-                          {inv.invoiceNumber}
+                          {inv.number}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-sm">
@@ -150,7 +150,7 @@ export default function InvoicesPage() {
                         {formatCurrency(inv.subtotal)}
                       </td>
                       <td className="py-3 px-4 text-sm font-mono text-muted-foreground">
-                        {formatCurrency(inv.vatAmount)}
+                        {formatCurrency(inv.taxAmount)}
                       </td>
                       <td className="py-3 px-4 text-sm font-mono font-semibold">
                         {formatCurrency(inv.total)}

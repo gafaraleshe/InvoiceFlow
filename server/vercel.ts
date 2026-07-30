@@ -8,5 +8,12 @@
  * tracer fail with ERR_MODULE_NOT_FOUND.
  */
 import { createApp } from "./_core/app";
+import { warnIfDevAuthMisconfigured } from "./auth/devAuth";
+
+// Log — deliberately do NOT throw. In a serverless runtime a module-scope throw
+// fails every invocation, including /api/health, which is the endpoint that
+// would tell you what is misconfigured. Dev sign-in is already inert in
+// production (see devAuth.ts); the health probe reports the misconfiguration.
+warnIfDevAuthMisconfigured();
 
 export default createApp();

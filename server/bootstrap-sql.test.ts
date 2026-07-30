@@ -78,11 +78,28 @@ describe("generated schema artifacts", () => {
   it("casts auth.uid() to text in RLS policies", () => {
     // users.id / memberships.user_id are Clerk strings (varchar); auth.uid()
     // is a uuid. Without the cast Postgres rejects the comparison outright.
+    //
+    // The local-dev stub block declares auth.uid() rather than comparing against
+    // it, so it is excluded — that block is covered by the test below.
     const executable = APPLY_SQL.split("\n")
       .filter(line => !line.trimStart().startsWith("--"))
-      .join("\n");
+      .join("\n")
+      .replace(/do \$bootstrap\$[\s\S]*?\$bootstrap\$;/g, "");
     expect(executable).toContain("auth.uid()::text");
     expect(executable).not.toMatch(/auth\.uid\(\)(?!::text)/);
+  });
+
+  it("installs an auth.uid() stub when there is no auth schema", () => {
+    // Supabase provides auth.uid(); a plain local Postgres does not, and every
+    // policy would fail to compile without it. The stub returns NULL, so the
+    // policies match no rows — the API connects as the table owner and bypasses
+    // RLS anyway. Guarded on the schema being absent, so it is a no-op on
+    // Supabase and the real auth.uid() is used there.
+    expect(APPLY_SQL).toMatch(/if to_regnamespace\('auth'\) is null then/);
+    expect(APPLY_SQL).toContain("create schema auth");
+    expect(APPLY_SQL).toMatch(
+      /create function auth\.uid\(\) returns uuid language sql stable as 'select null::uuid'/
+    );
   });
 
   it("enables row level security on every org-scoped table", () => {

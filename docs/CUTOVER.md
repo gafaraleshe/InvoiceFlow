@@ -5,17 +5,28 @@ login or a secret. The application itself is built and verified: CRM, public
 API, MCP server and schema all work end to end (see *What is already done* at
 the bottom).
 
-Work top to bottom. Step 0 is the one currently breaking the site.
+Work top to bottom. **Step 4 (`DATABASE_URL`) is the one currently breaking
+sign-in** — `flow.hermitelabs.com/api/health` returns 503 with `database_url`
+unset, and every check below it fails as a consequence rather than on its own.
+
+Verify progress at any point with <https://flow.hermitelabs.com/api/health>:
+it reports each requirement separately and names the exact fix for whatever is
+failing. All five green means sign-in works.
 
 ---
 
-## 0. Point `flow.hermitelabs.com` at the right Vercel project
+## 0. Point `flow.hermitelabs.com` at the right Vercel project — ✅ DONE
 
-**Symptom:** `flow.hermitelabs.com` currently serves the *Hermite Labs parent
-site*, not HermiteFlow. The DNS is correct; the domain is attached to the wrong
-project.
+> This step is complete. `flow.hermitelabs.com` serves HermiteFlow, and
+> `hermitelabs.com` / `www.hermitelabs.com` serve the parent site. Kept here for
+> reference; skip to step 1.
 
-There are two Vercel projects:
+**Original symptom:** `flow.hermitelabs.com` served the *Hermite Labs parent
+site*, not HermiteFlow. The DNS was correct; the domain was attached to the
+wrong project.
+
+There are two Vercel projects (see [`DOMAINS.md`](./DOMAINS.md) for whether to
+keep it that way):
 
 | Project | Builds from | Should serve |
 |---|---|---|

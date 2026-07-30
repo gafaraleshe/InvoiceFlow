@@ -192,7 +192,7 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                  {recentInvoices.map((inv: any) => (
+                  {recentInvoices.map(inv => (
                     <tr
                       key={inv.id}
                       className="border-b last:border-0 hover:bg-muted/50 cursor-pointer transition-colors"
@@ -200,7 +200,7 @@ export default function Home() {
                     >
                       <td className="py-3 px-2">
                         <span className="font-mono text-sm font-medium">
-                          {inv.invoiceNumber}
+                          {inv.number}
                         </span>
                       </td>
                       <td className="py-3 px-2 text-sm">
