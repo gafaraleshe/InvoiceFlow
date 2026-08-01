@@ -2,7 +2,7 @@
 
 **Phase 0 — Audit. No code has been changed.**
 
-Audit date: 2026-07-24 · Repo: `gafaraleshe/InvoiceFlow` @ `fe011da` · Branch: `claude/new-session-wrbp07`
+Audit date: 2026-07-24 · Repo: `gafaraleshe/InvoiceFlow` @ `fe011da`
 
 ---
 

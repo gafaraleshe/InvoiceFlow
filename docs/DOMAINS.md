@@ -7,7 +7,7 @@ Two Vercel projects, each serving its own hosts:
 | Vercel project | Builds from | Serves |
 |---|---|---|
 | `invoice-flow` | `gafaraleshe/InvoiceFlow`, branch `main` | `flow.hermitelabs.com` — **HermiteFlow**: marketing at `/`, app at `/dashboard`, API at `/api/v1` |
-| `hermite` | `gafaraleshe/hermite`, branch `claude/hermite-resolve-plugin-cf4zzx` (the Next.js app in `site/`) | `hermitelabs.com`, `www.hermitelabs.com` — the **Hermite Labs** parent site |
+| `hermite` | `gafaraleshe/hermite`, branch `main` (the Next.js app in `site/`) | `hermitelabs.com`, `www.hermitelabs.com` — the **Hermite Labs** parent site |
 
 The photography site (`shotbygafar`) stays its own repo/project — it is a
 separate website that *talks to* HermiteFlow over the API.

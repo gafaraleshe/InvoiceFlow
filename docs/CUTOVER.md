@@ -30,7 +30,7 @@ keep it that way):
 
 | Project | Builds from | Should serve |
 |---|---|---|
-| `hermite` | `gafaraleshe/hermite` (branch `claude/hermite-resolve-plugin-cf4zzx`) | `hermitelabs.com` |
+| `hermite` | `gafaraleshe/hermite` (branch `main`) | `hermitelabs.com` |
 | `invoice-flow` | `gafaraleshe/InvoiceFlow` (branch `main`) | `flow.hermitelabs.com` |
 
 1. <https://vercel.com/gafitenisons-projects/hermite> → **Settings → Domains**
