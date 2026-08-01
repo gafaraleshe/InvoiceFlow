@@ -75,10 +75,10 @@ const FEATURES = [
     icon: Plug,
     label: "API & MCP",
     title: "Open API, built for agents",
-    body: "Everything in the UI is in the public REST API at /api/v1, with an OpenAPI spec and a Model Context Protocol server so Claude and other agents can run your studio as tools.",
+    body: "Everything in the UI is in the public REST API at /api/v1, with an OpenAPI spec and a Model Context Protocol server so AI agents can run your studio as tools.",
     points: [
       "REST API at /api/v1 with OpenAPI spec",
-      "@hermitelabs/flow-mcp for Claude",
+      "@hermitelabs/flow-mcp for AI agents",
       "Organization-scoped keys & RLS",
     ],
   },
@@ -459,7 +459,7 @@ function FeatureVisual({ id }: { id: string }) {
       <Mono color={LX.body}>{"  \"total\": 14, \"page\": 1"}</Mono>
       <Mono color={LX.success}>{"}"}</Mono>
       <div className="mt-3 border-t pt-3" style={{ borderColor: LX.hairline }}>
-        <Mono color={LX.muted}># from Claude, via MCP</Mono>
+        <Mono color={LX.muted}># from an AI agent, via MCP</Mono>
         <Mono color={LX.primaryGlow}>convert_booking_to_invoice(bk_9f2)</Mono>
       </div>
     </div>

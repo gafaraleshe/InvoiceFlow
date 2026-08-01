@@ -150,7 +150,7 @@ curl -X POST https://YOURDOMAIN/api/v1/invoices/in_456/send \
 ## MCP server
 
 The [`mcp/`](../mcp) package wraps this REST API as a Model Context Protocol
-server, so assistants (Claude Code, Claude Desktop) can manage clients and
+server, so AI assistants can manage clients and
 invoices. It talks to the API over HTTP using:
 
 | Variable | Example |
@@ -158,7 +158,8 @@ invoices. It talks to the API over HTTP using:
 | `HERMITE_FLOW_API_URL` | `https://flow.hermitelabs.com` |
 | `HERMITE_FLOW_API_KEY` | `ifk_live_…` |
 
-Configure it in `.mcp.json` (Claude Code) or `claude_desktop_config.json`:
+Configure it in your MCP client's config (for example `.mcp.json` in your
+project root):
 
 ```json
 {

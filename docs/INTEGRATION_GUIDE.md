@@ -123,10 +123,10 @@ GET    /me                       Workspace + access level ({ owner, scopes })
 The full REST reference is in [`API.md`](./API.md); the machine-readable spec is
 served at `/api/v1/openapi.json`.
 
-## Connect from Claude (MCP)
+## Connect from an AI assistant (MCP)
 
 The [`@hermitelabs/flow-mcp`](../mcp) server exposes the whole API — including
-bookings — as tools, so you can run your CRM from Claude in natural language.
+bookings — as tools, so you can run your CRM in natural language.
 
 ```json
 {

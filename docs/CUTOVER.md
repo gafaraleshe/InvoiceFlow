@@ -221,8 +221,7 @@ booking→invoice conversion, PDF and email.
 cd mcp && pnpm install && pnpm build
 ```
 
-Then in your MCP client config (Claude Desktop:
-`~/Library/Application Support/Claude/claude_desktop_config.json`):
+Then in your MCP client's config:
 
 ```json
 {

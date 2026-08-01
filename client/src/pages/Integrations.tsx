@@ -366,13 +366,13 @@ export default function IntegrationsPage() {
                 <div>
                   <p className="text-sm font-medium leading-none">MCP server</p>
                   <p className="text-muted-foreground text-xs mt-1">
-                    Claude / AI agents
+                    AI agents
                   </p>
                 </div>
               </div>
               <p className="text-muted-foreground text-sm flex-1">
-                Manage clients, invoices and bookings from Claude in natural
-                language, over the same REST API.
+                Manage clients, invoices and bookings from an AI assistant in
+                natural language, over the same REST API.
               </p>
               <Button asChild variant="outline" size="sm" className="w-full">
                 <a href="/docs#mcp" target="_blank" rel="noreferrer">

@@ -255,13 +255,12 @@ owner/admin only) — a separate path from the API keys themselves.
 
 ## MCP server
 
-An MCP server in [`mcp/`](mcp/) wraps this REST API so assistants (Claude Code,
-Claude Desktop) can manage invoicing conversationally. It ships as its own
+An MCP server in [`mcp/`](mcp/) wraps this REST API so AI assistants can
+manage invoicing conversationally. It ships as its own
 package (`node mcp/dist/index.js`) and is configured with two env vars —
 `HERMITE_FLOW_API_URL` and `HERMITE_FLOW_API_KEY`. Tools include `list_clients`,
 `create_invoice`, `send_invoice_email`, `get_dashboard_stats`, and more. See
-[`mcp/README.md`](mcp/README.md) for the exact `.mcp.json` /
-`claude_desktop_config.json` snippet.
+[`mcp/README.md`](mcp/README.md) for the exact `.mcp.json` snippet.
 
 ---
 

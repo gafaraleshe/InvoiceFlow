@@ -1,7 +1,7 @@
 {
   "name": "@hermite/flow-mcp",
   "version": "1.0.0",
-  "description": "Model Context Protocol server for the HermiteFlow REST API — manage bookings, clients and invoices from Claude.",
+  "description": "Model Context Protocol server for the HermiteFlow REST API — manage bookings, clients and invoices from an AI assistant.",
   "type": "module",
   "bin": {
     "hermite-flow-mcp": "dist/index.js"

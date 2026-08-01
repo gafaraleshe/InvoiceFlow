@@ -1,7 +1,7 @@
 # @hermitelabs/flow-mcp
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server that exposes
-the **HermiteFlow REST API** as tools, so assistants like Claude can manage your
+the **HermiteFlow REST API** as tools, so AI assistants can manage your
 clients and invoices in natural language.
 
 It talks to the deployed HermiteFlow API over HTTP with an API key — it does not
@@ -51,29 +51,9 @@ HERMITE_FLOW_API_KEY=ifk_live_xxx \
 node dist/index.js
 ```
 
-## Use in Claude Code (`.mcp.json`)
+## Use in a project (`.mcp.json`)
 
-Add to `.mcp.json` in your project root (or `~/.claude.json`):
-
-```json
-{
-  "mcpServers": {
-    "hermite-flow": {
-      "command": "node",
-      "args": ["/absolute/path/to/HermiteFlow/mcp/dist/index.js"],
-      "env": {
-        "HERMITE_FLOW_API_URL": "https://flow.hermitelabs.com",
-        "HERMITE_FLOW_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
-      }
-    }
-  }
-}
-```
-
-## Use in Claude Desktop (`claude_desktop_config.json`)
-
-`~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or
-`%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+Add to `.mcp.json` in your project root:
 
 ```json
 {
@@ -90,7 +70,26 @@ Add to `.mcp.json` in your project root (or `~/.claude.json`):
 }
 ```
 
-Restart Claude Desktop after editing. If you publish the package, you can use
+## Use in a desktop MCP client
+
+Add the same block to your client's config file:
+
+```json
+{
+  "mcpServers": {
+    "hermite-flow": {
+      "command": "node",
+      "args": ["/absolute/path/to/HermiteFlow/mcp/dist/index.js"],
+      "env": {
+        "HERMITE_FLOW_API_URL": "https://flow.hermitelabs.com",
+        "HERMITE_FLOW_API_KEY": "ifk_live_xxxxxxxxxxxxxxxx"
+      }
+    }
+  }
+}
+```
+
+Restart the client after editing. If you publish the package, you can use
 `"command": "npx", "args": ["-y", "@hermitelabs/flow-mcp"]` instead of an absolute path.
 
 ## Develop
